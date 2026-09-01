@@ -43,8 +43,8 @@ export function wrapInLuxuryEmailTemplate({
         ${contentHtml}
       </div>
       <div class="footer">
-        &copy; ${new Date().getFullYear()} KHAVYN Fashion Private Limited. All rights reserved.<br/>
-        Need assistance? Contact our concierge at <a href="mailto:support@khavyn.com">support@khavyn.com</a> or WhatsApp <a href="https://wa.me/919373205258">+91 93732 05258</a>.
+        &copy; ${new Date().getFullYear()} KHAVYN. All rights reserved.<br/>
+        Need assistance? Contact our concierge at <a href="mailto:complaint@khavyn.com">complaint@khavyn.com</a> or WhatsApp <a href="https://wa.me/919373205258">+91 93732 05258</a>.
       </div>
     </div>
   </div>

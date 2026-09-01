@@ -30,7 +30,7 @@ const values = [
 ];
 
 const milestones = [
-  { year: "2022", title: "The Founding Vision", desc: "KHAVYN Fashion Private Limited was incorporated in Pune by a team of textile engineers and European-trained designers obsessed with accessible luxury." },
+  { year: "2022", title: "The Founding Vision", desc: "KHAVYN was founded by a team of textile engineers and European-trained designers obsessed with accessible luxury." },
   { year: "2023", title: "First Collection Launch", desc: "The inaugural Formal Shirts line — crafted from 100% yarn-dyed combed cotton — sold out in 72 hours, validating the demand for honest luxury." },
   { year: "2024", title: "Expansion to Knitwear", desc: "The 230 GSM Polo and Oversized lines were introduced, pioneering heavyweight pique knits priced for the modern professional wardrobe." },
   { year: "2025", title: "Pan-India Presence", desc: "KHAVYN expanded shipping to every pin code across India, with export orders beginning to arrive from UAE, UK, and the US." },
@@ -106,7 +106,7 @@ export default function AboutPage() {
               </div>
               {/* Floating stat card */}
               <div className="absolute -bottom-6 -left-6 bg-[#1A1A1A] text-white p-5 rounded-lg shadow-2xl border border-[#C6A664]/30 max-w-[180px]">
-                <p className="font-serif text-3xl font-bold text-[#C6A664]">230</p>
+                <p className="font-sans text-3xl font-bold text-[#C6A664]">230</p>
                 <p className="text-[10px] uppercase tracking-wider text-white/70 mt-1">GSM Heavyweight Knit</p>
                 <p className="text-[10px] text-white/50 mt-1 font-light">Our signature weight standard</p>
               </div>
@@ -126,7 +126,7 @@ export default function AboutPage() {
               { val: "3 Days", label: "Exchange Window" },
             ].map((s) => (
               <div key={s.label} className="space-y-1">
-                <p className="font-serif text-3xl sm:text-4xl font-bold text-[#C6A664]">{s.val}</p>
+                <p className="font-sans text-3xl sm:text-4xl font-bold text-[#C6A664]">{s.val}</p>
                 <p className="text-[11px] uppercase tracking-wider text-[#1A1A1A]/60">{s.label}</p>
               </div>
             ))}

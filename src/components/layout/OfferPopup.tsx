@@ -104,77 +104,20 @@ export const OfferPopup: React.FC = () => {
           <X className="w-5 h-5" />
         </button>
 
-        <div className="p-6 sm:p-8 text-center space-y-5">
-          {/* Badge & Icon */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1A1A1A] text-[#C6A664] rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Private Invitation</span>
-          </div>
+        <div className="p-8 sm:p-12 flex flex-col items-center justify-center text-center space-y-10">
+          <img 
+            src="/k-logo.png" 
+            alt="KHAVYN" 
+            className="w-48 sm:w-56 h-auto object-contain mx-auto" 
+          />
 
-          {/* Title & Subtitle */}
-          <div className="space-y-2">
-            <h3 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1A1A]">
-              {config.title}
-            </h3>
-            <p className="text-xs sm:text-sm text-[#1A1A1A]/70 max-w-md mx-auto leading-relaxed">
-              {config.subtitle}
-            </p>
-          </div>
-
-          {/* Coupon Code Pill */}
-          {config.couponCode && (
-            <div className="bg-[#F5F3EF] border border-[#D8C9B0] rounded-xl p-3 sm:p-4 flex items-center justify-between gap-3 max-w-sm mx-auto shadow-inner">
-              <div className="text-left">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-[#1A1A1A]/60 block">
-                  Use Privilege Code
-                </span>
-                <span className="font-mono text-base sm:text-lg font-bold text-[#1A1A1A] tracking-wider">
-                  {config.couponCode}
-                </span>
-              </div>
-              <button
-                onClick={handleCopyCode}
-                className="inline-flex items-center gap-1.5 bg-[#C6A664] hover:bg-[#1A1A1A] text-black hover:text-[#C6A664] px-3.5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 shadow-sm"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-emerald-700">Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copy</span>
-                  </>
-                )}
-              </button>
-            </div>
-          )}
-
-          {/* Complimentary Shipping Tag */}
-          <div className="inline-flex items-center gap-2 text-xs text-[#1A1A1A]/80 font-medium">
-            <Gift className="w-4 h-4 text-[#C6A664]" />
-            <span>{config.discountText}</span>
-          </div>
-
-          {/* CTA & Dismiss Buttons */}
-          <div className="pt-2 space-y-2.5">
-            <Link
-              href={config.ctaLink || "/shop"}
-              onClick={handleClose}
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-[#C6A664] text-white hover:text-black font-semibold text-xs uppercase tracking-[0.18em] py-3.5 px-6 rounded-xl transition-all duration-300 shadow-xl group"
-            >
-              <span>{config.ctaText}</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-
-            <button
-              onClick={handleClose}
-              className="text-[11px] uppercase tracking-widest text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors font-medium py-1"
-            >
-              Continue Browsing Atelier
-            </button>
-          </div>
+          <button
+            onClick={handleClose}
+            className="w-full inline-flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-[#C6A664] text-white hover:text-black font-semibold text-xs uppercase tracking-[0.18em] py-3.5 px-6 rounded-xl transition-all duration-300 shadow-xl group"
+          >
+            <span>Continue to Atelier</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </button>
         </div>
       </div>
     </div>

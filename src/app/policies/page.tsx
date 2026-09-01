@@ -60,7 +60,7 @@ export default function PoliciesIndexPage() {
             Legal & Policy Center
           </h1>
           <p className="text-xs sm:text-sm text-white/70 font-light leading-relaxed max-w-xl mx-auto">
-            Comprehensive legal governance, customer rights, shipping standards, and payment policies for KHAVYN Fashion Private Limited.
+            Comprehensive legal governance, customer rights, shipping standards, and payment policies for KHAVYN.
           </p>
         </div>
       </div>
@@ -103,10 +103,10 @@ export default function PoliciesIndexPage() {
         {/* Corporate Legal Info */}
         <div className="bg-[#1A1A1A] text-white p-8 rounded-xl border border-[#C6A664]/30 text-center space-y-3">
           <h4 className="font-serif text-xl font-bold text-[#C6A664]">
-            KHAVYN Fashion Private Limited
+            KHAVYN
           </h4>
           <p className="text-xs text-white/70 font-light max-w-xl mx-auto leading-relaxed">
-            GSTIN: 27AAMCK8767F1ZW • CIN: U74999PN2022PTC212345 • Registered Office: Samarth Nagar, New Sangavi, Pune – 411027, Maharashtra, India.
+            Crafting Everyday Luxury • Timeless European Menswear
           </p>
           <p className="text-[11px] text-white/50 pt-2 font-mono">
             Legal inquiries & governance requests: <a href="mailto:legal@khavyn.com" className="text-[#C6A664] hover:underline">legal@khavyn.com</a>

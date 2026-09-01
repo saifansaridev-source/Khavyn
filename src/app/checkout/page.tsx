@@ -69,7 +69,7 @@ export default function CheckoutPage() {
         key: orderData.key,
         amount: orderData.amount * 100,
         currency: "INR",
-        name: "KHAVYN Fashion Private Limited",
+        name: "KHAVYN",
         description:
           paymentType === "full"
             ? "100% Prepaid Luxury Order"

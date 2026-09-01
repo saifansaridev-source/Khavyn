@@ -6,6 +6,7 @@ import Image from "next/image";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { HomePreloader } from "@/components/layout/HomePreloader";
 import { WishlistButton } from "@/components/product/WishlistButton";
 import {
   Diamond,
@@ -30,9 +31,9 @@ export default function HomePage() {
 
   const bestSellers = storeProducts.filter((p) => p.isBestSeller).slice(0, 4);
 
-
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1A1A1A]">
+      <HomePreloader />
       <AnnouncementBar />
       <Header />
 
@@ -40,13 +41,12 @@ export default function HomePage() {
       <section className="relative w-full min-h-[85vh] bg-[#F0E9DD] flex items-center overflow-hidden border-b border-[#D8C9B0]/40">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85"
+            src="/hero-image.jpg"
             alt="KHAVYN European Luxury Menswear Lifestyle"
             fill
             priority
-            className="object-cover object-center opacity-35 mix-blend-multiply scale-105 transition-transform duration-1000"
+            className="object-cover object-top transition-transform duration-1000"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F2]/95 via-[#FAF7F2]/75 to-transparent" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
@@ -421,20 +421,20 @@ export default function HomePage() {
                 Crafting Everyday Luxury
               </h2>
               <p className="text-sm text-white/70 leading-relaxed font-light">
-                KHAVYN Fashion Private Limited was born out of a single obsession: creating garments that feel as remarkable as they look. We reject fast fashion, flimsy fabrics, and overt logos in favor of tailored lines, yarn-dyed combed cotton, and timeless European minimalism.
+                KHAVYN was born out of a single obsession: creating garments that feel as remarkable as they look. We reject fast fashion, flimsy fabrics, and overt logos in favor of tailored lines, yarn-dyed combed cotton, and timeless European minimalism.
               </p>
 
               <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
                 <div className="space-y-1">
-                  <h5 className="font-serif text-xl font-bold text-[#C6A664]">100%</h5>
+                  <h5 className="font-sans text-xl font-bold text-[#C6A664]">100%</h5>
                   <p className="text-[11px] text-white/60 uppercase tracking-wider">Combed Cotton</p>
                 </div>
                 <div className="space-y-1">
-                  <h5 className="font-serif text-xl font-bold text-[#C6A664]">230 GSM</h5>
+                  <h5 className="font-sans text-xl font-bold text-[#C6A664]">230 GSM</h5>
                   <p className="text-[11px] text-white/60 uppercase tracking-wider">Heavyweight Knit</p>
                 </div>
                 <div className="space-y-1">
-                  <h5 className="font-serif text-xl font-bold text-[#C6A664]">3 Days</h5>
+                  <h5 className="font-sans text-xl font-bold text-[#C6A664]">3 Days</h5>
                   <p className="text-[11px] text-white/60 uppercase tracking-wider">Easy Exchange</p>
                 </div>
               </div>

@@ -115,7 +115,7 @@ export default function ContactPage() {
 
                 <div className="space-y-5">
                   <a
-                    href="mailto:care@khavyn.com"
+                    href="mailto:complaint@khavyn.com"
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-10 h-10 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/30 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-[#C6A664]/20 transition-colors">
@@ -123,13 +123,14 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[#1A1A1A]/50 font-medium">Email</p>
-                      <p className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors">care@khavyn.com</p>
+                      <p className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors">complaint.khavyn@gmail.com</p>
+                      <p className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors">complaint@khavyn.com</p>
                       <p className="text-[11px] text-[#1A1A1A]/50 font-light mt-0.5">Response within 4–6 hours</p>
                     </div>
                   </a>
 
                   <a
-                    href="tel:+917841000001"
+                    href="tel:+919373205258"
                     className="flex items-start gap-4 group"
                   >
                     <div className="w-10 h-10 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/30 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-[#C6A664]/20 transition-colors">
@@ -137,25 +138,26 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[#1A1A1A]/50 font-medium">Phone / WhatsApp</p>
-                      <p className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors">+91 78410 00001</p>
+                      <p className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors">+91-9373205258</p>
                       <p className="text-[11px] text-[#1A1A1A]/50 font-light mt-0.5">Mon–Sat, 10 AM – 7 PM IST</p>
                     </div>
                   </a>
 
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <a href="https://share.google/LjPlIkzfZOwNMAwEU" target="_blank" rel="noreferrer" className="flex items-start gap-4 group">
+                    <div className="w-10 h-10 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/30 flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-[#C6A664]/20 transition-colors">
                       <MapPin className="w-4 h-4 text-[#C6A664]" />
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-[#1A1A1A]/50 font-medium">Registered Office</p>
-                      <p className="text-sm font-medium text-[#1A1A1A]">KHAVYN Fashion Private Limited</p>
-                      <p className="text-[11px] text-[#1A1A1A]/60 font-light mt-0.5 leading-relaxed">
-                        Samarth Nagar, New Sangavi,<br />
-                        Pune – 411027, Maharashtra, India<br />
+                      <p className="text-sm font-medium text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors">KHAVYN</p>
+                      <p className="text-[11px] text-[#1A1A1A]/60 font-light mt-0.5 leading-relaxed group-hover:text-[#C6A664]/80 transition-colors">
+                        Sr No 80/16 Samarth Nagar, New Sangavi,<br />
+                        Kavita Appt, Pimple Gurav, Haveli,<br />
+                        Pune - 411061, Maharashtra<br />
                         GST: 27AAMCK8767F1ZW
                       </p>
                     </div>
-                  </div>
+                  </a>
 
                   <div className="flex items-start gap-4">
                     <div className="w-10 h-10 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/30 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -169,6 +171,30 @@ export default function ContactPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-[#D8C9B0]/40" />
+
+              {/* Map */}
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
+                  Location Map
+                </p>
+                <div className="w-full h-48 rounded-lg overflow-hidden border border-[#D8C9B0]/40">
+                  <iframe 
+                    src="https://maps.google.com/maps?q=Sr+No+80/16+Samarth+Nagar,+New+Sangavi,+Pune,+Maharashtra&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                    width="100%" 
+                    height="100%" 
+                    style={{ border: 0 }} 
+                    allowFullScreen={false} 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+                <a href="https://share.google/LjPlIkzfZOwNMAwEU" target="_blank" rel="noreferrer" className="text-[11px] text-[#C6A664] hover:underline font-medium flex items-center gap-1">
+                  Open in Google Maps →
+                </a>
               </div>
 
               {/* Divider */}
@@ -382,7 +408,7 @@ export default function ContactPage() {
           <div className="text-center mt-10">
             <p className="text-xs text-[#1A1A1A]/50 font-light">
               Didn&apos;t find your answer?{" "}
-              <a href="mailto:care@khavyn.com" className="text-[#C6A664] hover:underline font-medium">
+              <a href="mailto:complaint@khavyn.com" className="text-[#C6A664] hover:underline font-medium">
                 Email our concierge
               </a>
             </p>

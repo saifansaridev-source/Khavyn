@@ -29,17 +29,16 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-[#1A1A1A] text-white border-t border-[#C6A664]/30 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 5-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+        {/* 6-Column Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 pb-12 border-b border-white/10">
           {/* Column 1: Brand */}
           <div className="lg:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
-              <span className="font-serif text-2xl font-bold tracking-[0.2em] text-[#C6A664]">
-                KHAVYN
-              </span>
-              <span className="block text-[9px] tracking-[0.25em] text-[#C6A664]/80 uppercase mt-0.5">
-                CRAFTING EVERYDAY LUXURY
-              </span>
+              <img
+                src="/logo.png"
+                alt="KHAVYN - Crafting Everyday Luxury"
+                className="h-12 sm:h-14 w-auto object-contain hover:opacity-90 transition-opacity"
+              />
             </Link>
             <p className="text-xs text-white/70 leading-relaxed">
               Premium European luxury fashion house for modern menswear. Designed with unyielding commitment to craftsmanship, timeless aesthetics, and ultimate fabric comfort.
@@ -65,7 +64,7 @@ export const Footer: React.FC = () => {
                 <InstagramIcon />
               </a>
               <a
-                href="https://linkedin.com/company/khavyn-fashion-pvt-ltd"
+                href="https://linkedin.com/company/khavyn"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="KHAVYN on LinkedIn"
@@ -181,48 +180,60 @@ export const Footer: React.FC = () => {
                   Payment Policy
                 </Link>
               </li>
+              <li>
+                <Link href="/policies/cookie" className="hover:text-[#C6A664] transition-colors">
+                  Cookie Policy
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 5: Newsletter */}
-          <div className="space-y-3">
-            <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
-              Private Privileges
-            </h4>
-            <p className="text-xs text-white/70 leading-relaxed">
-              Subscribe to receive exclusive access to capsule releases, private sales, and sartorial recommendations.
-            </p>
+          {/* Column 5 & 6: Newsletter & K Logo */}
+          <div className="lg:col-span-2 flex items-start justify-between gap-6">
+            <div className="space-y-3 flex-1">
+              <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
+                Private Privileges
+              </h4>
+              <p className="text-xs text-white/70 leading-relaxed max-w-xs">
+                Subscribe to receive exclusive access to capsule releases, private sales, and sartorial recommendations.
+              </p>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                alert("Thank you for subscribing to KHAVYN Private Privileges.");
-              }}
-              className="flex items-center border border-white/20 rounded overflow-hidden focus-within:border-[#C6A664]"
-            >
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                required
-                className="w-full bg-white/5 text-xs px-3 py-2.5 text-white focus:outline-none placeholder:text-white/40"
-              />
-              <button
-                type="submit"
-                className="bg-[#C6A664] text-black p-2.5 hover:bg-white transition-colors"
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  alert("Thank you for subscribing to KHAVYN Private Privileges.");
+                }}
+                className="flex items-center border border-white/20 rounded overflow-hidden focus-within:border-[#C6A664] max-w-xs"
               >
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  required
+                  className="w-full bg-white/5 text-xs px-3 py-2.5 text-white focus:outline-none placeholder:text-white/40"
+                />
+                <button
+                  type="submit"
+                  className="bg-[#C6A664] text-black p-2.5 hover:bg-white transition-colors"
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+            </div>
+            
+            <div className="hidden lg:flex items-center justify-center pt-2">
+              <img 
+                src="/k-logo.png" 
+                alt="KHAVYN K" 
+                className="w-44 h-auto object-contain opacity-90" 
+              />
+            </div>
           </div>
         </div>
 
         {/* Bottom Row */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/50">
           <div className="space-y-1 text-center md:text-left">
-            <p>© {new Date().getFullYear()} KHAVYN FASHION PRIVATE LIMITED. All Rights Reserved.</p>
-            <p className="text-[11px] text-white/40">
-              GST: 27AAMCK8767F1ZW | Registered Office: Samarth Nagar, New Sangavi, Pune – 411027, Maharashtra
-            </p>
+            <p>© {new Date().getFullYear()} KHAVYN. All Rights Reserved.</p>
           </div>
 
           {/* Payment Badges */}

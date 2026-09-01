@@ -77,14 +77,13 @@ export const Header: React.FC = () => {
               {/* Left-Aligned Logo with Luxury Animation */}
               <Link
                 href="/"
-                className="group inline-flex flex-col items-start text-left py-1 animate-logo-pop hover-gold-glow transition-transform duration-300"
+                className="group inline-flex items-center py-1 animate-logo-pop hover-gold-glow transition-transform duration-300"
               >
-                <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.22em] text-[#C6A664] group-hover:text-[#FAF7F2] transition-all duration-300 group-hover:tracking-[0.25em]">
-                  KHAVYN
-                </span>
-                <span className="text-[8px] sm:text-[9px] tracking-[0.28em] uppercase text-[#C6A664]/80 font-medium -mt-0.5 group-hover:text-[#C6A664] transition-colors">
-                  CRAFTING EVERYDAY LUXURY
-                </span>
+                <img
+                  src="/logo.png"
+                  alt="KHAVYN - Crafting Everyday Luxury"
+                  className="h-11 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                />
               </Link>
             </div>
 
@@ -128,7 +127,7 @@ export const Header: React.FC = () => {
                 href="/contact"
                 className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]"
               >
-                Concierge
+                Contact Us
               </Link>
             </nav>
 

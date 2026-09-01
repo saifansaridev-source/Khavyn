@@ -21,7 +21,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "KHAVYN | Crafting Everyday Luxury",
   description:
-    "Explore timeless European luxury menswear by KHAVYN Fashion Private Limited. Premium Formal Shirts, Polo T-Shirts, Oversized T-Shirts & Round Neck T-Shirts.",
+    "Explore timeless European luxury menswear by KHAVYN. Premium Formal Shirts, Polo T-Shirts, Oversized T-Shirts & Round Neck T-Shirts.",
   keywords: [
     "KHAVYN",
     "Luxury Menswear",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "Oversized T-Shirts",
     "Premium Indian Menswear",
   ],
-  authors: [{ name: "Khavyn Fashion Private Limited" }],
+  authors: [{ name: "KHAVYN" }],
   openGraph: {
     title: "KHAVYN | Crafting Everyday Luxury",
     description: "Premium European luxury fashion house for modern menswear.",
