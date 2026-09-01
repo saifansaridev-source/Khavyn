@@ -103,24 +103,24 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
     date: "Effective Date: August 1, 2026",
     sections: [
       {
-        heading: "1. 3-Day Inspection & Exchange Window",
-        body: "We offer a 3-day exchange window from the date of delivery. If your KHAVYN garment requires a size adjustment or has a manufacturing defect, you may initiate a exchange through your Account Portal.",
+        heading: "1. 7-Day Doorstep Exchange & Return Window",
+        body: "We offer a 7-day return and exchange window from the date of delivery. If your KHAVYN garment requires a size adjustment or has any manufacturing issue, you may easily initiate a request through your Account Portal or by contacting Concierge.",
       },
       {
-        heading: "2. Condition Requirements for Acceptance",
-        body: "To be eligible for exchange or refund, items must be unworn, unwashed, unaltered, free of perfume/stains, and returned in their original KHAVYN box with all woven labels and tags intact.",
+        heading: "2. Apparel Scope & Product Categories",
+        body: "Our standard Return & Exchange policy applies exclusively to apparel items (Formal Shirts, Polo T-Shirts, Oversized T-Shirts, and Round Neck T-Shirts). Items must be unworn, unwashed, unaltered, free of fragrance/stains, and returned in original KHAVYN packaging with all tags attached. Future non-apparel capsules (such as accessories or footwear) may carry specific category terms.",
       },
       {
         heading: "3. Quality Inspection Protocol",
-        body: "All returned parcels undergo a 14-point physical inspection at our Pune facility. Returns showing signs of wear, laundering, or missing tags will be returned to the customer at their expense.",
+        body: "All returned parcels undergo a standard physical inspection at our Pune fulfillment center. Items meeting eligibility criteria are approved within 24–48 hours of receipt.",
       },
       {
-        heading: "4. Reverse Pickup & Shipping",
-        body: "Complimentary reverse pickup is arranged by KHAVYN for size exchange requests. Our courier partner will collect the parcel within 48 hours of approval.",
+        heading: "4. Complimentary Reverse Pickup",
+        body: "Complimentary reverse pickup is arranged nationwide across supported pincodes through our logistics partners. Our courier partner collects the parcel within 24–48 hours of request approval.",
       },
       {
-        heading: "5. Refund Timeline",
-        body: "Upon quality approval, store credit or direct bank refund is processed within 5–7 business days to the original payment source.",
+        heading: "5. Refund & Exchange Fulfillment Timeline",
+        body: "Upon inspection approval, size replacement shipments dispatch within 2 business days. For return refunds, credit is processed within 5–7 business days to the original payment source or KHAVYN store credit as preferred.",
       },
     ],
   },

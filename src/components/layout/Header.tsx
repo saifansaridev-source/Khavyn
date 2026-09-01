@@ -63,9 +63,9 @@ export const Header: React.FC = () => {
     <>
       <header className="sticky top-0 z-40 bg-[#1A1A1A] text-white border-b border-[#C6A664]/30 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-20 flex items-center justify-between">
-            {/* Left Nav */}
-            <div className="flex items-center gap-6">
+          <div className="h-20 flex items-center justify-between gap-4">
+            {/* Left Brand Logo & Mobile Toggle */}
+            <div className="flex items-center gap-4 sm:gap-6">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="lg:hidden p-2 text-white/80 hover:text-[#C6A664] transition-colors"
@@ -74,39 +74,63 @@ export const Header: React.FC = () => {
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
 
-              <nav className="hidden lg:flex items-center space-x-8 text-xs font-medium uppercase tracking-[0.15em] text-white/90">
-                <Link href="/" className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]">
-                  Home
-                </Link>
-                <div className="relative group py-5">
-                  <Link href="/shop" className="hover:text-[#C6A664] transition-colors flex items-center gap-1 border-b-2 border-transparent hover:border-[#C6A664]">
-                    <span>Shop</span>
-                    <ChevronDown className="w-3 h-3 text-[#C6A664]" />
-                  </Link>
-                  <div className="absolute left-0 top-full hidden group-hover:block w-56 bg-[#1A1A1A] border border-[#C6A664]/30 shadow-xl py-3 px-2 z-50">
-                    <Link href="/shop" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">All Products</Link>
-                    <Link href="/collections/formal-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Formal Shirts</Link>
-                    <Link href="/collections/polo-t-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Polo T-Shirts</Link>
-                    <Link href="/collections/oversized-t-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Oversized T-Shirts</Link>
-                    <Link href="/collections/round-neck-t-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Round Neck T-Shirts</Link>
-                  </div>
-                </div>
-                <Link href="/collections" className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]">Collections</Link>
-                <Link href="/about" className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]">About Us</Link>
-              </nav>
-            </div>
-
-            {/* Center Logo */}
-            <div className="flex flex-col items-center justify-center text-center py-2">
-              <Link href="/" className="group inline-flex flex-col items-center">
-                <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.25em] text-[#C6A664] group-hover:text-[#FAF7F2] transition-colors duration-300">
+              {/* Left-Aligned Logo with Luxury Animation */}
+              <Link
+                href="/"
+                className="group inline-flex flex-col items-start text-left py-1 animate-logo-pop hover-gold-glow transition-transform duration-300"
+              >
+                <span className="font-serif text-2xl sm:text-3xl font-bold tracking-[0.22em] text-[#C6A664] group-hover:text-[#FAF7F2] transition-all duration-300 group-hover:tracking-[0.25em]">
                   KHAVYN
                 </span>
-                <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-[#C6A664]/80 font-medium -mt-0.5">
+                <span className="text-[8px] sm:text-[9px] tracking-[0.28em] uppercase text-[#C6A664]/80 font-medium -mt-0.5 group-hover:text-[#C6A664] transition-colors">
                   CRAFTING EVERYDAY LUXURY
                 </span>
               </Link>
             </div>
+
+            {/* Center-Left Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-7 text-xs font-medium uppercase tracking-[0.15em] text-white/90">
+              <Link
+                href="/"
+                className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]"
+              >
+                Home
+              </Link>
+              <div className="relative group py-5">
+                <Link
+                  href="/shop"
+                  className="hover:text-[#C6A664] transition-colors flex items-center gap-1 border-b-2 border-transparent hover:border-[#C6A664]"
+                >
+                  <span>Shop</span>
+                  <ChevronDown className="w-3 h-3 text-[#C6A664] transition-transform group-hover:rotate-180 duration-200" />
+                </Link>
+                <div className="absolute left-0 top-full hidden group-hover:block w-56 bg-[#1A1A1A] border border-[#C6A664]/30 shadow-2xl py-3 px-2 z-50 rounded-b-md">
+                  <Link href="/shop" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">All Products</Link>
+                  <Link href="/collections/formal-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Formal Shirts</Link>
+                  <Link href="/collections/polo-t-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Polo T-Shirts</Link>
+                  <Link href="/collections/oversized-t-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Oversized T-Shirts</Link>
+                  <Link href="/collections/round-neck-t-shirts" className="block px-4 py-2 text-xs hover:bg-[#C6A664]/20 hover:text-[#C6A664] rounded transition-colors">Round Neck T-Shirts</Link>
+                </div>
+              </div>
+              <Link
+                href="/collections"
+                className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]"
+              >
+                Collections
+              </Link>
+              <Link
+                href="/about"
+                className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]"
+              >
+                About Us
+              </Link>
+              <Link
+                href="/contact"
+                className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]"
+              >
+                Concierge
+              </Link>
+            </nav>
 
             {/* Right Icons */}
             <div className="flex items-center space-x-4 text-white">

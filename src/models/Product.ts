@@ -51,6 +51,8 @@ export interface IProduct extends Document {
   seoDescription?: string;
   isBestSeller: boolean;
   isNewArrival: boolean;
+  customBadge?: string;
+  returnPolicyApplicable?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -112,6 +114,8 @@ const ProductSchema = new Schema<IProduct>(
     seoDescription: { type: String },
     isBestSeller: { type: Boolean, default: false },
     isNewArrival: { type: Boolean, default: false },
+    customBadge: { type: String },
+    returnPolicyApplicable: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

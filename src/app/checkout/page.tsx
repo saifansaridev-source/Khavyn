@@ -441,9 +441,16 @@ export default function CheckoutPage() {
                         <p className="text-[11px] text-[#1A1A1A]/60">
                           Qty: {item.quantity} | Size: {item.size}
                         </p>
-                        <p className="font-semibold text-[#1A1A1A] mt-0.5">
-                          ₹{(item.price * item.quantity).toLocaleString("en-IN")}
-                        </p>
+                        <div className="flex items-baseline gap-2 mt-0.5">
+                          <span className="font-semibold text-[#1A1A1A]">
+                            ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                          </span>
+                          {item.compareAtPrice && item.compareAtPrice > item.price && (
+                            <span className="text-[10px] text-[#1A1A1A]/40 line-through">
+                              ₹{(item.compareAtPrice * item.quantity).toLocaleString("en-IN")}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

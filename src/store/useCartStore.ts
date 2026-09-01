@@ -10,6 +10,7 @@ export interface CartItem {
   colour: string;
   size: string;
   price: number;
+  compareAtPrice?: number;
   quantity: number;
   image: string;
 }

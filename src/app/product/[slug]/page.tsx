@@ -144,6 +144,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       colour: product.colour,
       size: selectedSize,
       price: product.price,
+      compareAtPrice: product.compareAtPrice,
       quantity: 1,
       image: product.images.front,
     });
@@ -307,19 +308,32 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               </span>
             </div>
 
-            {/* Price */}
-            <div className="flex items-baseline gap-3">
-              <span className="font-serif text-2xl font-bold text-[#1A1A1A]">
-                ₹{product.price.toLocaleString("en-IN")}
-              </span>
-              {product.compareAtPrice && (
-                <span className="text-sm text-[#1A1A1A]/40 line-through">
-                  ₹{product.compareAtPrice.toLocaleString("en-IN")}
+            {/* Price & Offer Badges */}
+            <div className="space-y-1">
+              <div className="flex items-baseline flex-wrap gap-3">
+                <span className="font-serif text-3xl font-bold text-[#1A1A1A]">
+                  ₹{product.price.toLocaleString("en-IN")}
                 </span>
-              )}
-              <span className="text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
-                Inclusive of all taxes
-              </span>
+                {product.compareAtPrice && product.compareAtPrice > product.price && (
+                  <>
+                    <span className="text-base text-[#1A1A1A]/40 line-through font-sans">
+                      ₹{product.compareAtPrice.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-xs font-bold text-[#8C6D2B] bg-[#C6A664]/20 border border-[#C6A664]/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                      {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% OFF
+                    </span>
+                  </>
+                )}
+                {product.customBadge && (
+                  <span className="text-xs font-bold text-white bg-[#1A1A1A] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    {product.customBadge}
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] font-medium text-emerald-800 flex items-center gap-1.5 pt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block" />
+                Inclusive of all taxes • Free express shipping above ₹2,499
+              </p>
             </div>
 
             {/* Interactive Colour Selector */}
@@ -351,12 +365,15 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               </div>
             </div>
 
-            {/* Size Selector */}
+            {/* Compact Size Selector */}
             <div className="space-y-2 border-t border-[#D8C9B0]/40 pt-4">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
-                  Select Size
-                </label>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
+                    Select Size:
+                  </label>
+                  <span className="text-xs font-semibold text-[#C6A664]">{selectedSize}</span>
+                </div>
                 <button
                   onClick={() => setSizeGuideOpen(true)}
                   className="text-xs text-[#C6A664] hover:underline flex items-center gap-1 font-medium"
@@ -366,7 +383,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                 </button>
               </div>
 
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-4 gap-2.5 max-w-sm">
                 {product.sizes.map((s) => {
                   const stockCount = product.stock[s as keyof typeof product.stock] || 0;
                   const isSelected = selectedSize === s;
@@ -383,18 +400,21 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                           setSelectedSize(s);
                         }
                       }}
-                      className={`py-3 rounded text-xs font-semibold uppercase tracking-wider border transition-all ${
+                      className={`h-11 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-200 flex flex-col items-center justify-center ${
                         isSelected && !isOutOfStock
-                          ? "bg-[#1A1A1A] text-white border-[#1A1A1A] shadow"
-                          : "bg-white text-[#1A1A1A] border-[#D8C9B0] hover:border-[#C6A664]"
+                          ? "bg-[#1A1A1A] text-[#C6A664] border-2 border-[#C6A664] shadow-md scale-[1.02]"
+                          : "bg-white text-[#1A1A1A] border border-[#D8C9B0] hover:border-[#1A1A1A]"
                       } ${
                         isOutOfStock
-                          ? "opacity-40 line-through bg-gray-100 hover:opacity-70"
+                          ? "opacity-40 line-through bg-gray-100/80 hover:opacity-75 cursor-pointer"
                           : ""
                       }`}
                       title={isOutOfStock ? "Sold Out - Click to get restock alert" : `Select size ${s}`}
                     >
-                      {s}
+                      <span>{s}</span>
+                      {stockCount > 0 && stockCount <= 5 && (
+                        <span className="text-[8px] font-normal text-amber-700 -mt-0.5">Only {stockCount} left</span>
+                      )}
                     </button>
                   );
                 })}
@@ -483,9 +503,14 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   id: "shipping",
                   title: "Shipping & Returns Policy",
                   content: (
-                    <p className="text-xs text-[#1A1A1A]/80 leading-relaxed font-light">
-                      Dispatched within 1–2 business days. Free shipping on orders over ₹2,499. Returns and size exchanges are accepted within 3 days of delivery provided items are unused with original tags.
-                    </p>
+                    <div className="space-y-2 text-xs text-[#1A1A1A]/80 leading-relaxed font-light">
+                      <p>
+                        <strong className="font-semibold text-[#1A1A1A]">Complimentary Express Shipping:</strong> Dispatched within 1–2 business days. Complimentary express shipping applies nationwide on all orders above ₹2,499.
+                      </p>
+                      <p>
+                        <strong className="font-semibold text-[#1A1A1A]">Apparel 7-Day Return Policy:</strong> Returns and size exchanges are accepted within 7 days of delivery for all eligible unworn apparel garments with original tags attached.
+                      </p>
+                    </div>
                   ),
                 },
               ].map((acc) => (
@@ -517,42 +542,61 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               YOU MAY ALSO LIKE
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((rel) => (
-                <Link
-                  key={rel.styleCode}
-                  href={`/product/${rel.slug}`}
-                  className="group bg-[#F5F3EF] rounded-lg overflow-hidden border border-[#D8C9B0]/40 shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <div className="relative aspect-[3/4] w-full bg-white overflow-hidden">
-                    <Image
-                      src={rel.images.front}
-                      alt={rel.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <WishlistButton
-                      item={{
-                        productId: rel.styleCode,
-                        name: rel.name,
-                        slug: rel.slug,
-                        styleCode: rel.styleCode,
-                        colour: rel.colour,
-                        price: rel.price,
-                        image: rel.images.front,
-                      }}
-                      className="absolute top-3 right-3 z-10"
-                    />
-                  </div>
-                  <div className="p-4 space-y-1">
-                    <h4 className="font-serif text-sm font-medium text-[#1A1A1A] line-clamp-1 group-hover:text-[#C6A664]">
-                      {rel.name}
-                    </h4>
-                    <p className="text-xs font-semibold text-[#1A1A1A]">
-                      ₹{rel.price.toLocaleString("en-IN")}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+              {relatedProducts.map((rel) => {
+                const hasDiscount = rel.compareAtPrice && rel.compareAtPrice > rel.price;
+                const discountPercent = hasDiscount
+                  ? Math.round(((rel.compareAtPrice! - rel.price) / rel.compareAtPrice!) * 100)
+                  : 0;
+
+                return (
+                  <Link
+                    key={rel.styleCode}
+                    href={`/product/${rel.slug}`}
+                    className="group bg-[#F5F3EF] rounded-lg overflow-hidden border border-[#D8C9B0]/40 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="relative aspect-[3/4] w-full bg-white overflow-hidden">
+                      <Image
+                        src={rel.images.front}
+                        alt={rel.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <WishlistButton
+                        item={{
+                          productId: rel.styleCode,
+                          name: rel.name,
+                          slug: rel.slug,
+                          styleCode: rel.styleCode,
+                          colour: rel.colour,
+                          price: rel.price,
+                          image: rel.images.front,
+                        }}
+                        className="absolute top-3 right-3 z-10"
+                      />
+                    </div>
+                    <div className="p-4 space-y-1.5">
+                      <h4 className="font-serif text-sm font-medium text-[#1A1A1A] line-clamp-1 group-hover:text-[#C6A664]">
+                        {rel.name}
+                      </h4>
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-xs font-semibold text-[#1A1A1A]">
+                          ₹{rel.price.toLocaleString("en-IN")}
+                        </span>
+                        {hasDiscount && (
+                          <>
+                            <span className="text-[11px] text-[#1A1A1A]/40 line-through">
+                              ₹{rel.compareAtPrice?.toLocaleString("en-IN")}
+                            </span>
+                            <span className="text-[10px] font-bold text-[#8C6D2B] bg-[#C6A664]/20 px-1.5 py-0.5 rounded">
+                              ({discountPercent}% OFF)
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

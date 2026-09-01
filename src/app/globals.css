@@ -74,3 +74,32 @@ body {
   height: 1px;
   background: linear-gradient(90deg, transparent, #C6A664, transparent);
 }
+
+@keyframes logoPop {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-logo-pop {
+  animation: logoPop 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pulseGoldGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(198, 166, 100, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(198, 166, 100, 0.6));
+  }
+}
+
+.hover-gold-glow:hover {
+  animation: pulseGoldGlow 2s infinite ease-in-out;
+}
+

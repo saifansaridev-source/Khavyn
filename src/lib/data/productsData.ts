@@ -39,6 +39,8 @@ export interface ProductSeedInput {
   countryOfOrigin: string;
   isBestSeller: boolean;
   isNewArrival: boolean;
+  customBadge?: string;
+  returnPolicyApplicable?: boolean;
 }
 
 // Slot-based distinct luxury photography angles map

@@ -364,24 +364,44 @@ export default function HomePage() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-sm font-semibold text-[#1A1A1A]">
-                        ₹{product.price.toLocaleString("en-IN")}
-                      </span>
-                      {product.compareAtPrice && (
-                        <span className="text-xs text-[#1A1A1A]/40 line-through">
-                          ₹{product.compareAtPrice.toLocaleString("en-IN")}
-                        </span>
-                      )}
-                    </div>
-                    <Link
-                      href={`/product/${product.slug}`}
-                      className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A] group-hover:text-[#C6A664]"
-                    >
-                      VIEW →
-                    </Link>
-                  </div>
+                  {/* Price & Offer Badges */}
+                  {(() => {
+                    const hasDiscount =
+                      product.compareAtPrice && product.compareAtPrice > product.price;
+                    const discountPercent = hasDiscount
+                      ? Math.round(
+                          ((product.compareAtPrice! - product.price) /
+                            product.compareAtPrice!) *
+                            100
+                        )
+                      : 0;
+
+                    return (
+                      <div className="flex items-center justify-between pt-1">
+                        <div className="flex items-baseline gap-2 flex-wrap">
+                          <span className="text-sm font-semibold text-[#1A1A1A]">
+                            ₹{product.price.toLocaleString("en-IN")}
+                          </span>
+                          {hasDiscount && (
+                            <>
+                              <span className="text-xs text-[#1A1A1A]/40 line-through">
+                                ₹{product.compareAtPrice?.toLocaleString("en-IN")}
+                              </span>
+                              <span className="text-[10px] font-bold text-[#8C6D2B] bg-[#C6A664]/20 px-1.5 py-0.2 rounded">
+                                ({discountPercent}% OFF)
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        <Link
+                          href={`/product/${product.slug}`}
+                          className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors"
+                        >
+                          VIEW →
+                        </Link>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             ))}

@@ -114,9 +114,21 @@ export const CartDrawer: React.FC = () => {
                       <p className="text-xs text-[#1A1A1A]/60 mt-0.5">
                         Colour: {item.colour} | Size: {item.size}
                       </p>
-                      <p className="text-xs font-semibold text-[#1A1A1A] mt-1">
-                        ₹{item.price.toLocaleString("en-IN")}
-                      </p>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-xs font-semibold text-[#1A1A1A]">
+                          ₹{item.price.toLocaleString("en-IN")}
+                        </span>
+                        {item.compareAtPrice && item.compareAtPrice > item.price && (
+                          <>
+                            <span className="text-[10px] text-[#1A1A1A]/40 line-through">
+                              ₹{item.compareAtPrice.toLocaleString("en-IN")}
+                            </span>
+                            <span className="text-[9px] font-bold text-[#8C6D2B] bg-[#C6A664]/20 px-1 py-0.2 rounded">
+                              ({Math.round(((item.compareAtPrice - item.price) / item.compareAtPrice) * 100)}% OFF)
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center justify-between mt-3">
@@ -137,9 +149,16 @@ export const CartDrawer: React.FC = () => {
                           +
                         </button>
                       </div>
-                      <p className="text-sm font-semibold text-[#1A1A1A]">
-                        ₹{(item.price * item.quantity).toLocaleString("en-IN")}
-                      </p>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-[#1A1A1A]">
+                          ₹{(item.price * item.quantity).toLocaleString("en-IN")}
+                        </p>
+                        {item.compareAtPrice && item.compareAtPrice > item.price && (
+                          <p className="text-[10px] text-[#1A1A1A]/40 line-through">
+                            ₹{(item.compareAtPrice * item.quantity).toLocaleString("en-IN")}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

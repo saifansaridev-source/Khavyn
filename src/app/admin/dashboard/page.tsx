@@ -36,6 +36,7 @@ import {
   Percent,
   Save,
   Key,
+  Sparkles,
 } from "lucide-react";
 import { SEED_PRODUCTS, ProductSeedInput } from "@/lib/data/productsData";
 import { useProductStore } from "@/store/useProductStore";
@@ -46,6 +47,27 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetchProducts();
+    const fetchAdminSettings = async () => {
+      try {
+        const res = await fetch("/api/admin/settings");
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.settings) {
+            setStoreSettings((prev) => ({
+              ...prev,
+              ...data.settings,
+              offerPopup: {
+                ...prev.offerPopup,
+                ...(data.settings.offerPopup || {}),
+              },
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load store settings", err);
+      }
+    };
+    fetchAdminSettings();
   }, [fetchProducts]);
 
   const [activeSection, setActiveSection] = useState<
@@ -65,7 +87,6 @@ export default function AdminDashboardPage() {
 
   const productsList = storeProducts;
 
-
   // Modal State for Product Add / Edit
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductSeedInput | null>(null);
@@ -77,6 +98,8 @@ export default function AdminDashboardPage() {
     styleCode: "KHV-NEW-01",
     price: 2999,
     compareAtPrice: 4999,
+    customBadge: "",
+    returnPolicyApplicable: true,
     isBestSeller: false,
     isNewArrival: true,
     stock: { S: 10, M: 25, L: 20, XL: 15 },
@@ -246,14 +269,25 @@ export default function AdminDashboardPage() {
 
   // 6. STORE SETTINGS STATE
   const [storeSettings, setStoreSettings] = useState({
-    announcementText: "COMPLIMENTARY EXPRESS SHIPPING ON ORDERS ABOVE ₹2,499",
-    heroHeadline: "Timeless Style. Everyday Luxury.",
+    announcementText: "COMPLIMENTARY EXPRESS SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹2,499 • 50% ADVANCE PARTIAL COD AVAILABLE",
+    heroHeadline: "Crafted for Distinction, Tailored for Eternity",
     heroSubline: "Architectural precision meets long-staple bio-washed combed cotton. Elevated essentials designed in Europe, tailored in India.",
     freeShippingThreshold: 2499,
     standardShippingFee: 150,
-    partialCodAdvanceAmount: 1000,
-    razorpayLiveMode: true,
+    partialCodAdvanceAmount: 500,
+    razorpayLiveMode: false,
     razorpayKeyId: "rzp_live_KHAVYN2026_PRODUCTION",
+    offerPopup: {
+      enabled: true,
+      title: "EXCLUSIVE PRIVATE PRIVILEGE",
+      subtitle: "Unlock 10% off your inaugural KHAVYN order + complimentary express shipping nationwide.",
+      couponCode: "KHAVYN10",
+      discountText: "Complimentary shipping above ₹2,499",
+      ctaText: "EXPLORE THE ATELIER",
+      ctaLink: "/shop",
+      frequency: "once_per_session" as "once_per_session" | "every_visit",
+    },
+    returnPolicyNotice: "Hassle-free 7-day returns & exchanges on all eligible unworn apparel items.",
   });
   const [settingsSaveNotice, setSettingsSaveNotice] = useState(false);
 
@@ -430,11 +464,20 @@ export default function AdminDashboardPage() {
     addAuditLog("CREATE_COUPON", "PROMOTIONS", `Created promotion code ${newCouponCode}`);
   };
 
-  const handleSaveStoreSettings = (e: React.FormEvent) => {
+  const handleSaveStoreSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storeSettings),
+      });
+    } catch (err) {
+      console.error("Failed to save store settings to server", err);
+    }
     setSettingsSaveNotice(true);
     setTimeout(() => setSettingsSaveNotice(false), 3000);
-    addAuditLog("UPDATE_STORE_SETTINGS", "SETTINGS", "Updated global store configuration");
+    addAuditLog("UPDATE_STORE_SETTINGS", "SETTINGS", "Updated global store configuration & offer popup");
   };
 
   const addAuditLog = (action: string, module: string, details: string) => {
@@ -1184,6 +1227,179 @@ export default function AdminDashboardPage() {
               </div>
 
               <form onSubmit={handleSaveStoreSettings} className="space-y-6">
+                {/* Promotional Offer Popup Configuration */}
+                <div className="bg-[#1F1F1F] border border-[#C6A664]/40 rounded-lg p-6 space-y-4 shadow-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                    <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-[#C6A664]" />
+                      <span>Promotional Offer Popup Modal (Storefront)</span>
+                    </h3>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={storeSettings.offerPopup.enabled}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              enabled: e.target.checked,
+                            },
+                          })
+                        }
+                        className="w-4 h-4 rounded text-[#C6A664] focus:ring-0"
+                      />
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#C6A664]">
+                        {storeSettings.offerPopup.enabled ? "Popup Active" : "Popup Disabled"}
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        Popup Main Headline *
+                      </label>
+                      <input
+                        type="text"
+                        value={storeSettings.offerPopup.title}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              title: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        Privilege Coupon Code
+                      </label>
+                      <input
+                        type="text"
+                        value={storeSettings.offerPopup.couponCode}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              couponCode: e.target.value.toUpperCase(),
+                            },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs font-mono font-bold text-[#C6A664] focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        Popup Subtitle / Offer Message *
+                      </label>
+                      <input
+                        type="text"
+                        value={storeSettings.offerPopup.subtitle}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              subtitle: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        Free Shipping / Highlight Tag Text
+                      </label>
+                      <input
+                        type="text"
+                        value={storeSettings.offerPopup.discountText}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              discountText: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        Display Frequency
+                      </label>
+                      <select
+                        value={storeSettings.offerPopup.frequency}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              frequency: e.target.value as any,
+                            },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      >
+                        <option value="once_per_session">Once Per Session (Recommended)</option>
+                        <option value="every_visit">Every Page Visit</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        CTA Button Label
+                      </label>
+                      <input
+                        type="text"
+                        value={storeSettings.offerPopup.ctaText}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              ctaText: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        CTA Target URL
+                      </label>
+                      <input
+                        type="text"
+                        value={storeSettings.offerPopup.ctaLink}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            offerPopup: {
+                              ...storeSettings.offerPopup,
+                              ctaLink: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* Announcement Bar & Hero Configuration */}
                 <div className="bg-[#1F1F1F] border border-white/10 rounded-lg p-6 space-y-4">
                   <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
@@ -1251,6 +1467,30 @@ export default function AdminDashboardPage() {
                         className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* Return Policy Notice */}
+                <div className="bg-[#1F1F1F] border border-white/10 rounded-lg p-6 space-y-4">
+                  <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <RotateCw className="w-4 h-4 text-[#C6A664]" />
+                    <span>Return Policy Notice (Apparel Scope)</span>
+                  </h3>
+                  <div>
+                    <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                      Return & Exchange Summary Notice
+                    </label>
+                    <input
+                      type="text"
+                      value={storeSettings.returnPolicyNotice}
+                      onChange={(e) =>
+                        setStoreSettings({
+                          ...storeSettings,
+                          returnPolicyNotice: e.target.value,
+                        })
+                      }
+                      className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                    />
                   </div>
                 </div>
 
@@ -1444,12 +1684,48 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-semibold uppercase text-white/70 block mb-1">Price (₹) *</label>
+                  <label className="text-[10px] font-semibold uppercase text-white/70 block mb-1">Selling Price (₹) *</label>
                   <input
                     type="number"
                     required
                     value={productForm.price}
                     onChange={(e) => setProductForm({ ...productForm, price: Number(e.target.value) })}
+                    className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-[#C6A664]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-semibold uppercase text-white/70 block mb-1">
+                    MRP / Compare-at Price (₹)
+                  </label>
+                  <input
+                    type="number"
+                    value={productForm.compareAtPrice || ""}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        compareAtPrice: e.target.value ? Number(e.target.value) : 0,
+                      })
+                    }
+                    placeholder="e.g. 3999"
+                    className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-[#C6A664]"
+                  />
+                  {productForm.compareAtPrice && productForm.compareAtPrice > productForm.price ? (
+                    <span className="text-[10px] text-emerald-400 font-bold block mt-1">
+                      ✓ Auto-Badge: {Math.round(((productForm.compareAtPrice - productForm.price) / productForm.compareAtPrice) * 100)}% OFF (Save ₹{productForm.compareAtPrice - productForm.price})
+                    </span>
+                  ) : null}
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-semibold uppercase text-white/70 block mb-1">
+                    Custom Badge Override (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={productForm.customBadge || ""}
+                    onChange={(e) => setProductForm({ ...productForm, customBadge: e.target.value })}
+                    placeholder="e.g. BESTSELLER, LIMITED EDITION"
                     className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-[#C6A664]"
                   />
                 </div>
@@ -1576,17 +1852,32 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="bestSellerCheck"
-                  checked={productForm.isBestSeller}
-                  onChange={(e) => setProductForm({ ...productForm, isBestSeller: e.target.checked })}
-                  className="rounded border-white/20 text-[#C6A664] focus:ring-0"
-                />
-                <label htmlFor="bestSellerCheck" className="text-xs text-white/90 cursor-pointer">
-                  Feature in Best Sellers Section
-                </label>
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="bestSellerCheck"
+                    checked={productForm.isBestSeller}
+                    onChange={(e) => setProductForm({ ...productForm, isBestSeller: e.target.checked })}
+                    className="rounded border-white/20 text-[#C6A664] focus:ring-0"
+                  />
+                  <label htmlFor="bestSellerCheck" className="text-xs text-white/90 cursor-pointer">
+                    Feature in Best Sellers
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="returnApplicableCheck"
+                    checked={productForm.returnPolicyApplicable !== false}
+                    onChange={(e) => setProductForm({ ...productForm, returnPolicyApplicable: e.target.checked })}
+                    className="rounded border-white/20 text-[#C6A664] focus:ring-0"
+                  />
+                  <label htmlFor="returnApplicableCheck" className="text-xs text-white/90 cursor-pointer">
+                    7-Day Return Policy Eligible
+                  </label>
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
