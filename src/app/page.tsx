@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
@@ -25,6 +25,64 @@ import { useProductStore } from "@/store/useProductStore";
 export default function HomePage() {
   const { products: storeProducts, fetchProducts } = useProductStore();
 
+  const [siteSettings, setSiteSettings] = useState<{
+    heroHeadline: string;
+    heroSubline: string;
+    heroImage: string;
+    collectionImages: { slug: string; title: string; sub: string; image: string }[];
+  }>({
+    heroHeadline: "Timeless Style. Everyday Luxury.",
+    heroSubline:
+      "Architectural precision meets long-staple bio-washed combed cotton. Elevated essentials designed in Europe, tailored in India for the modern gentleman.",
+    heroImage: "/hero-image.jpg",
+    collectionImages: [
+      {
+        slug: "formal-shirts",
+        title: "Formal Shirts",
+        sub: "Contemporary Tailored Slim Fit",
+        image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=80",
+      },
+      {
+        slug: "polo-t-shirts",
+        title: "Polo T-Shirts",
+        sub: "230 GSM Pique Combed Knit",
+        image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80",
+      },
+      {
+        slug: "oversized-t-shirts",
+        title: "Oversized T-Shirts",
+        sub: "230 GSM Streetwear Silhouette",
+        image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80",
+      },
+      {
+        slug: "round-neck-t-shirts",
+        title: "Round Neck T-Shirts",
+        sub: "210 GSM Everyday Essentials",
+        image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&auto=format&fit=crop&q=80",
+      },
+    ],
+  });
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.settings) {
+          setSiteSettings((prev) => ({
+            ...prev,
+            heroHeadline: data.settings.heroHeadline || prev.heroHeadline,
+            heroSubline: data.settings.heroSubline || prev.heroSubline,
+            heroImage: data.settings.heroImage || prev.heroImage,
+            collectionImages:
+              data.settings.collectionImages?.length
+                ? data.settings.collectionImages
+                : prev.collectionImages,
+          }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
@@ -41,7 +99,7 @@ export default function HomePage() {
       <section className="relative w-full min-h-[85vh] bg-[#F0E9DD] flex items-center overflow-hidden border-b border-[#D8C9B0]/40">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/hero-image.jpg"
+            src={siteSettings.heroImage}
             alt="KHAVYN European Luxury Menswear Lifestyle"
             fill
             priority
@@ -57,12 +115,11 @@ export default function HomePage() {
             </div>
 
             <h1 className="font-serif text-4xl sm:text-6xl font-bold tracking-tight text-[#1A1A1A] leading-[1.1]">
-              Timeless Style. <br />
-              <span className="italic font-normal text-[#C6A664]">Everyday Luxury.</span>
+              {siteSettings.heroHeadline}
             </h1>
 
             <p className="text-sm sm:text-base text-[#1A1A1A]/80 leading-relaxed font-light">
-              Architectural precision meets long-staple bio-washed combed cotton. Elevated essentials designed in Europe, tailored in India for the modern gentleman.
+              {siteSettings.heroSubline}
             </p>
 
             <div className="pt-4 flex flex-wrap items-center gap-4">
@@ -98,10 +155,10 @@ export default function HomePage() {
               <Truck className="w-6 h-6 text-[#C6A664] stroke-[1.5] flex-shrink-0" />
               <div>
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
-                  Worldwide Shipping
+                  All Over India Shipping
                 </h4>
                 <p className="text-[11px] text-[#1A1A1A]/60 font-light">
-                  Complimentary above ₹2,499
+                  Premium
                 </p>
               </div>
             </div>
@@ -147,36 +204,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                title: "Formal Shirts",
-                sub: "Contemporary Tailored Slim Fit",
-                slug: "formal-shirts",
-                image:
-                  "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=80",
-              },
-              {
-                title: "Polo T-Shirts",
-                sub: "230 GSM Pique Combed Knit",
-                slug: "polo-t-shirts",
-                image:
-                  "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80",
-              },
-              {
-                title: "Oversized T-Shirts",
-                sub: "230 GSM Streetwear Silhouette",
-                slug: "oversized-t-shirts",
-                image:
-                  "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80",
-              },
-              {
-                title: "Round Neck T-Shirts",
-                sub: "210 GSM Everyday Essentials",
-                slug: "round-neck-t-shirts",
-                image:
-                  "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&auto=format&fit=crop&q=80",
-              },
-            ].map((col) => (
+            {siteSettings.collectionImages.map((col) => (
               <Link
                 key={col.slug}
                 href={`/collections/${col.slug}`}

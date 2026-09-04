@@ -30,11 +30,36 @@ const values = [
 ];
 
 const milestones = [
-  { year: "2022", title: "The Founding Vision", desc: "KHAVYN was founded by a team of textile engineers and European-trained designers obsessed with accessible luxury." },
-  { year: "2023", title: "First Collection Launch", desc: "The inaugural Formal Shirts line — crafted from 100% yarn-dyed combed cotton — sold out in 72 hours, validating the demand for honest luxury." },
-  { year: "2024", title: "Expansion to Knitwear", desc: "The 230 GSM Polo and Oversized lines were introduced, pioneering heavyweight pique knits priced for the modern professional wardrobe." },
-  { year: "2025", title: "Pan-India Presence", desc: "KHAVYN expanded shipping to every pin code across India, with export orders beginning to arrive from UAE, UK, and the US." },
-  { year: "2026", title: "Digital Flagship Launch", desc: "Launch of the KHAVYN digital flagship — a seamless luxury shopping experience powered by technology, built for the next generation of Indian gentlemen." },
+  {
+    year: "01 — The Vision",
+    title: "Where It All Began",
+    desc: "A vision to create refined everyday clothing that brings together exceptional craftsmanship, timeless design and modern Indian sensibility.",
+  },
+  {
+    year: "02 — The Foundation",
+    title: "Crafting the KHAVYN Identity",
+    desc: "KHAVYN was built around a simple belief — luxury should not be reserved for special occasions. It should be part of everyday life.",
+  },
+  {
+    year: "03 — The Craft",
+    title: "Designed With Intention",
+    desc: "From fabric selection and silhouettes to finishing and detailing, every element is thoughtfully developed to deliver comfort, sophistication and lasting quality.",
+  },
+  {
+    year: "04 — The Collection",
+    title: "Everyday Luxury, Curated",
+    desc: "Our first collections bring together premium formal shirts, polos, oversized T-shirts and round-neck T-shirts — designed to become effortless essentials.",
+  },
+  {
+    year: "05 — The Launch",
+    title: "A New Chapter Begins",
+    desc: "KHAVYN steps into the world with its first collection, introducing a distinct interpretation of contemporary Indian luxury.",
+  },
+  {
+    year: "06 — The Future",
+    title: "Beyond Everyday",
+    desc: "Our journey continues — expanding collections, refining craftsmanship and building KHAVYN into a contemporary Indian fashion house with a global point of view.",
+  },
 ];
 
 export default function AboutPage() {
@@ -81,17 +106,32 @@ export default function AboutPage() {
                 The KHAVYN Story
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A] leading-snug">
-                A Brand Born From One Obsession
+                Company Profile / About Us
               </h2>
               <div className="h-px w-16 bg-gradient-to-r from-[#C6A664] to-transparent" />
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
-                KHAVYN was born from a single frustration: the gap between premium price tags and actual quality in Indian menswear. Our founders — engineers and designers trained across Europe and India — believed that everyday men deserve garments with the same architectural precision as luxury European ateliers, at a price that doesn&apos;t require a special occasion to justify.
+                KHAVYN Fashion Private Limited is a premium Indian fashion brand dedicated to creating timeless apparel that combines refined design, exceptional quality, and everyday comfort. Inspired by global fashion standards and guided by our philosophy, &quot;Crafting Everyday Luxury,&quot; KHAVYN creates clothing that is elegant, versatile, and made to be enjoyed for years.
               </p>
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
-                We spent two years sourcing 100% long-staple combed cotton from certified mills, working with master tailors in Pune to perfect our European slim-fit pattern, and developing our bio-wash finish that gives every KHAVYN piece its signature silky hand-feel from the very first wear.
+                We believe true luxury lies in simplicity, quality, and attention to detail. Every KHAVYN garment is thoughtfully designed using carefully selected fabrics, modern silhouettes, and skilled craftsmanship. From the first design to the final stitch, every step reflects our commitment to excellence, ensuring that each product delivers comfort, durability, and a premium finish.
               </p>
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
-                The result is a wardrobe that earns compliments in boardrooms and resonates on weekends — garments that tell the world, without a single word, that you have taste.
+                Our collections include Premium Formal Shirts, Premium Polo T-Shirts, Premium Oversized T-Shirts, and Premium Round Neck T-Shirts. Every piece is designed to suit modern lifestyles, offering effortless style for work, travel, casual outings, celebrations, and everyday wear. With clean designs and timeless colours, our apparel is created to remain relevant beyond changing fashion trends.
+              </p>
+              <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
+                At KHAVYN, we focus on creating clothing that people enjoy wearing—not just because it looks premium, but because it feels comfortable, fits well, and is made to last. We believe that exceptional clothing is defined by quality materials, thoughtful design, and careful craftsmanship rather than unnecessary extravagance.
+              </p>
+              <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
+                Customer trust is at the heart of everything we do. We are committed to delivering a premium shopping experience through secure online payments, reliable nationwide delivery, elegant packaging, and dedicated customer support. As KHAVYN continues to grow, we aim to expand our presence through our official online store, trusted retail partners, and exclusive brand stores.
+              </p>
+              <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
+                Our vision is to establish KHAVYN as one of India&apos;s most admired premium fashion brands while building a strong presence in international markets. Through innovation, responsible business practices, and an uncompromising commitment to quality, we aspire to create apparel that reflects confidence, sophistication, and timeless style.
+              </p>
+              <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
+                At KHAVYN, we believe great style is never temporary. It is created through quality, craftsmanship, and designs that remain timeless.
+              </p>
+              <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light font-medium">
+                Brand Philosophy: <span className="italic">Crafting Everyday Luxury.</span>
               </p>
             </div>
 
@@ -106,7 +146,7 @@ export default function AboutPage() {
               </div>
               {/* Floating stat card */}
               <div className="absolute -bottom-6 -left-6 bg-[#1A1A1A] text-white p-5 rounded-lg shadow-2xl border border-[#C6A664]/30 max-w-[180px]">
-                <p className="font-sans text-3xl font-bold text-[#C6A664]">230</p>
+                <p className="font-serif text-3xl font-bold text-[#C6A664]">230</p>
                 <p className="text-[10px] uppercase tracking-wider text-white/70 mt-1">GSM Heavyweight Knit</p>
                 <p className="text-[10px] text-white/50 mt-1 font-light">Our signature weight standard</p>
               </div>
@@ -126,7 +166,7 @@ export default function AboutPage() {
               { val: "3 Days", label: "Exchange Window" },
             ].map((s) => (
               <div key={s.label} className="space-y-1">
-                <p className="font-sans text-3xl sm:text-4xl font-bold text-[#C6A664]">{s.val}</p>
+                <p className="font-serif text-3xl sm:text-4xl font-bold text-[#C6A664]">{s.val}</p>
                 <p className="text-[11px] uppercase tracking-wider text-[#1A1A1A]/60">{s.label}</p>
               </div>
             ))}
@@ -166,7 +206,7 @@ export default function AboutPage() {
 
       {/* TIMELINE / MILESTONES */}
       <section className="py-24 bg-[#FAF7F2]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-3 mb-16">
             <span className="text-xs font-semibold uppercase tracking-[0.25em] text-[#C6A664]">
               Our Journey
@@ -179,30 +219,26 @@ export default function AboutPage() {
 
           <div className="relative">
             {/* Vertical line */}
-            <div className="absolute left-[27px] sm:left-1/2 top-0 bottom-0 w-px bg-[#D8C9B0] -translate-x-1/2" />
+            <div className="absolute left-[6px] sm:left-[7px] top-1 bottom-1 w-px bg-[#D8C9B0]" />
 
-            <div className="space-y-10">
-              {milestones.map((m, i) => (
-                <div
-                  key={m.year}
-                  className={`relative flex items-start gap-6 sm:gap-0 ${
-                    i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"
-                  }`}
-                >
+            <div className="space-y-12">
+              {milestones.map((m) => (
+                <div key={m.year} className="relative flex items-start gap-6 sm:gap-8 pl-1">
+                  {/* Dot */}
+                  <div className="relative z-10 w-[14px] h-[14px] rounded-full bg-[#C6A664] border-2 border-[#FAF7F2] shadow-sm mt-1.5 flex-shrink-0" />
+
                   {/* Content */}
-                  <div className={`flex-1 sm:px-10 ${i % 2 === 0 ? "sm:text-right" : "sm:text-left"} pl-14 sm:pl-0`}>
+                  <div className="flex-1 min-w-0">
                     <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#C6A664]">
                       {m.year}
                     </span>
-                    <h3 className="font-serif text-base font-semibold text-[#1A1A1A] mt-0.5">{m.title}</h3>
-                    <p className="text-xs text-[#1A1A1A]/65 leading-relaxed font-light mt-1">{m.desc}</p>
+                    <h3 className="font-serif text-base sm:text-lg font-semibold text-[#1A1A1A] mt-0.5">
+                      {m.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#1A1A1A]/65 leading-relaxed font-light mt-1.5 max-w-lg">
+                      {m.desc}
+                    </p>
                   </div>
-
-                  {/* Dot */}
-                  <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 w-[14px] h-[14px] rounded-full bg-[#C6A664] border-2 border-[#FAF7F2] shadow-sm mt-4 sm:mt-3 flex-shrink-0" />
-
-                  {/* Spacer for alternating layout */}
-                  <div className="hidden sm:block flex-1" />
                 </div>
               ))}
             </div>
@@ -232,7 +268,7 @@ export default function AboutPage() {
               </h2>
               <div className="h-px w-16 bg-gradient-to-r from-[#C6A664] to-transparent" />
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
-                Our production hub is based in Sangavi, Pune — home to some of India&apos;s most skilled garment craftsmen. Every piece passes through a 14-point quality checkpoint before it earns the KHAVYN label.
+                Our production hub is based in Banglore and Triupur home to some of India&apos;s most skilled garment craftsmen. Every piece passes through a 14-point quality checkpoint before it earns the KHAVYN label.
               </p>
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
                 We are proudly a Make in India brand — not as a marketing slogan, but as a genuine commitment to the artisans, mills, and textile workers who breathe life into every garment we create.

@@ -90,7 +90,7 @@ export default function AdminDashboardPage() {
   // Modal State for Product Add / Edit
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductSeedInput | null>(null);
-  
+
   const defaultProductTemplate: ProductSeedInput = {
     ...SEED_PRODUCTS[0],
     name: "",
@@ -272,6 +272,13 @@ export default function AdminDashboardPage() {
     announcementText: "COMPLIMENTARY EXPRESS SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹2,499 • 50% ADVANCE PARTIAL COD AVAILABLE",
     heroHeadline: "Crafted for Distinction, Tailored for Eternity",
     heroSubline: "Architectural precision meets long-staple bio-washed combed cotton. Elevated essentials designed in Europe, tailored in India.",
+    heroImage: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+    collectionImages: [
+      { slug: "formal-shirts", title: "Formal Shirts", sub: "Contemporary Tailored Slim Fit", image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=80" },
+      { slug: "polo-t-shirts", title: "Polo T-Shirts", sub: "230 GSM Pique Combed Knit", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80" },
+      { slug: "oversized-t-shirts", title: "Oversized T-Shirts", sub: "230 GSM Streetwear Silhouette", image: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80" },
+      { slug: "round-neck-t-shirts", title: "Round Neck T-Shirts", sub: "210 GSM Everyday Essentials", image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=800&auto=format&fit=crop&q=80" },
+    ],
     freeShippingThreshold: 2499,
     standardShippingFee: 150,
     partialCodAdvanceAmount: 500,
@@ -414,10 +421,10 @@ export default function AdminDashboardPage() {
       prev.map((o) =>
         o.id === orderId
           ? {
-              ...o,
-              balanceCollected: !o.balanceCollected,
-              balanceDue: !o.balanceCollected ? 0 : o.total - o.advancePaid,
-            }
+            ...o,
+            balanceCollected: !o.balanceCollected,
+            balanceDue: !o.balanceCollected ? 0 : o.total - o.advancePaid,
+          }
           : o
       )
     );
@@ -572,11 +579,10 @@ export default function AdminDashboardPage() {
               <button
                 key={nav.id}
                 onClick={() => setActiveSection(nav.id as any)}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
-                  isActive
+                className={`w-full flex items-center justify-between px-4 py-3 rounded text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${isActive
                     ? "bg-[#C6A664] text-black font-bold shadow-lg"
                     : "text-white/70 hover:bg-white/5 hover:text-white"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <Icon className="w-4 h-4" />
@@ -584,9 +590,8 @@ export default function AdminDashboardPage() {
                 </div>
                 {nav.badge !== null && (
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
-                      isActive ? "bg-black text-[#C6A664]" : "bg-white/10 text-white"
-                    }`}
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${isActive ? "bg-black text-[#C6A664]" : "bg-white/10 text-white"
+                      }`}
                   >
                     {nav.badge}
                   </span>
@@ -1418,7 +1423,7 @@ export default function AdminDashboardPage() {
                       />
                     </div>
 
-                    <div>
+                                        <div>
                       <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Hero Section Main Headline</label>
                       <input
                         type="text"
@@ -1427,6 +1432,105 @@ export default function AdminDashboardPage() {
                         className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
                       />
                     </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Hero Section Subline / Description</label>
+                      <input
+                        type="text"
+                        value={storeSettings.heroSubline}
+                        onChange={(e) => setStoreSettings({ ...storeSettings, heroSubline: e.target.value })}
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Hero Background Image (Cloudinary URL)</label>
+                      <input
+                        type="text"
+                        value={storeSettings.heroImage}
+                        onChange={(e) => setStoreSettings({ ...storeSettings, heroImage: e.target.value })}
+                        placeholder="https://res.cloudinary.com/..."
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                      {storeSettings.heroImage && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={storeSettings.heroImage}
+                          alt="Hero preview"
+                          className="mt-2 h-24 w-full object-cover rounded border border-white/10"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Collection Cards / Homepage Grid Images */}
+                <div className="bg-[#1F1F1F] border border-white/10 rounded-lg p-6 space-y-4">
+                  <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
+                    <Package className="w-4 h-4 text-[#C6A664]" />
+                    <span>Homepage Collection Cards (4 Images)</span>
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {storeSettings.collectionImages.map((card, idx) => (
+                      <div key={card.slug} className="bg-[#141414] border border-white/10 rounded-lg p-4 space-y-3">
+                        <p className="text-[10px] uppercase font-bold text-[#C6A664] tracking-wider">
+                          Card {idx + 1} — {card.slug}
+                        </p>
+
+                        <div>
+                          <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Image URL (Cloudinary)</label>
+                          <input
+                            type="text"
+                            value={card.image}
+                            onChange={(e) => {
+                              const updated = [...storeSettings.collectionImages];
+                              updated[idx] = { ...updated[idx], image: e.target.value };
+                              setStoreSettings({ ...storeSettings, collectionImages: updated });
+                            }}
+                            placeholder="https://res.cloudinary.com/..."
+                            className="w-full bg-[#0F0F0F] border border-white/20 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6A664]"
+                          />
+                          {card.image && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={card.image}
+                              alt={card.title}
+                              className="mt-2 h-32 w-full object-cover rounded border border-white/10"
+                            />
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Title</label>
+                            <input
+                              type="text"
+                              value={card.title}
+                              onChange={(e) => {
+                                const updated = [...storeSettings.collectionImages];
+                                updated[idx] = { ...updated[idx], title: e.target.value };
+                                setStoreSettings({ ...storeSettings, collectionImages: updated });
+                              }}
+                              className="w-full bg-[#0F0F0F] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Subtitle</label>
+                            <input
+                              type="text"
+                              value={card.sub}
+                              onChange={(e) => {
+                                const updated = [...storeSettings.collectionImages];
+                                updated[idx] = { ...updated[idx], sub: e.target.value };
+                                setStoreSettings({ ...storeSettings, collectionImages: updated });
+                              }}
+                              className="w-full bg-[#0F0F0F] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
