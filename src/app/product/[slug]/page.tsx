@@ -88,6 +88,21 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   const [restockModalOpen, setRestockModalOpen] = useState<boolean>(false);
   const [outOfStockTargetSize, setOutOfStockTargetSize] = useState<string>("");
 
+  // UX additions state: quantity, coupon, pincode checker, sticky cart bar
+  const [quantity, setQuantity] = useState<number>(1);
+  const [couponCopied, setCouponCopied] = useState(false);
+  const [pincode, setPincode] = useState("");
+  const [deliveryEstimate, setDeliveryEstimate] = useState("");
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyBar(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Product Reviews state
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [reviewFormOpen, setReviewFormOpen] = useState(false);
@@ -145,9 +160,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
       size: selectedSize,
       price: product.price,
       compareAtPrice: product.compareAtPrice,
-      quantity: 1,
+      quantity: quantity,
       image: product.images.front,
     });
+    setQuantity(1);
   };
 
   const handleBuyNow = () => {
@@ -198,7 +214,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1A1A1A]">
+    <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1A1A1A] pb-20">
       <AnnouncementBar />
       <Header />
 
@@ -287,7 +303,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   New Arrival
                 </span>
               )}
-              <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
+              <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#1A1A1A]">
                 {product.name}
               </h1>
               <p className="text-xs text-[#1A1A1A]/60 font-medium">
@@ -311,12 +327,12 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             {/* Price & Offer Badges */}
             <div className="space-y-1">
               <div className="flex items-baseline flex-wrap gap-3">
-                <span className="font-serif text-3xl font-bold text-[#1A1A1A]">
+                <span className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
                   ₹{product.price.toLocaleString("en-IN")}
                 </span>
                 {product.compareAtPrice && product.compareAtPrice > product.price && (
                   <>
-                    <span className="text-base text-[#1A1A1A]/40 line-through font-sans">
+                    <span className="text-sm sm:text-base text-[#1A1A1A]/40 line-through font-sans">
                       ₹{product.compareAtPrice.toLocaleString("en-IN")}
                     </span>
                     <span className="text-xs font-bold text-[#8C6D2B] bg-[#C6A664]/20 border border-[#C6A664]/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -334,6 +350,58 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block" />
                 Inclusive of all taxes • Free express shipping above ₹2,499
               </p>
+            </div>
+
+            {/* Coupon Banner with Copy-to-Clipboard */}
+            <div className="bg-[#F0E9DD] border border-dashed border-[#C6A664] rounded-lg px-4 py-3 flex items-center justify-between gap-3">
+              <div className="text-xs">
+                <span className="font-semibold text-[#1A1A1A]">New User Offer:</span>{" "}
+                <span className="text-[#1A1A1A]/70">Flat ₹300 OFF on orders above ₹1,999</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText("KHAVYN300");
+                  setCouponCopied(true);
+                  setTimeout(() => setCouponCopied(false), 2000);
+                }}
+                className="flex items-center gap-1.5 bg-[#1A1A1A] text-[#C6A664] text-xs font-bold px-3 py-1.5 rounded whitespace-nowrap hover:bg-black transition-colors"
+              >
+                <span>{couponCopied ? "Copied!" : "KHAVYN300"}</span>
+              </button>
+            </div>
+
+            {/* PIN Code Delivery Checker */}
+            <div className="border-t border-[#D8C9B0]/40 pt-4 space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
+                Check Delivery Availability
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value.replace(/\D/g, ""))}
+                  placeholder="Enter PIN Code"
+                  className="flex-1 border border-[#D8C9B0] rounded-md px-3 py-2.5 text-xs text-[#1A1A1A] focus:outline-none focus:border-[#C6A664] max-w-[180px]"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (pincode.length === 6) {
+                      setDeliveryEstimate("Delivery in 3–5 business days");
+                    } else {
+                      setDeliveryEstimate("Please enter a valid 6-digit PIN code");
+                    }
+                  }}
+                  className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A] underline underline-offset-2 hover:text-[#C6A664] transition-colors"
+                >
+                  Check
+                </button>
+              </div>
+              {deliveryEstimate && (
+                <p className="text-xs text-emerald-700 font-medium">{deliveryEstimate}</p>
+              )}
             </div>
 
             {/* Interactive Colour Selector */}
@@ -418,6 +486,32 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* Quantity Stepper */}
+            <div className="space-y-2 border-t border-[#D8C9B0]/40 pt-4">
+              <label className="text-xs font-bold uppercase tracking-wider text-[#1A1A1A]">
+                Quantity:
+              </label>
+              <div className="flex items-center gap-3 w-fit border border-[#D8C9B0] rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="w-10 h-10 flex items-center justify-center text-[#1A1A1A] hover:bg-[#F0E9DD] transition-colors"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="w-10 text-center text-sm font-bold text-[#1A1A1A]">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.min(10, q + 1))}
+                  className="w-10 h-10 flex items-center justify-center text-[#1A1A1A] hover:bg-[#F0E9DD] transition-colors"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
@@ -883,6 +977,38 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           </div>
         </div>
       )}
+
+      {/* Sticky Bottom Cart Bar */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#D8C9B0] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] transition-transform duration-300 ${
+          showStickyBar ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3 sm:gap-6">
+          <div className="relative w-12 h-14 rounded overflow-hidden flex-shrink-0 hidden xs:block sm:block">
+            <Image src={product.images.front} alt={product.name} fill className="object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-[#1A1A1A] truncate">{product.name}</p>
+            <p className="text-xs sm:text-sm font-bold text-[#1A1A1A]">₹{product.price.toLocaleString("en-IN")}</p>
+          </div>
+          <select
+            value={selectedSize}
+            onChange={(e) => setSelectedSize(e.target.value)}
+            className="border border-[#D8C9B0] rounded-md px-2 py-2 text-xs font-semibold text-[#1A1A1A] focus:outline-none focus:border-[#C6A664]"
+          >
+            {product.sizes.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleAddToCart}
+            className="bg-[#1A1A1A] text-white hover:bg-[#C6A664] px-5 sm:px-8 py-2.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap"
+          >
+            Add to Cart
+          </button>
+        </div>
+      </div>
 
       <Footer />
     </div>

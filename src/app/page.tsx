@@ -7,6 +7,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomePreloader } from "@/components/layout/HomePreloader";
+import { HeroCarousel } from "@/components/layout/HeroCarousel";
 import { WishlistButton } from "@/components/product/WishlistButton";
 import {
   Diamond,
@@ -28,13 +29,18 @@ export default function HomePage() {
   const [siteSettings, setSiteSettings] = useState<{
     heroHeadline: string;
     heroSubline: string;
-    heroImage: string;
+    heroImages: string[];
     collectionImages: { slug: string; title: string; sub: string; image: string }[];
   }>({
     heroHeadline: "Timeless Style. Everyday Luxury.",
     heroSubline:
       "Architectural precision meets long-staple bio-washed combed cotton. Elevated essentials designed in Europe, tailored in India for the modern gentleman.",
-    heroImage: "/hero-image.jpg",
+    heroImages: [
+      "/hero-image.jpg",
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1920&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1920&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1920&auto=format&fit=crop&q=85",
+    ],
     collectionImages: [
       {
         slug: "formal-shirts",
@@ -72,7 +78,10 @@ export default function HomePage() {
             ...prev,
             heroHeadline: data.settings.heroHeadline || prev.heroHeadline,
             heroSubline: data.settings.heroSubline || prev.heroSubline,
-            heroImage: data.settings.heroImage || prev.heroImage,
+            heroImages:
+              data.settings.heroImages?.length
+                ? data.settings.heroImages
+                : (data.settings.heroImage ? [data.settings.heroImage] : prev.heroImages),
             collectionImages:
               data.settings.collectionImages?.length
                 ? data.settings.collectionImages
@@ -97,18 +106,10 @@ export default function HomePage() {
 
       {/* 1. HERO BANNER */}
       <section className="relative w-full min-h-[85vh] bg-[#F0E9DD] flex items-center overflow-hidden border-b border-[#D8C9B0]/40">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={siteSettings.heroImage}
-            alt="KHAVYN European Luxury Menswear Lifestyle"
-            fill
-            priority
-            className="object-cover object-top transition-transform duration-1000"
-          />
-        </div>
+        <HeroCarousel images={siteSettings.heroImages} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div className="max-w-xl space-y-6">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full pointer-events-none">
+          <div className="max-w-xl space-y-6 pointer-events-auto">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1A1A1A] text-[#C6A664] rounded-full text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase">
               <Sparkles className="w-3.5 h-3.5" />
               <span>CRAFTING EVERYDAY LUXURY</span>

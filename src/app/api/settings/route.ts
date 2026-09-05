@@ -5,6 +5,12 @@ import { StoreSettings } from "@/models/StoreSettings";
 const DEFAULT_SETTINGS = {
   announcementText: "COMPLIMENTARY EXPRESS SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹2,499 • 50% ADVANCE PARTIAL COD AVAILABLE",
   heroHeadline: "Crafted for Distinction, Tailored for Eternity",
+  heroImages: [
+    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+    "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1920&auto=format&fit=crop&q=85",
+    "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1920&auto=format&fit=crop&q=85",
+    "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1920&auto=format&fit=crop&q=85",
+  ],
   freeShippingThreshold: 2499,
   standardShippingFee: 150,
   partialCodAdvanceAmount: 500,

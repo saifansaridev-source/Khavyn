@@ -37,6 +37,9 @@ import {
   Save,
   Key,
   Sparkles,
+  ArrowUp,
+  ArrowDown,
+  Menu,
 } from "lucide-react";
 import { SEED_PRODUCTS, ProductSeedInput } from "@/lib/data/productsData";
 import { useProductStore } from "@/store/useProductStore";
@@ -56,6 +59,10 @@ export default function AdminDashboardPage() {
             setStoreSettings((prev) => ({
               ...prev,
               ...data.settings,
+              heroImages:
+                Array.isArray(data.settings.heroImages) && data.settings.heroImages.length > 0
+                  ? data.settings.heroImages
+                  : (data.settings.heroImage ? [data.settings.heroImage] : prev.heroImages),
               offerPopup: {
                 ...prev.offerPopup,
                 ...(data.settings.offerPopup || {}),
@@ -80,6 +87,7 @@ export default function AdminDashboardPage() {
     | "settings"
     | "audit"
   >("kpis");
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // 1. PRODUCTS STATE
   const [productSearch, setProductSearch] = useState("");
@@ -272,7 +280,12 @@ export default function AdminDashboardPage() {
     announcementText: "COMPLIMENTARY EXPRESS SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹2,499 • 50% ADVANCE PARTIAL COD AVAILABLE",
     heroHeadline: "Crafted for Distinction, Tailored for Eternity",
     heroSubline: "Architectural precision meets long-staple bio-washed combed cotton. Elevated essentials designed in Europe, tailored in India.",
-    heroImage: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+    heroImages: [
+      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1920&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1920&auto=format&fit=crop&q=85",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1920&auto=format&fit=crop&q=85",
+    ],
     collectionImages: [
       { slug: "formal-shirts", title: "Formal Shirts", sub: "Contemporary Tailored Slim Fit", image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=800&auto=format&fit=crop&q=80" },
       { slug: "polo-t-shirts", title: "Polo T-Shirts", sub: "230 GSM Pique Combed Knit", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800&auto=format&fit=crop&q=80" },
@@ -526,8 +539,15 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-[#141414] text-white flex flex-col font-sans selection:bg-[#C6A664] selection:text-black">
       {/* Top Admin Header */}
-      <header className="bg-[#1F1F1F] border-b border-[#C6A664]/30 px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-xl">
+      <header className="bg-[#1F1F1F] border-b border-[#C6A664]/30 px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-40 shadow-xl">
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setMobileSidebarOpen(true)}
+            className="lg:hidden p-2 -ml-2 text-white/80 hover:text-white"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
           <Link href="/" className="font-serif text-2xl font-bold tracking-[0.2em] text-[#C6A664] hover:text-white transition-colors">
             KHAVYN
           </Link>
@@ -536,7 +556,7 @@ export default function AdminDashboardPage() {
           </span>
         </div>
 
-        <div className="flex items-center gap-6 text-xs">
+        <div className="flex items-center gap-2 sm:gap-6 text-xs">
           <div className="hidden sm:flex items-center gap-2 text-white/70">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Server: <strong className="text-white">Online (Port 3000)</strong></span>
@@ -544,7 +564,7 @@ export default function AdminDashboardPage() {
 
           <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-3 py-1.5 rounded">
             <ShieldCheck className="w-4 h-4 text-[#C6A664]" />
-            <span className="text-white/90 font-medium">admin@khavyn.com</span>
+            <span className="text-white/90 font-medium hidden sm:inline">admin@khavyn.com</span>
           </div>
 
           <button
@@ -552,16 +572,36 @@ export default function AdminDashboardPage() {
             className="flex items-center gap-1.5 text-[#C6A664] hover:text-white transition-colors uppercase font-semibold text-[11px] bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded border border-[#C6A664]/30"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Logout</span>
+            <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
       </header>
 
       <div className="flex-1 flex flex-col lg:flex-row">
+        {mobileSidebarOpen && (
+          <div
+            onClick={() => setMobileSidebarOpen(false)}
+            className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          />
+        )}
+
         {/* Admin Navigation Sidebar */}
-        <aside className="w-full lg:w-64 bg-[#1A1A1A] border-r border-[#C6A664]/20 p-4 space-y-1.5 flex-shrink-0">
-          <div className="px-3 py-2 text-[10px] uppercase font-bold tracking-[0.2em] text-[#C6A664]">
-            Executive Controls
+        <aside
+          className={`fixed lg:static inset-y-0 left-0 z-50 lg:z-auto w-72 lg:w-64 bg-[#1A1A1A] border-r border-[#C6A664]/20 p-4 space-y-1.5 flex-shrink-0 overflow-y-auto transition-transform duration-300 lg:translate-x-0 ${
+            mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="flex items-center justify-between px-3 py-2">
+            <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-[#C6A664]">
+              Executive Controls
+            </span>
+            <button
+              onClick={() => setMobileSidebarOpen(false)}
+              className="lg:hidden p-1 text-white/60 hover:text-white"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
           {[
             { id: "kpis", label: "Executive Overview", icon: DollarSign, badge: null },
@@ -578,7 +618,10 @@ export default function AdminDashboardPage() {
             return (
               <button
                 key={nav.id}
-                onClick={() => setActiveSection(nav.id as any)}
+                onClick={() => {
+                  setActiveSection(nav.id as any);
+                  setMobileSidebarOpen(false);
+                }}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${isActive
                     ? "bg-[#C6A664] text-black font-bold shadow-lg"
                     : "text-white/70 hover:bg-white/5 hover:text-white"
@@ -603,6 +646,7 @@ export default function AdminDashboardPage() {
           <div className="pt-4 space-y-1.5 border-t border-white/10 px-1">
             <Link
               href="/admin/inventory"
+              onClick={() => setMobileSidebarOpen(false)}
               className="w-full flex items-center justify-between px-4 py-2.5 rounded text-xs font-semibold uppercase tracking-wider text-amber-400 bg-amber-950/40 border border-amber-500/30 hover:bg-amber-900/50 transition-colors"
             >
               <div className="flex items-center gap-2">
@@ -614,6 +658,7 @@ export default function AdminDashboardPage() {
 
             <Link
               href="/admin/reviews"
+              onClick={() => setMobileSidebarOpen(false)}
               className="w-full flex items-center justify-between px-4 py-2.5 rounded text-xs font-semibold uppercase tracking-wider text-[#C6A664] bg-[#C6A664]/10 border border-[#C6A664]/30 hover:bg-[#C6A664]/20 transition-colors"
             >
               <div className="flex items-center gap-2">
@@ -635,7 +680,7 @@ export default function AdminDashboardPage() {
         </aside>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-6 space-y-6 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 space-y-6 overflow-y-auto">
           {/* SECTION 1: EXECUTIVE KPIS */}
           {activeSection === "kpis" && (
             <div className="space-y-6">
@@ -1062,7 +1107,8 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="bg-[#1F1F1F] border border-white/10 rounded-lg overflow-hidden shadow-xl">
-                <table className="w-full text-xs text-left">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
                   <thead className="bg-[#141414] text-[#C6A664] uppercase font-bold text-[10px] tracking-widest border-b border-white/10">
                     <tr>
                       <th className="p-4">Customer Name</th>
@@ -1115,6 +1161,7 @@ export default function AdminDashboardPage() {
                 </table>
               </div>
             </div>
+          </div>
           )}
 
           {/* SECTION 6: PROMOTIONS & ENGINE */}
@@ -1180,32 +1227,34 @@ export default function AdminDashboardPage() {
 
               {/* Coupons List */}
               <div className="bg-[#1F1F1F] border border-white/10 rounded-lg overflow-hidden shadow-xl">
-                <table className="w-full text-xs text-left">
-                  <thead className="bg-[#141414] text-[#C6A664] uppercase font-bold text-[10px] tracking-widest border-b border-white/10">
-                    <tr>
-                      <th className="p-4">Coupon Code</th>
-                      <th className="p-4">Discount</th>
-                      <th className="p-4">Min Order Value</th>
-                      <th className="p-4">Redemptions</th>
-                      <th className="p-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {coupons.map((cp, idx) => (
-                      <tr key={idx} className="hover:bg-white/5 transition-colors">
-                        <td className="p-4 font-mono font-bold text-white">{cp.code}</td>
-                        <td className="p-4 text-emerald-400 font-bold">{cp.discount}</td>
-                        <td className="p-4 text-white/80">₹{cp.minOrder.toLocaleString("en-IN")}</td>
-                        <td className="p-4 text-white font-bold">{cp.usageCount} times</td>
-                        <td className="p-4">
-                          <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded">
-                            {cp.status}
-                          </span>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-[#141414] text-[#C6A664] uppercase font-bold text-[10px] tracking-widest border-b border-white/10">
+                      <tr>
+                        <th className="p-4">Coupon Code</th>
+                        <th className="p-4">Discount</th>
+                        <th className="p-4">Min Order Value</th>
+                        <th className="p-4">Redemptions</th>
+                        <th className="p-4">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                      {coupons.map((cp, idx) => (
+                        <tr key={idx} className="hover:bg-white/5 transition-colors">
+                          <td className="p-4 font-mono font-bold text-white">{cp.code}</td>
+                          <td className="p-4 text-emerald-400 font-bold">{cp.discount}</td>
+                          <td className="p-4 text-white/80">₹{cp.minOrder.toLocaleString("en-IN")}</td>
+                          <td className="p-4 text-white font-bold">{cp.usageCount} times</td>
+                          <td className="p-4">
+                            <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded">
+                              {cp.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -1443,23 +1492,135 @@ export default function AdminDashboardPage() {
                       />
                     </div>
 
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Hero Background Image (Cloudinary URL)</label>
-                      <input
-                        type="text"
-                        value={storeSettings.heroImage}
-                        onChange={(e) => setStoreSettings({ ...storeSettings, heroImage: e.target.value })}
-                        placeholder="https://res.cloudinary.com/..."
-                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6A664]"
-                      />
-                      {storeSettings.heroImage && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={storeSettings.heroImage}
-                          alt="Hero preview"
-                          className="mt-2 h-24 w-full object-cover rounded border border-white/10"
-                        />
+                    {/* Hero Carousel Images Multi-Manager */}
+                    <div className="pt-4 border-t border-white/10 space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                        <div>
+                          <label className="text-xs font-bold text-white flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-[#C6A664]" />
+                            <span>Hero Carousel Images (Min. 4 Recommended)</span>
+                          </label>
+                          <p className="text-[11px] text-white/50">
+                            Manage rotating luxury hero banner slides. Order determines the slide sequence on the homepage.
+                          </p>
+                        </div>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[#C6A664] self-start sm:self-auto">
+                          {storeSettings.heroImages.length} {storeSettings.heroImages.length === 1 ? "slide" : "slides"}
+                        </span>
+                      </div>
+
+                      {storeSettings.heroImages.length < 4 && (
+                        <div className="flex items-center gap-2 px-3 py-2 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs">
+                          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                          <span>Minimum 4 images recommended for carousel effect (Currently: {storeSettings.heroImages.length})</span>
+                        </div>
                       )}
+
+                      <div className="space-y-3">
+                        {storeSettings.heroImages.map((imgUrl, imgIdx) => (
+                          <div
+                            key={imgIdx}
+                            className="bg-[#141414] border border-white/10 rounded-lg p-3 space-y-2.5 transition-colors hover:border-white/20"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] uppercase font-bold text-[#C6A664] tracking-wider">
+                                Slide #{imgIdx + 1}
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  title="Move slide up"
+                                  disabled={imgIdx === 0}
+                                  onClick={() => {
+                                    if (imgIdx === 0) return;
+                                    const updated = [...storeSettings.heroImages];
+                                    const temp = updated[imgIdx - 1];
+                                    updated[imgIdx - 1] = updated[imgIdx];
+                                    updated[imgIdx] = temp;
+                                    setStoreSettings({ ...storeSettings, heroImages: updated });
+                                  }}
+                                  className="p-1 rounded text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                >
+                                  <ArrowUp className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  title="Move slide down"
+                                  disabled={imgIdx === storeSettings.heroImages.length - 1}
+                                  onClick={() => {
+                                    if (imgIdx === storeSettings.heroImages.length - 1) return;
+                                    const updated = [...storeSettings.heroImages];
+                                    const temp = updated[imgIdx + 1];
+                                    updated[imgIdx + 1] = updated[imgIdx];
+                                    updated[imgIdx] = temp;
+                                    setStoreSettings({ ...storeSettings, heroImages: updated });
+                                  }}
+                                  className="p-1 rounded text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                >
+                                  <ArrowDown className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  title={storeSettings.heroImages.length <= 1 ? "At least 1 slide is required" : "Remove slide"}
+                                  disabled={storeSettings.heroImages.length <= 1}
+                                  onClick={() => {
+                                    if (storeSettings.heroImages.length <= 1) return;
+                                    const updated = storeSettings.heroImages.filter((_, i) => i !== imgIdx);
+                                    setStoreSettings({ ...storeSettings, heroImages: updated });
+                                  }}
+                                  className="p-1 rounded text-red-400/70 hover:text-red-400 hover:bg-red-500/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors ml-1"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+
+                            <input
+                              type="text"
+                              value={imgUrl}
+                              placeholder="https://res.cloudinary.com/... or https://images.unsplash.com/..."
+                              onChange={(e) => {
+                                const updated = [...storeSettings.heroImages];
+                                updated[imgIdx] = e.target.value;
+                                setStoreSettings({ ...storeSettings, heroImages: updated });
+                              }}
+                              className="w-full bg-[#0D0D0D] border border-white/20 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6A664]"
+                            />
+
+                            {imgUrl ? (
+                              <div className="relative h-24 w-full rounded overflow-hidden border border-white/10 bg-black/40">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={imgUrl}
+                                  alt={`Slide ${imgIdx + 1} preview`}
+                                  className="w-full h-full object-cover object-top"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = "none";
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="h-14 w-full rounded border border-dashed border-white/10 flex items-center justify-center text-[10px] text-white/40">
+                                Enter a valid image URL above to preview
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setStoreSettings({
+                            ...storeSettings,
+                            heroImages: [...storeSettings.heroImages, ""],
+                          });
+                        }}
+                        className="w-full py-2.5 px-4 rounded border border-dashed border-[#C6A664]/40 hover:border-[#C6A664] bg-[#C6A664]/5 hover:bg-[#C6A664]/10 text-[#C6A664] text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Add New Slide</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1687,36 +1848,38 @@ export default function AdminDashboardPage() {
 
               {/* Audit Table */}
               <div className="bg-[#1F1F1F] border border-white/10 rounded-lg overflow-hidden shadow-xl">
-                <table className="w-full text-xs text-left">
-                  <thead className="bg-[#141414] text-[#C6A664] uppercase font-bold text-[10px] tracking-widest border-b border-white/10">
-                    <tr>
-                      <th className="p-4">Log ID</th>
-                      <th className="p-4">Timestamp</th>
-                      <th className="p-4">Admin User</th>
-                      <th className="p-4">Action</th>
-                      <th className="p-4">Module</th>
-                      <th className="p-4">IP Address</th>
-                      <th className="p-4">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10 font-mono">
-                    {auditLogs.map((log) => (
-                      <tr key={log.id} className="hover:bg-white/5 transition-colors">
-                        <td className="p-4 font-bold text-[#C6A664]">{log.id}</td>
-                        <td className="p-4 text-white/80">{log.timestamp}</td>
-                        <td className="p-4 text-white">{log.admin}</td>
-                        <td className="p-4 text-white font-bold">{log.action}</td>
-                        <td className="p-4 text-white/70">{log.module}</td>
-                        <td className="p-4 text-white/60">{log.ip}</td>
-                        <td className="p-4">
-                          <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded">
-                            {log.status}
-                          </span>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead className="bg-[#141414] text-[#C6A664] uppercase font-bold text-[10px] tracking-widest border-b border-white/10">
+                      <tr>
+                        <th className="p-4">Log ID</th>
+                        <th className="p-4">Timestamp</th>
+                        <th className="p-4">Admin User</th>
+                        <th className="p-4">Action</th>
+                        <th className="p-4">Module</th>
+                        <th className="p-4">IP Address</th>
+                        <th className="p-4">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-white/10 font-mono">
+                      {auditLogs.map((log) => (
+                        <tr key={log.id} className="hover:bg-white/5 transition-colors">
+                          <td className="p-4 font-bold text-[#C6A664]">{log.id}</td>
+                          <td className="p-4 text-white/80">{log.timestamp}</td>
+                          <td className="p-4 text-white">{log.admin}</td>
+                          <td className="p-4 text-white font-bold">{log.action}</td>
+                          <td className="p-4 text-white/70">{log.module}</td>
+                          <td className="p-4 text-white/60">{log.ip}</td>
+                          <td className="p-4">
+                            <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded">
+                              {log.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -1726,7 +1889,7 @@ export default function AdminDashboardPage() {
       {/* Modal: Add/Edit Product */}
       {isProductModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#1F1F1F] border border-[#C6A664] rounded-xl max-w-3xl w-full p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto my-8">
+          <div className="bg-[#1F1F1F] border border-[#C6A664] rounded-xl max-w-3xl w-full p-4 sm:p-6 space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto my-4 sm:my-8">
             <button
               onClick={() => setIsProductModalOpen(false)}
               className="absolute top-4 right-4 text-white/60 hover:text-white"
@@ -2007,7 +2170,7 @@ export default function AdminDashboardPage() {
       {/* Modal: Order Details */}
       {selectedOrderDetails && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#1F1F1F] border border-[#C6A664] rounded-lg max-w-lg w-full p-6 space-y-4 shadow-2xl relative text-xs">
+          <div className="bg-[#1F1F1F] border border-[#C6A664] rounded-lg max-w-lg w-full p-4 sm:p-6 space-y-4 shadow-2xl relative text-xs">
             <button
               onClick={() => setSelectedOrderDetails(null)}
               className="absolute top-4 right-4 text-white/60 hover:text-white"

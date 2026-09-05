@@ -22,7 +22,7 @@ export interface IStoreSettings extends Document {
   announcementText: string;
   heroHeadline: string;
   heroSubline: string;
-  heroImage: string;
+  heroImages: string[];
   collectionImages: ICollectionCard[];
   freeShippingThreshold: number;
   standardShippingFee: number;
@@ -96,9 +96,14 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
       type: String,
       default: "Architectural precision meets long-staple bio-washed combed cotton. Elevated essentials designed in Europe, tailored in India for the modern gentleman.",
     },
-    heroImage: {
-      type: String,
-      default: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+    heroImages: {
+      type: [String],
+      default: () => [
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+        "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1920&auto=format&fit=crop&q=85",
+        "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1920&auto=format&fit=crop&q=85",
+        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1920&auto=format&fit=crop&q=85",
+      ],
     },
     collectionImages: {
       type: [CollectionCardSchema],
