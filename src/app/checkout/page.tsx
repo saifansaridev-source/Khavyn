@@ -173,14 +173,14 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between border-b border-[#D8C9B0]/40 pb-2">
               <span className="text-[#1A1A1A]/60">Advance Paid via Razorpay:</span>
-              <span className="font-semibold text-[#C6A664]">
+              <span className="font-semibold font-numeric text-[#C6A664]">
                 ₹{orderConfirmed.advancePaid?.toLocaleString("en-IN")}
               </span>
             </div>
             {orderConfirmed.balanceDue > 0 && (
               <div className="flex justify-between font-bold text-[#1A1A1A]">
                 <span>Cash Payable on Delivery:</span>
-                <span>₹{orderConfirmed.balanceDue?.toLocaleString("en-IN")}</span>
+                <span className="font-numeric">₹{orderConfirmed.balanceDue?.toLocaleString("en-IN")}</span>
               </div>
             )}
           </div>
@@ -379,7 +379,7 @@ export default function CheckoutPage() {
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs font-bold text-[#C6A664]">
+                      <span className="text-xs font-bold font-numeric text-[#C6A664]">
                         ₹{grandTotal.toLocaleString("en-IN")}
                       </span>
                     </div>
@@ -412,7 +412,7 @@ export default function CheckoutPage() {
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs font-bold text-[#C6A664]">
+                      <span className="text-xs font-bold font-numeric text-[#C6A664]">
                         ₹{advanceToPay.toLocaleString("en-IN")} now
                       </span>
                     </div>
@@ -442,11 +442,11 @@ export default function CheckoutPage() {
                           Qty: {item.quantity} | Size: {item.size}
                         </p>
                         <div className="flex items-baseline gap-2 mt-0.5">
-                          <span className="font-semibold text-[#1A1A1A]">
+                          <span className="font-semibold font-numeric text-[#1A1A1A]">
                             ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                           </span>
                           {item.compareAtPrice && item.compareAtPrice > item.price && (
-                            <span className="text-[10px] text-[#1A1A1A]/40 line-through">
+                            <span className="text-[10px] text-[#1A1A1A]/40 line-through font-numeric">
                               ₹{(item.compareAtPrice * item.quantity).toLocaleString("en-IN")}
                             </span>
                           )}
@@ -459,21 +459,21 @@ export default function CheckoutPage() {
                 <div className="space-y-2 text-xs border-t border-[#D8C9B0]/50 pt-4">
                   <div className="flex justify-between text-[#1A1A1A]/70">
                     <span>Item Subtotal</span>
-                    <span className="font-semibold text-[#1A1A1A]">
+                    <span className="font-semibold font-numeric text-[#1A1A1A]">
                       ₹{subtotal.toLocaleString("en-IN")}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-[#1A1A1A]/70">
                     <span>Shipping Charges</span>
-                    <span className="font-semibold text-emerald-800">
+                    <span className="font-semibold font-numeric text-emerald-800">
                       {shippingFee === 0 ? "FREE" : `₹${shippingFee}`}
                     </span>
                   </div>
 
                   <div className="flex justify-between font-serif text-base font-bold text-[#1A1A1A] border-t border-[#D8C9B0]/50 pt-3">
                     <span>Total Order Value</span>
-                    <span>₹{grandTotal.toLocaleString("en-IN")}</span>
+                    <span className="font-numeric">₹{grandTotal.toLocaleString("en-IN")}</span>
                   </div>
                 </div>
 
@@ -481,14 +481,14 @@ export default function CheckoutPage() {
                 <div className="bg-[#F0E9DD] p-3 rounded text-xs space-y-1 border border-[#D8C9B0]">
                   <div className="flex justify-between font-semibold text-[#1A1A1A]">
                     <span>Amount Payable Now (Razorpay):</span>
-                    <span className="text-[#C6A664] font-bold">
+                    <span className="text-[#C6A664] font-bold font-numeric">
                       ₹{advanceToPay.toLocaleString("en-IN")}
                     </span>
                   </div>
                   {paymentType === "partial_cod" && (
                     <div className="flex justify-between text-[#1A1A1A]/70 text-[11px]">
                       <span>Remaining Cash Balance on Delivery:</span>
-                      <span className="font-semibold">
+                      <span className="font-semibold font-numeric">
                         ₹{codBalanceRemaining.toLocaleString("en-IN")}
                       </span>
                     </div>

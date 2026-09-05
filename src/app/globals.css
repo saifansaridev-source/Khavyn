@@ -37,6 +37,20 @@ body {
   font-family: var(--font-serif), Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
+@utility font-numeric {
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+@layer utilities {
+  .font-numeric {
+    font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
+
 /* Custom Luxury Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

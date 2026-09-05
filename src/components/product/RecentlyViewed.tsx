@@ -101,7 +101,7 @@ export const RecentlyViewed: React.FC<RecentlyViewedProps> = ({ currentSlug }) =
               <h4 className="font-serif text-sm font-medium text-[#1A1A1A] line-clamp-1 group-hover:text-[#C6A664]">
                 {prod.name}
               </h4>
-              <p className="text-xs font-semibold text-[#1A1A1A]">
+              <p className="text-xs font-semibold text-[#1A1A1A] font-numeric">
                 ₹{prod.price.toLocaleString("en-IN")}
               </p>
             </div>

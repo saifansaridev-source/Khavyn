@@ -178,15 +178,15 @@ export default function CollectionPage({ params }: CollectionPageProps) {
                   return (
                     <div className="flex items-center justify-between pt-1">
                       <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-sm font-semibold text-[#1A1A1A]">
+                        <span className="text-sm font-semibold text-[#1A1A1A] font-numeric">
                           ₹{product.price.toLocaleString("en-IN")}
                         </span>
                         {hasDiscount && (
                           <>
-                            <span className="text-xs text-[#1A1A1A]/40 line-through">
+                            <span className="text-xs text-[#1A1A1A]/40 line-through font-numeric">
                               ₹{product.compareAtPrice?.toLocaleString("en-IN")}
                             </span>
-                            <span className="text-[10px] font-bold text-[#8C6D2B] bg-[#C6A664]/20 px-1.5 py-0.2 rounded">
+                            <span className="text-[10px] font-bold font-numeric text-[#8C6D2B] bg-[#C6A664]/20 px-1.5 py-0.2 rounded">
                               ({discountPercent}% OFF)
                             </span>
                           </>

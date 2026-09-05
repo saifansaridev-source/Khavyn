@@ -47,7 +47,7 @@ export const CartDrawer: React.FC = () => {
           <div className="bg-[#F0E9DD] px-6 py-3 border-b border-[#D8C9B0]/50 text-xs">
             {amountToFreeShipping > 0 ? (
               <p className="text-[#1A1A1A] font-medium">
-                Add <span className="font-bold text-[#C6A664]">₹{amountToFreeShipping.toLocaleString("en-IN")}</span> more for <span className="uppercase tracking-wider font-semibold">Free Express Shipping</span>
+                Add <span className="font-bold font-numeric text-[#C6A664]">₹{amountToFreeShipping.toLocaleString("en-IN")}</span> more for <span className="uppercase tracking-wider font-semibold">Free Express Shipping</span>
               </p>
             ) : (
               <p className="text-[#1A1A1A] font-medium flex items-center gap-1.5 text-emerald-800">
@@ -115,15 +115,15 @@ export const CartDrawer: React.FC = () => {
                         Colour: {item.colour} | Size: {item.size}
                       </p>
                       <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-xs font-semibold text-[#1A1A1A]">
+                        <span className="text-xs font-semibold text-[#1A1A1A] font-numeric">
                           ₹{item.price.toLocaleString("en-IN")}
                         </span>
                         {item.compareAtPrice && item.compareAtPrice > item.price && (
                           <>
-                            <span className="text-[10px] text-[#1A1A1A]/40 line-through">
+                            <span className="text-[10px] text-[#1A1A1A]/40 line-through font-numeric">
                               ₹{item.compareAtPrice.toLocaleString("en-IN")}
                             </span>
-                            <span className="text-[9px] font-bold text-[#8C6D2B] bg-[#C6A664]/20 px-1 py-0.2 rounded">
+                            <span className="text-[9px] font-bold font-numeric text-[#8C6D2B] bg-[#C6A664]/20 px-1 py-0.2 rounded">
                               ({Math.round(((item.compareAtPrice - item.price) / item.compareAtPrice) * 100)}% OFF)
                             </span>
                           </>
@@ -139,7 +139,7 @@ export const CartDrawer: React.FC = () => {
                         >
                           -
                         </button>
-                        <span className="px-3 font-medium text-[#1A1A1A]">
+                        <span className="px-3 font-medium text-[#1A1A1A] font-numeric">
                           {item.quantity}
                         </span>
                         <button
@@ -150,11 +150,11 @@ export const CartDrawer: React.FC = () => {
                         </button>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-[#1A1A1A]">
+                        <p className="text-sm font-semibold text-[#1A1A1A] font-numeric">
                           ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                         </p>
                         {item.compareAtPrice && item.compareAtPrice > item.price && (
-                          <p className="text-[10px] text-[#1A1A1A]/40 line-through">
+                          <p className="text-[10px] text-[#1A1A1A]/40 line-through font-numeric">
                             ₹{(item.compareAtPrice * item.quantity).toLocaleString("en-IN")}
                           </p>
                         )}
@@ -173,7 +173,7 @@ export const CartDrawer: React.FC = () => {
                 <span className="text-[#1A1A1A]/70 uppercase tracking-wider text-xs">
                   Subtotal
                 </span>
-                <span className="font-serif text-xl font-bold text-[#1A1A1A]">
+                <span className="text-xl font-bold font-numeric text-[#1A1A1A]">
                   ₹{total.toLocaleString("en-IN")}
                 </span>
               </div>

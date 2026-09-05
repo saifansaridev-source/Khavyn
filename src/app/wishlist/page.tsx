@@ -129,7 +129,7 @@ export default function WishlistPage() {
                       >
                         {item.name}
                       </Link>
-                      <p className="text-xs font-bold text-[#1A1A1A]">
+                      <p className="text-xs font-bold text-[#1A1A1A] font-numeric">
                         ₹{item.price.toLocaleString("en-IN")}
                       </p>
                     </div>

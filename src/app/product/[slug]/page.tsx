@@ -275,7 +275,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               {show360 ? (
                 <SpinViewer360 images={imageList} productName={product.name} />
               ) : (
-                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-[#F5F3EF] border border-[#D8C9B0]/40 group">
+                <div className="relative aspect-[3/4] w-full max-h-[600px] sm:max-h-[650px] lg:max-h-[700px] mx-auto rounded-lg overflow-hidden bg-[#F5F3EF] border border-[#D8C9B0]/40 group">
                   <Image
                     src={selectedImage}
                     alt={product.name}
@@ -327,15 +327,15 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
             {/* Price & Offer Badges */}
             <div className="space-y-1">
               <div className="flex items-baseline flex-wrap gap-3">
-                <span className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
+                <span className="font-numeric text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
                   ₹{product.price.toLocaleString("en-IN")}
                 </span>
                 {product.compareAtPrice && product.compareAtPrice > product.price && (
                   <>
-                    <span className="text-sm sm:text-base text-[#1A1A1A]/40 line-through font-sans">
+                    <span className="text-sm sm:text-base text-[#1A1A1A]/40 line-through font-numeric">
                       ₹{product.compareAtPrice.toLocaleString("en-IN")}
                     </span>
-                    <span className="text-xs font-bold text-[#8C6D2B] bg-[#C6A664]/20 border border-[#C6A664]/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="text-xs font-bold font-numeric text-[#8C6D2B] bg-[#C6A664]/20 border border-[#C6A664]/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                       {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% OFF
                     </span>
                   </>
@@ -503,7 +503,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                 >
                   <Minus className="w-4 h-4" />
                 </button>
-                <span className="w-10 text-center text-sm font-bold text-[#1A1A1A]">{quantity}</span>
+                <span className="w-10 text-center text-sm font-bold text-[#1A1A1A] font-numeric">{quantity}</span>
                 <button
                   type="button"
                   onClick={() => setQuantity((q) => Math.min(10, q + 1))}
@@ -673,15 +673,15 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                         {rel.name}
                       </h4>
                       <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-xs font-semibold text-[#1A1A1A]">
+                        <span className="text-xs font-semibold text-[#1A1A1A] font-numeric">
                           ₹{rel.price.toLocaleString("en-IN")}
                         </span>
                         {hasDiscount && (
                           <>
-                            <span className="text-[11px] text-[#1A1A1A]/40 line-through">
+                            <span className="text-[11px] text-[#1A1A1A]/40 line-through font-numeric">
                               ₹{rel.compareAtPrice?.toLocaleString("en-IN")}
                             </span>
-                            <span className="text-[10px] font-bold text-[#8C6D2B] bg-[#C6A664]/20 px-1.5 py-0.5 rounded">
+                            <span className="text-[10px] font-bold font-numeric text-[#8C6D2B] bg-[#C6A664]/20 px-1.5 py-0.5 rounded">
                               ({discountPercent}% OFF)
                             </span>
                           </>
@@ -990,7 +990,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs sm:text-sm font-medium text-[#1A1A1A] truncate">{product.name}</p>
-            <p className="text-xs sm:text-sm font-bold text-[#1A1A1A]">₹{product.price.toLocaleString("en-IN")}</p>
+            <p className="text-xs sm:text-sm font-bold text-[#1A1A1A] font-numeric">₹{product.price.toLocaleString("en-IN")}</p>
           </div>
           <select
             value={selectedSize}

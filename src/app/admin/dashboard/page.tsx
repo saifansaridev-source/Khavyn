@@ -666,6 +666,17 @@ export default function AdminDashboardPage() {
                 <span>Review Moderation</span>
               </div>
             </Link>
+
+            <Link
+              href="/admin/hero-images"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded text-xs font-semibold uppercase tracking-wider text-[#C6A664] bg-[#C6A664]/10 border border-[#C6A664]/30 hover:bg-[#C6A664]/20 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Hero Banner Images</span>
+              </div>
+            </Link>
           </div>
 
           <div className="pt-6 px-3">
@@ -712,7 +723,7 @@ export default function AdminDashboardPage() {
                     <span>Gross Order Value</span>
                     <DollarSign className="w-4 h-4 text-[#C6A664]" />
                   </div>
-                  <div className="text-2xl font-bold font-serif text-white">
+                  <div className="text-2xl font-bold font-numeric text-white">
                     ₹{totalRevenue.toLocaleString("en-IN")}
                   </div>
                   <div className="text-[11px] text-emerald-400 flex items-center gap-1">
@@ -726,7 +737,7 @@ export default function AdminDashboardPage() {
                     <span>Prepaid Advances Collected</span>
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   </div>
-                  <div className="text-2xl font-bold font-serif text-emerald-400">
+                  <div className="text-2xl font-bold font-numeric text-emerald-400">
                     ₹{totalAdvanceCollected.toLocaleString("en-IN")}
                   </div>
                   <div className="text-[11px] text-white/50">
@@ -739,7 +750,7 @@ export default function AdminDashboardPage() {
                     <span>Pending Partial COD Balance</span>
                     <AlertTriangle className="w-4 h-4 text-amber-400" />
                   </div>
-                  <div className="text-2xl font-bold font-serif text-amber-400">
+                  <div className="text-2xl font-bold font-numeric text-amber-400">
                     ₹{pendingCodBalance.toLocaleString("en-IN")}
                   </div>
                   <div className="text-[11px] text-amber-400/80">
@@ -753,7 +764,7 @@ export default function AdminDashboardPage() {
                     <Package className="w-4 h-4 text-[#C6A664]" />
                   </div>
                   <div className="text-2xl font-bold font-serif text-white">
-                    {productsList.length} Products
+                    <span className="font-numeric">{productsList.length}</span> Products
                   </div>
                   <div className="text-[11px] text-emerald-400">
                     4 Signature Collections
@@ -777,7 +788,7 @@ export default function AdminDashboardPage() {
                     <div key={idx} className="space-y-1">
                       <div className="flex justify-between text-xs font-medium">
                         <span className="text-white/90">{cat.name}</span>
-                        <span className="text-[#C6A664]">{cat.revenue} ({cat.share}%)</span>
+                        <span className="text-[#C6A664] font-numeric">{cat.revenue} ({cat.share}%)</span>
                       </div>
                       <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
                         <div className={`h-full ${cat.color}`} style={{ width: `${cat.share}%` }} />
@@ -870,16 +881,16 @@ export default function AdminDashboardPage() {
                             </td>
                             <td className="p-4 text-white/70 font-mono">{prod.styleCode}</td>
                             <td className="p-4 text-white/80">{prod.collectionName}</td>
-                            <td className="p-4 text-[#C6A664] font-bold">
+                            <td className="p-4 text-[#C6A664] font-bold font-numeric">
                               ₹{prod.price.toLocaleString("en-IN")}
                               {prod.compareAtPrice && (
-                                <span className="ml-2 text-white/40 line-through text-[10px]">
+                                <span className="ml-2 text-white/40 line-through text-[10px] font-numeric">
                                   ₹{prod.compareAtPrice.toLocaleString("en-IN")}
                                 </span>
                               )}
                             </td>
                             <td className="p-4">
-                              <div className="flex items-center gap-1.5 text-[10px]">
+                              <div className="flex items-center gap-1.5 text-[10px] font-numeric">
                                 <span className="bg-white/10 px-1.5 py-0.5 rounded text-white/90">S:{prod.stock.S}</span>
                                 <span className="bg-white/10 px-1.5 py-0.5 rounded text-white/90">M:{prod.stock.M}</span>
                                 <span className="bg-white/10 px-1.5 py-0.5 rounded text-white/90">L:{prod.stock.L}</span>
@@ -993,9 +1004,9 @@ export default function AdminDashboardPage() {
                             <div className="font-semibold text-white">{ord.customer}</div>
                             <div className="text-[10px] text-white/50">{ord.email}</div>
                           </td>
-                          <td className="p-4 font-bold text-white">₹{ord.total.toLocaleString("en-IN")}</td>
-                          <td className="p-4 text-emerald-400 font-medium">₹{ord.advancePaid.toLocaleString("en-IN")}</td>
-                          <td className="p-4">
+                          <td className="p-4 font-bold text-white font-numeric">₹{ord.total.toLocaleString("en-IN")}</td>
+                          <td className="p-4 text-emerald-400 font-medium font-numeric">₹{ord.advancePaid.toLocaleString("en-IN")}</td>
+                          <td className="p-4 font-numeric">
                             {ord.balanceCollected ? (
                               <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded">
                                 Collected (₹0)
@@ -1003,7 +1014,7 @@ export default function AdminDashboardPage() {
                             ) : (
                               <button
                                 onClick={() => handleToggleCodBalance(ord.id)}
-                                className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded transition-colors"
+                                className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded transition-colors font-numeric"
                               >
                                 ₹{ord.balanceDue.toLocaleString("en-IN")} (Click to Collect)
                               </button>
@@ -1124,7 +1135,7 @@ export default function AdminDashboardPage() {
                       <tr key={cust.id} className="hover:bg-white/5 transition-colors">
                         <td className="p-4 font-semibold text-white">{cust.name}</td>
                         <td className="p-4 text-white/70">{cust.email} ({cust.phone})</td>
-                        <td className="p-4 font-bold text-white">{cust.totalOrders}</td>
+                        <td className="p-4 font-bold text-white font-numeric">{cust.totalOrders}</td>
                         <td className="p-4">
                           {cust.riskLevel.includes("High") ? (
                             <span className="bg-red-500/20 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded">
@@ -1242,9 +1253,9 @@ export default function AdminDashboardPage() {
                       {coupons.map((cp, idx) => (
                         <tr key={idx} className="hover:bg-white/5 transition-colors">
                           <td className="p-4 font-mono font-bold text-white">{cp.code}</td>
-                          <td className="p-4 text-emerald-400 font-bold">{cp.discount}</td>
-                          <td className="p-4 text-white/80">₹{cp.minOrder.toLocaleString("en-IN")}</td>
-                          <td className="p-4 text-white font-bold">{cp.usageCount} times</td>
+                          <td className="p-4 text-emerald-400 font-bold font-numeric">{cp.discount}</td>
+                          <td className="p-4 text-white/80 font-numeric">₹{cp.minOrder.toLocaleString("en-IN")}</td>
+                          <td className="p-4 text-white font-bold"><span className="font-numeric">{cp.usageCount}</span> times</td>
                           <td className="p-4">
                             <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded">
                               {cp.status}
@@ -2191,9 +2202,9 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="bg-white/5 p-3 rounded space-y-1">
-                <p><strong>Total Amount:</strong> ₹{selectedOrderDetails.total.toLocaleString("en-IN")}</p>
-                <p><strong>Advance Paid:</strong> ₹{selectedOrderDetails.advancePaid.toLocaleString("en-IN")}</p>
-                <p><strong>Balance Due:</strong> ₹{selectedOrderDetails.balanceDue.toLocaleString("en-IN")}</p>
+                <p><strong>Total Amount:</strong> <span className="font-numeric font-bold">₹{selectedOrderDetails.total.toLocaleString("en-IN")}</span></p>
+                <p><strong>Advance Paid:</strong> <span className="font-numeric font-medium text-emerald-400">₹{selectedOrderDetails.advancePaid.toLocaleString("en-IN")}</span></p>
+                <p><strong>Balance Due:</strong> <span className="font-numeric font-medium text-amber-400">₹{selectedOrderDetails.balanceDue.toLocaleString("en-IN")}</span></p>
                 <p><strong>Tracking Number:</strong> {selectedOrderDetails.trackingId}</p>
               </div>
 

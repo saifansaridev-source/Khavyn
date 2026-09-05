@@ -165,7 +165,7 @@ export default function AccountPage() {
                             <span>
                               {item.name} ({item.size}) x {item.qty}
                             </span>
-                            <span className="font-semibold">
+                            <span className="font-semibold font-numeric">
                               ₹{item.price.toLocaleString("en-IN")}
                             </span>
                           </div>
@@ -176,10 +176,10 @@ export default function AccountPage() {
                       <div className="bg-[#FAF7F2] p-3 rounded text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-[#D8C9B0]/40">
                         <div>
                           <p className="text-[#1A1A1A]/70">
-                            Total Order Value: <strong className="text-[#1A1A1A]">₹{order.total.toLocaleString("en-IN")}</strong>
+                            Total Order Value: <strong className="text-[#1A1A1A] font-numeric">₹{order.total.toLocaleString("en-IN")}</strong>
                           </p>
                           <p className="text-[11px] text-[#1A1A1A]/60">
-                            Advance Paid: ₹{order.advancePaid.toLocaleString("en-IN")} | Balance Due: ₹{order.balanceDue.toLocaleString("en-IN")}
+                            Advance Paid: <span className="font-numeric">₹{order.advancePaid.toLocaleString("en-IN")}</span> | Balance Due: <span className="font-numeric">₹{order.balanceDue.toLocaleString("en-IN")}</span>
                           </p>
                         </div>
                         {order.trackingId && (

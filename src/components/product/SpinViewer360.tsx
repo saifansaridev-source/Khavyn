@@ -72,7 +72,7 @@ export const SpinViewer360: React.FC<SpinViewer360Props> = ({
   };
 
   return (
-    <div className="relative group rounded-lg overflow-hidden bg-[#F5F3EF] border border-[#D8C9B0]/40 p-4 select-none">
+    <div className="relative group rounded-lg overflow-hidden bg-[#F5F3EF] border border-[#D8C9B0]/40 p-4 select-none max-h-[600px] sm:max-h-[650px] lg:max-h-[700px] mx-auto">
       {/* Top Bar Controls */}
       <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between pointer-events-none">
         <div className="inline-flex items-center gap-2 bg-[#1A1A1A]/80 backdrop-blur-md px-3 py-1.5 rounded-full text-white text-xs tracking-wider uppercase font-medium pointer-events-auto">
@@ -109,7 +109,7 @@ export const SpinViewer360: React.FC<SpinViewer360Props> = ({
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
         onDragStart={(e) => e.preventDefault()}
-        className={`relative aspect-[3/4] w-full cursor-grab ${
+        className={`relative aspect-[3/4] w-full max-h-[560px] sm:max-h-[610px] lg:max-h-[660px] mx-auto cursor-grab ${
           isDragging ? "cursor-grabbing" : ""
         } flex items-center justify-center touch-none [perspective:1000px]`}
       >
