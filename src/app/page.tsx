@@ -104,34 +104,35 @@ export default function HomePage() {
       <AnnouncementBar />
       <Header />
 
-      {/* 1. HERO BANNER */}
-      <section className="relative w-full min-h-[85vh] bg-[#F0E9DD] flex items-center overflow-hidden border-b border-[#D8C9B0]/40">
+      {/* 1A. HERO IMAGE CAROUSEL (CLEAN, NO TEXT OVERLAY PER PART 11) */}
+      <section className="relative w-full h-[60vh] sm:h-[68vh] min-h-[420px] max-h-[640px] overflow-hidden bg-[#1A1A1A] border-b border-[#D8C9B0]/40">
         <HeroCarousel images={siteSettings.heroImages} />
+      </section>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full pointer-events-none">
-          <div className="max-w-xl space-y-6 pointer-events-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1A1A1A] text-[#C6A664] rounded-full text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>CRAFTING EVERYDAY LUXURY</span>
-            </div>
+      {/* 1B. HERO BRAND CONTENT SECTION (BELOW CAROUSEL ON OFF-WHITE BACKGROUND) */}
+      <section className="py-16 sm:py-20 bg-[#FAF7F2] border-b border-[#D8C9B0]/40 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#1A1A1A] text-[#C6A664] rounded-full text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>CRAFTING EVERYDAY LUXURY</span>
+          </div>
 
-            <h1 className="font-serif text-4xl sm:text-6xl font-bold tracking-tight text-[#1A1A1A] leading-[1.1]">
-              {siteSettings.heroHeadline}
-            </h1>
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#1A1A1A] leading-[1.15]">
+            {siteSettings.heroHeadline}
+          </h1>
 
-            <p className="text-sm sm:text-base text-[#1A1A1A]/80 leading-relaxed font-light">
-              {siteSettings.heroSubline}
-            </p>
+          <p className="text-sm sm:text-base text-[#1A1A1A]/75 leading-relaxed font-light max-w-2xl mx-auto">
+            {siteSettings.heroSubline}
+          </p>
 
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <Link
-                href="/shop"
-                className="bg-[#1A1A1A] text-white hover:bg-[#C6A664] hover:shadow-xl px-8 py-4 rounded-md text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-3 group"
-              >
-                <span>EXPLORE COLLECTIONS</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
+          <div className="pt-2 flex flex-wrap justify-center items-center gap-4">
+            <Link
+              href="/shop"
+              className="bg-[#1A1A1A] text-white hover:bg-[#C6A664] hover:shadow-xl px-8 py-4 rounded-md text-xs font-semibold uppercase tracking-[0.2em] transition-all duration-300 flex items-center gap-3 group shadow-md"
+            >
+              <span>EXPLORE COLLECTIONS</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </section>
@@ -453,18 +454,11 @@ export default function HomePage() {
                 KHAVYN was born out of a single obsession: creating garments that feel as remarkable as they look. We reject fast fashion, flimsy fabrics, and overt logos in favor of tailored lines, yarn-dyed combed cotton, and timeless European minimalism.
               </p>
 
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/10">
-                <div className="space-y-1">
-                  <h5 className="font-numeric text-xl font-bold text-[#C6A664]">100%</h5>
-                  <p className="text-[11px] text-white/60 uppercase tracking-wider">Combed Cotton</p>
-                </div>
-                <div className="space-y-1">
-                  <h5 className="font-numeric text-xl font-bold text-[#C6A664]">230 GSM</h5>
-                  <p className="text-[11px] text-white/60 uppercase tracking-wider">Heavyweight Knit</p>
-                </div>
-                <div className="space-y-1">
-                  <h5 className="font-numeric text-xl font-bold text-[#C6A664]">3 Days</h5>
-                  <p className="text-[11px] text-white/60 uppercase tracking-wider">Easy Exchange</p>
+              {/* Part 12 Fix: Single centered stat without GSM or 3 Days */}
+              <div className="pt-4 border-t border-white/10">
+                <div className="inline-block space-y-1 bg-white/5 border border-white/10 px-6 py-3 rounded-lg">
+                  <h5 className="font-numeric text-2xl font-bold text-[#C6A664]">100%</h5>
+                  <p className="text-[11px] text-white/70 uppercase tracking-wider">Combed Cotton</p>
                 </div>
               </div>
             </div>

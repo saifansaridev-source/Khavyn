@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import { SEED_PRODUCTS, ProductSeedInput } from "@/lib/data/productsData";
 import { useProductStore } from "@/store/useProductStore";
+import { DragDropUpload } from "@/components/admin/DragDropUpload";
 import { ImageDropzone } from "@/components/admin/ImageDropzone";
 
 export default function AdminDashboardPage() {
@@ -111,6 +112,7 @@ export default function AdminDashboardPage() {
     isBestSeller: false,
     isNewArrival: true,
     stock: { S: 10, M: 25, L: 20, XL: 15 },
+    videoUrl: "",
   };
 
   const [productForm, setProductForm] = useState<ProductSeedInput>(defaultProductTemplate);
@@ -677,6 +679,17 @@ export default function AdminDashboardPage() {
                 <span>Hero Banner Images</span>
               </div>
             </Link>
+
+            <Link
+              href="/admin/brand-imagery"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded text-xs font-semibold uppercase tracking-wider text-[#C6A664] bg-[#C6A664]/10 border border-[#C6A664]/30 hover:bg-[#C6A664]/20 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Brand Imagery</span>
+              </div>
+            </Link>
           </div>
 
           <div className="pt-6 px-3">
@@ -728,7 +741,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <div className="text-[11px] text-emerald-400 flex items-center gap-1">
                     <TrendingUp className="w-3 h-3" />
-                    <span>+18.4% vs last week</span>
+                    <span><span className="font-numeric">+18.4%</span> vs last week</span>
                   </div>
                 </div>
 
@@ -2067,10 +2080,12 @@ export default function AdminDashboardPage() {
                   ].map((imgField) => {
                     const currentUrl = (productForm.images as any)[imgField.key] || "";
                     return (
-                      <ImageDropzone
+                      <DragDropUpload
                         key={imgField.key}
                         label={imgField.label}
                         value={currentUrl}
+                        folder="khavyn/products"
+                        resourceType="image"
                         onChange={(newUrl) =>
                           setProductForm({
                             ...productForm,
@@ -2083,6 +2098,20 @@ export default function AdminDashboardPage() {
                       />
                     );
                   })}
+                </div>
+
+                {/* Product Video Showcase Upload */}
+                <div className="pt-3">
+                  <DragDropUpload
+                    label="Product Video Showcase (MP4 / WebM)"
+                    value={productForm.videoUrl || ""}
+                    onChange={(newUrl) =>
+                      setProductForm({ ...productForm, videoUrl: newUrl })
+                    }
+                    resourceType="video"
+                    folder="khavyn/product-videos"
+                    helperText="Upload a product video preview. Appears in the product page media gallery."
+                  />
                 </div>
               </div>
 

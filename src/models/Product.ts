@@ -33,6 +33,7 @@ export interface IProduct extends Document {
   price: number;
   compareAtPrice?: number;
   images: IProductImages;
+  videoUrl?: string;
   material: string;
   fabricWeight: string;
   fit: string;
@@ -96,6 +97,7 @@ const ProductSchema = new Schema<IProduct>(
     price: { type: Number, required: true },
     compareAtPrice: { type: Number },
     images: { type: ProductImagesSchema, required: true },
+    videoUrl: { type: String, default: "" },
     material: { type: String, required: true },
     fabricWeight: { type: String, required: true },
     fit: { type: String, required: true },

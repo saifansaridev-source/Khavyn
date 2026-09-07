@@ -16,30 +16,74 @@ import {
   ChevronUp,
 } from "lucide-react";
 
-const faqs = [
+interface FAQItem {
+  q: string;
+  a: React.ReactNode;
+}
+
+const faqs: FAQItem[] = [
   {
     q: "What is KHAVYN's exchange policy?",
-    a: "We offer a 3-day exchange window from the date of delivery. Items must be unworn, unwashed, and in original packaging with all tags attached. Initiate your exchange request from your account portal.",
+    a: (
+      <span>
+        We offer a 3-day exchange window from the date of delivery for unused, unworn, and unwashed garments with all original tags, labels, and packaging intact. Every returned piece undergoes a mandatory quality inspection at our atelier before an exchange shipment is dispatched. See our full{" "}
+        <Link href="/policies/returns" className="text-[#C6A664] underline hover:text-[#1A1A1A] font-medium">
+          Exchange Policy
+        </Link>{" "}
+        for details.
+      </span>
+    ),
   },
   {
     q: "How long does delivery take?",
-    a: "Standard delivery within India takes 4–7 business days. Express delivery (2–3 days) is available for select pin codes. International orders to UAE, UK, and US ship within 10–14 business days.",
+    a: (
+      <span>
+        Orders are processed within 1–3 business days. Following dispatch, estimated transit times are 2–5 business days for Metro cities, 3–7 business days for Non-Metro regions, and 5–10 business days for remote or rural locations across India. Refer to our{" "}
+        <Link href="/policies/shipping" className="text-[#C6A664] underline hover:text-[#1A1A1A] font-medium">
+          Shipping & Delivery Policy
+        </Link>{" "}
+        for tracking details.
+      </span>
+    ),
   },
   {
     q: "Is there a Cash on Delivery option?",
-    a: "Yes. KHAVYN offers a Partial COD option where you pay 50% online and the remaining balance on delivery. Full prepaid orders receive priority shipping.",
+    a: (
+      <span>
+        Yes, KHAVYN offers a Partial Cash on Delivery (COD) facility for eligible pin codes. Customers complete a 50% advance payment online at checkout, with the remaining 50% balance collected by our courier partner upon delivery. Full details are available in our{" "}
+        <Link href="/policies/payment" className="text-[#C6A664] underline hover:text-[#1A1A1A] font-medium">
+          Payment Policy
+        </Link>.
+      </span>
+    ),
   },
   {
     q: "How do I care for my KHAVYN garments?",
-    a: "Machine wash cold on gentle cycle. Dry in shade — avoid tumble drying. Iron on medium heat with a damp cloth between iron and fabric. Our bio-washed cotton actually improves softness with gentle washes.",
+    a: (
+      <span>
+        To preserve the rich texture and structure of our bio-washed combed cotton, machine wash cold on a gentle cycle or hand wash with mild detergent. Dry in the shade away from direct sunlight, avoid bleach or tumble drying, and iron on reverse for embroidered pieces.
+      </span>
+    ),
   },
   {
     q: "Do you offer bulk/corporate orders?",
-    a: "Absolutely. We work with companies looking to outfit their teams in premium KHAVYN formal shirts and polos. Contact us directly for bulk pricing, custom embroidery, and branded packaging options.",
+    a: (
+      <span>
+        Yes. Our corporate concierge assists organizations with executive gifting, bespoke company uniforms, and bulk orders of our formal shirts and polo collections. Please contact our concierge desk directly at{" "}
+        <a href="mailto:complaint.khavyn@gmail.com" className="text-[#C6A664] underline hover:text-[#1A1A1A] font-medium">
+          complaint.khavyn@gmail.com
+        </a>{" "}
+        for custom quantities and embroidery specifications.
+      </span>
+    ),
   },
   {
     q: "Where are KHAVYN garments manufactured?",
-    a: "All KHAVYN garments are designed with European proportions and manufactured in our partner facility in Sangavi, Pune, Maharashtra — under strict 14-point quality control.",
+    a: (
+      <span>
+        All KHAVYN garments are drafted with European architectural proportions and tailored at our dedicated production hub in Bangalore and Tripur, India. Every creation reflects our steadfast Make in India commitment and passes a 14-point checkpoint before earning the KHAVYN mark.
+      </span>
+    ),
   },
 ];
 
@@ -64,7 +108,6 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate network delay
     await new Promise((r) => setTimeout(r, 1800));
     setIsSubmitting(false);
     setSubmitted(true);
@@ -77,9 +120,11 @@ export default function ContactPage() {
 
       {/* PAGE HEADER */}
       <section className="bg-[#1A1A1A] py-20 text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5"
+        <div
+          className="absolute inset-0 opacity-5"
           style={{
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 39px, #C6A664 39px, #C6A664 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, #C6A664 39px, #C6A664 40px)"
+            backgroundImage:
+              "repeating-linear-gradient(0deg, transparent, transparent 39px, #C6A664 39px, #C6A664 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, #C6A664 39px, #C6A664 40px)",
           }}
         />
         <div className="relative z-10 max-w-2xl mx-auto px-4 space-y-4">
@@ -99,14 +144,12 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* CONTACT GRID */}
+      {/* MAIN CONTACT SECTION */}
       <section className="py-20 bg-[#FAF7F2]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-
-            {/* LEFT — Info & Channels */}
-            <div className="lg:col-span-2 space-y-10">
-              {/* Contact Info */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
+            {/* LEFT — Info & Channels (2 cols) */}
+            <div className="lg:col-span-2 space-y-8">
               <div className="space-y-6">
                 <h2 className="font-serif text-2xl font-bold text-[#1A1A1A]">
                   Our Concierge Channels
@@ -172,60 +215,9 @@ export default function ContactPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Divider */}
-              <div className="h-px bg-[#D8C9B0]/40" />
-
-              {/* Map */}
-              <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
-                  Location Map
-                </p>
-                <div className="w-full h-48 rounded-lg overflow-hidden border border-[#D8C9B0]/40">
-                  <iframe 
-                    src="https://maps.google.com/maps?q=Sr+No+80/16+Samarth+Nagar,+New+Sangavi,+Pune,+Maharashtra&t=&z=15&ie=UTF8&iwloc=&output=embed" 
-                    width="100%" 
-                    height="100%" 
-                    style={{ border: 0 }} 
-                    allowFullScreen={false} 
-                    loading="lazy" 
-                    referrerPolicy="no-referrer-when-downgrade"
-                  ></iframe>
-                </div>
-                <a href="https://share.google/LjPlIkzfZOwNMAwEU" target="_blank" rel="noreferrer" className="text-[11px] text-[#C6A664] hover:underline font-medium flex items-center gap-1">
-                  Open in Google Maps →
-                </a>
-              </div>
-
-              {/* Divider */}
-              <div className="h-px bg-[#D8C9B0]/40" />
-
-              {/* Quick Links */}
-              <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
-                  Quick Self-Service
-                </p>
-                <div className="space-y-2">
-                  {[
-                    { href: "/account", label: "Track Your Order" },
-                    { href: "/account", label: "Initiate Exchange / Return" },
-                    { href: "/policies/shipping", label: "Shipping Information" },
-                    { href: "/policies/returns", label: "Return & Exchange Policy" },
-                  ].map((l) => (
-                    <Link
-                      key={l.label}
-                      href={l.href}
-                      className="flex items-center justify-between py-2 border-b border-[#D8C9B0]/30 text-xs text-[#1A1A1A]/70 hover:text-[#C6A664] transition-colors group"
-                    >
-                      <span>{l.label}</span>
-                      <span className="text-[#D8C9B0] group-hover:text-[#C6A664] transition-colors">→</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
             </div>
 
-            {/* RIGHT — Contact Form */}
+            {/* RIGHT — Contact Form (3 cols) */}
             <div className="lg:col-span-3">
               {submitted ? (
                 <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center space-y-5 bg-[#F5F3EF] rounded-lg border border-[#D8C9B0]/40 p-10">
@@ -235,14 +227,17 @@ export default function ContactPage() {
                     Thank you for reaching out to the KHAVYN Concierge. Our team will respond to your enquiry within 4–6 hours.
                   </p>
                   <button
-                    onClick={() => { setSubmitted(false); setFormState({ name: "", email: "", phone: "", subject: "", message: "" }); }}
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFormState({ name: "", email: "", phone: "", subject: "", message: "" });
+                    }}
                     className="mt-4 text-xs font-semibold uppercase tracking-wider text-[#C6A664] hover:text-[#1A1A1A] transition-colors border-b border-[#C6A664] pb-0.5"
                   >
                     Send Another Message
                   </button>
                 </div>
               ) : (
-                <div className="bg-[#F5F3EF] rounded-lg border border-[#D8C9B0]/40 p-8 sm:p-10">
+                <div className="bg-[#F5F3EF] rounded-lg border border-[#D8C9B0]/40 p-8 sm:p-10 shadow-sm">
                   <h2 className="font-serif text-2xl font-bold text-[#1A1A1A] mb-1">
                     Send Us a Message
                   </h2>
@@ -360,10 +355,88 @@ export default function ContactPage() {
               )}
             </div>
           </div>
+
+          {/* PART 10 FIX: Side-by-Side Map & Quick Self-Service Grid */}
+          <div className="pt-8 border-t border-[#D8C9B0]/50">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+              {/* Column 1: Location Map */}
+              <div className="bg-[#F5F3EF] border border-[#D8C9B0]/50 rounded-lg p-6 flex flex-col justify-between space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
+                      Registered Atelier Map
+                    </p>
+                    <a
+                      href="https://share.google/LjPlIkzfZOwNMAwEU"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] text-[#C6A664] hover:underline font-medium"
+                    >
+                      Open in Google Maps →
+                    </a>
+                  </div>
+                  <p className="text-xs text-[#1A1A1A]/60 font-light">
+                    New Sangavi, Pune — 411061, Maharashtra
+                  </p>
+                </div>
+
+                <div className="w-full h-56 rounded-md overflow-hidden border border-[#D8C9B0]/40 flex-1 min-h-[220px]">
+                  <iframe
+                    src="https://maps.google.com/maps?q=Sr+No+80/16+Samarth+Nagar,+New+Sangavi,+Pune,+Maharashtra&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={false}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              </div>
+
+              {/* Column 2: Quick Self-Service Links */}
+              <div className="bg-[#F5F3EF] border border-[#D8C9B0]/50 rounded-lg p-6 flex flex-col justify-between space-y-4">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
+                    Quick Self-Service Portal
+                  </p>
+                  <p className="text-xs text-[#1A1A1A]/60 font-light">
+                    Instant access to order tracking, exchanges, and verified brand policies.
+                  </p>
+                </div>
+
+                <div className="space-y-2.5 flex-1 flex flex-col justify-center">
+                  {[
+                    { href: "/account", label: "Track Your Order", desc: "Real-time dispatch status via AWB tracking" },
+                    { href: "/account", label: "Initiate Exchange / Return", desc: "Submit 3-day window exchange requests" },
+                    { href: "/policies/shipping", label: "Shipping Information", desc: "Timelines across Metro and Non-Metro pincodes" },
+                    { href: "/policies/returns", label: "Return & Exchange Policy", desc: "Review 14-point inspection criteria" },
+                  ].map((l) => (
+                    <Link
+                      key={l.label}
+                      href={l.href}
+                      className="flex items-center justify-between p-3 rounded-md bg-white border border-[#D8C9B0]/40 text-xs text-[#1A1A1A]/80 hover:text-[#C6A664] hover:border-[#C6A664]/60 transition-all group shadow-2xs"
+                    >
+                      <div>
+                        <span className="font-semibold block text-[#1A1A1A] group-hover:text-[#C6A664] transition-colors">
+                          {l.label}
+                        </span>
+                        <span className="text-[10px] text-[#1A1A1A]/50 font-light">
+                          {l.desc}
+                        </span>
+                      </div>
+                      <span className="text-[#D8C9B0] group-hover:text-[#C6A664] group-hover:translate-x-0.5 transition-all text-sm font-bold">
+                        →
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ SECTION — Policy-Accurate Answers per Part 9 */}
       <section className="py-20 bg-[#F0E9DD] border-t border-[#D8C9B0]/40">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-3 mb-12">
@@ -387,7 +460,7 @@ export default function ContactPage() {
                   className="w-full flex items-center justify-between px-6 py-4 text-left"
                   aria-expanded={openFaq === i}
                 >
-                  <span className="text-sm font-medium text-[#1A1A1A] pr-4">{faq.q}</span>
+                  <span className="text-sm font-semibold text-[#1A1A1A] pr-4">{faq.q}</span>
                   {openFaq === i ? (
                     <ChevronUp className="w-4 h-4 text-[#C6A664] flex-shrink-0" />
                   ) : (
@@ -396,7 +469,7 @@ export default function ContactPage() {
                 </button>
                 {openFaq === i && (
                   <div className="px-6 pb-5 border-t border-[#D8C9B0]/30">
-                    <p className="text-xs text-[#1A1A1A]/65 leading-relaxed font-light pt-4">
+                    <p className="text-xs text-[#1A1A1A]/75 leading-relaxed font-light pt-4">
                       {faq.a}
                     </p>
                   </div>

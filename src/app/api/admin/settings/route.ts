@@ -27,6 +27,8 @@ const DEFAULT_SETTINGS = {
     frequency: "once_per_session" as "once_per_session" | "every_visit",
   },
   returnPolicyNotice: "Hassle-free 7-day returns & exchanges on all eligible unworn apparel items.",
+  aboutHeroImage: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+  craftedInIndiaImage: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=900&auto=format&fit=crop&q=80",
 };
 
 export async function GET() {

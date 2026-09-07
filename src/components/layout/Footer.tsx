@@ -188,43 +188,43 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Column 5 & 6: Newsletter & K Logo */}
-          <div className="lg:col-span-2 flex items-start justify-between gap-6">
-            <div className="space-y-3 flex-1">
-              <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
-                Private Privileges
-              </h4>
-              <p className="text-xs text-white/70 leading-relaxed max-w-xs">
-                Subscribe to receive exclusive access to capsule releases, private sales, and sartorial recommendations.
-              </p>
+          {/* Column 5 & 6: Newsletter with K Logo below */}
+          <div className="lg:col-span-2 space-y-4">
+            <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
+              Private Privileges
+            </h4>
+            <p className="text-xs text-white/70 leading-relaxed max-w-sm">
+              Subscribe to receive exclusive access to capsule releases, private sales, and sartorial recommendations.
+            </p>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  alert("Thank you for subscribing to KHAVYN Private Privileges.");
-                }}
-                className="flex items-center border border-white/20 rounded overflow-hidden focus-within:border-[#C6A664] max-w-xs"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                alert("Thank you for subscribing to KHAVYN Private Privileges.");
+              }}
+              className="flex items-center border border-white/20 rounded overflow-hidden focus-within:border-[#C6A664] max-w-sm"
+            >
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                required
+                className="w-full bg-white/5 text-xs px-3 py-2.5 text-white focus:outline-none placeholder:text-white/40"
+              />
+              <button
+                type="submit"
+                aria-label="Subscribe"
+                className="bg-[#C6A664] text-black p-2.5 hover:bg-white transition-colors"
               >
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  required
-                  className="w-full bg-white/5 text-xs px-3 py-2.5 text-white focus:outline-none placeholder:text-white/40"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#C6A664] text-black p-2.5 hover:bg-white transition-colors"
-                >
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </form>
-            </div>
-            
-            <div className="hidden lg:flex items-center justify-center pt-2">
-              <img 
-                src="/k-logo.png" 
-                alt="KHAVYN K" 
-                className="w-44 h-auto object-contain opacity-90" 
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* Repositioned K Logo directly below newsletter */}
+            <div className="pt-2">
+              <img
+                src="/k-logo.png"
+                alt="KHAVYN Monogram"
+                className="w-24 sm:w-28 max-w-[120px] h-auto object-contain opacity-85"
               />
             </div>
           </div>

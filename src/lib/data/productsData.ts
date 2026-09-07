@@ -23,6 +23,7 @@ export interface ProductSeedInput {
     modelBack: string;
     model45: string;
   };
+  videoUrl?: string;
   material: string;
   fabricWeight: string;
   fit: string;

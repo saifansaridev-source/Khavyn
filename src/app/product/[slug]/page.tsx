@@ -7,7 +7,6 @@ import { useRouter, notFound } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
-import { SpinViewer360 } from "@/components/product/SpinViewer360";
 import { WishlistButton } from "@/components/product/WishlistButton";
 import { RecentlyViewed } from "@/components/product/RecentlyViewed";
 import { RestockNotifyModal } from "@/components/product/RestockNotifyModal";
@@ -18,7 +17,7 @@ import {
   ShieldCheck,
   Plus,
   Minus,
-  RotateCw as SpinIcon,
+  Film,
   Ruler,
   MessageSquare,
   Send,
@@ -80,7 +79,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
   const [selectedImage, setSelectedImage] = useState<string>(imageList[0]);
   const [selectedSize, setSelectedSize] = useState<string>("M");
-  const [show360, setShow360] = useState<boolean>(false);
+  const [isVideoSelected, setIsVideoSelected] = useState<boolean>(false);
   const [sizeGuideOpen, setSizeGuideOpen] = useState<boolean>(false);
   const [openAccordion, setOpenAccordion] = useState<string | null>(null);
 
@@ -143,7 +142,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   // Keep selected image updated when product slug changes
   useEffect(() => {
     setSelectedImage(product.images.front);
-    setShow360(false);
+    setIsVideoSelected(false);
   }, [product.slug, product.images.front]);
 
   const toggleAccordion = (name: string) => {
@@ -236,7 +235,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Left Column: Image Gallery & 360 Viewer (7 cols) */}
+          {/* Left Column: Image & Video Gallery (7 cols) */}
           <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4">
             {/* Thumbnail Rail */}
             <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto max-h-[600px] scrollbar-none order-2 sm:order-1">
@@ -245,10 +244,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   key={idx}
                   onClick={() => {
                     setSelectedImage(img);
-                    setShow360(false);
+                    setIsVideoSelected(false);
                   }}
                   className={`relative w-16 h-20 rounded border overflow-hidden flex-shrink-0 transition-all ${
-                    !show360 && selectedImage === img
+                    !isVideoSelected && selectedImage === img
                       ? "ring-2 ring-[#C6A664] border-transparent"
                       : "border-[#D8C9B0]/50 hover:border-[#1A1A1A]"
                   }`}
@@ -257,25 +256,35 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                 </button>
               ))}
 
-              {/* 360 Spin Thumbnail Button */}
-              <button
-                onClick={() => setShow360(true)}
-                className={`relative w-16 h-20 rounded border flex flex-col items-center justify-center gap-1 bg-[#1A1A1A] text-[#C6A664] flex-shrink-0 transition-all ${
-                  show360 ? "ring-2 ring-[#C6A664]" : "hover:bg-black"
-                }`}
-                title="Launch Interactive 360° Spin"
-              >
-                <SpinIcon className="w-5 h-5 animate-spin-slow" />
-                <span className="text-[9px] font-bold uppercase">360°</span>
-              </button>
+              {/* Product Video Thumbnail Button (if product has videoUrl) */}
+              {product.videoUrl && (
+                <button
+                  onClick={() => setIsVideoSelected(true)}
+                  className={`relative w-16 h-20 rounded border flex flex-col items-center justify-center gap-1 bg-[#1A1A1A] text-[#C6A664] flex-shrink-0 transition-all ${
+                    isVideoSelected ? "ring-2 ring-[#C6A664]" : "hover:bg-black"
+                  }`}
+                  title="Watch Product Video"
+                >
+                  <Film className="w-5 h-5 text-[#C6A664]" />
+                  <span className="text-[9px] font-bold uppercase">Video</span>
+                </button>
+              )}
             </div>
 
-            {/* Main Display Frame */}
+            {/* Main Display Frame — Capped height per Part 8 */}
             <div className="flex-1 order-1 sm:order-2">
-              {show360 ? (
-                <SpinViewer360 images={imageList} productName={product.name} />
+              {isVideoSelected && product.videoUrl ? (
+                <div className="relative aspect-[3/4] w-full max-h-[70vh] sm:max-h-[75vh] lg:max-h-[600px] mx-auto rounded-lg overflow-hidden bg-black border border-[#D8C9B0]/40 flex items-center justify-center">
+                  <video
+                    src={product.videoUrl}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               ) : (
-                <div className="relative aspect-[3/4] w-full max-h-[600px] sm:max-h-[650px] lg:max-h-[700px] mx-auto rounded-lg overflow-hidden bg-[#F5F3EF] border border-[#D8C9B0]/40 group">
+                <div className="relative aspect-[3/4] w-full max-h-[70vh] sm:max-h-[75vh] lg:max-h-[600px] mx-auto rounded-lg overflow-hidden bg-[#F5F3EF] border border-[#D8C9B0]/40 group">
                   <Image
                     src={selectedImage}
                     alt={product.name}
@@ -283,13 +292,6 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                     priority
                     className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  <button
-                    onClick={() => setShow360(true)}
-                    className="absolute bottom-4 right-4 bg-[#1A1A1A]/85 backdrop-blur-md text-[#C6A664] text-xs px-3.5 py-2 rounded-full flex items-center gap-2 shadow-lg hover:bg-[#1A1A1A] transition-colors"
-                  >
-                    <SpinIcon className="w-4 h-4" />
-                    <span>Launch 360° View</span>
-                  </button>
                 </div>
               )}
             </div>
@@ -303,7 +305,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   New Arrival
                 </span>
               )}
-              <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#1A1A1A]">
+              <h1 className="font-serif text-xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#1A1A1A]">
                 {product.name}
               </h1>
               <p className="text-xs text-[#1A1A1A]/60 font-medium">
@@ -318,21 +320,21 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
                   <Star key={i} className="w-4 h-4 fill-[#C6A664]" />
                 ))}
               </div>
-              <span className="text-xs font-semibold text-[#1A1A1A]">4.9</span>
+              <span className="text-xs font-semibold text-[#1A1A1A] font-numeric">4.9</span>
               <span className="text-xs text-[#1A1A1A]/50">
-                ({reviews.length > 0 ? reviews.length + 148 : 148} verified reviews)
+                (<span className="font-numeric">{reviews.length > 0 ? reviews.length + 148 : 148}</span> verified reviews)
               </span>
             </div>
 
             {/* Price & Offer Badges */}
             <div className="space-y-1">
               <div className="flex items-baseline flex-wrap gap-3">
-                <span className="font-numeric text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
+                <span className="font-numeric text-lg sm:text-2xl lg:text-3xl font-bold text-[#1A1A1A]">
                   ₹{product.price.toLocaleString("en-IN")}
                 </span>
                 {product.compareAtPrice && product.compareAtPrice > product.price && (
                   <>
-                    <span className="text-sm sm:text-base text-[#1A1A1A]/40 line-through font-numeric">
+                    <span className="text-xs sm:text-sm lg:text-base text-[#1A1A1A]/40 line-through font-numeric">
                       ₹{product.compareAtPrice.toLocaleString("en-IN")}
                     </span>
                     <span className="text-xs font-bold font-numeric text-[#8C6D2B] bg-[#C6A664]/20 border border-[#C6A664]/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -546,15 +548,11 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
               />
             </div>
 
-            {/* Trust Icons Row */}
-            <div className="bg-[#F0E9DD] rounded-lg p-4 grid grid-cols-3 gap-2 border border-[#D8C9B0]/50 text-center text-[11px] font-medium text-[#1A1A1A]">
-              <div className="flex flex-col items-center gap-1.5 p-1">
+            {/* Trust Icons Row — Cleaned per Part 12 */}
+            <div className="bg-[#F0E9DD] rounded-lg p-4 grid grid-cols-2 gap-4 border border-[#D8C9B0]/50 text-center text-[11px] font-medium text-[#1A1A1A]">
+              <div className="flex flex-col items-center gap-1.5 p-1 border-r border-[#D8C9B0]/60">
                 <Truck className="w-5 h-5 text-[#C6A664]" />
                 <span>Free Shipping Above ₹2,499</span>
-              </div>
-              <div className="flex flex-col items-center gap-1.5 p-1 border-x border-[#D8C9B0]">
-                <RotateCw className="w-5 h-5 text-[#C6A664]" />
-                <span>3 Days Easy Exchange</span>
               </div>
               <div className="flex flex-col items-center gap-1.5 p-1">
                 <ShieldCheck className="w-5 h-5 text-[#C6A664]" />

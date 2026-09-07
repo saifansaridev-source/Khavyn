@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
@@ -15,7 +17,7 @@ const values = [
   {
     icon: Layers,
     title: "Architectural Precision",
-    desc: "Our patterns are drafted in European proportions, then refined by master tailors in Pune to marry minimal silhouette with ultimate wearability.",
+    desc: "Our patterns are drafted in European proportions, then refined by master tailors to marry minimal silhouette with ultimate wearability.",
   },
   {
     icon: Diamond,
@@ -63,35 +65,58 @@ const milestones = [
 ];
 
 export default function AboutPage() {
+  const [aboutHeroImage, setAboutHeroImage] = useState(
+    "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85"
+  );
+  const [craftedInIndiaImage, setCraftedInIndiaImage] = useState(
+    "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=900&auto=format&fit=crop&q=80"
+  );
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.settings) {
+          if (data.settings.aboutHeroImage) {
+            setAboutHeroImage(data.settings.aboutHeroImage);
+          }
+          if (data.settings.craftedInIndiaImage) {
+            setCraftedInIndiaImage(data.settings.craftedInIndiaImage);
+          }
+        }
+      })
+      .catch((err) => console.error("Error loading about page imagery", err));
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#1A1A1A]">
       <AnnouncementBar />
       <Header />
 
-      {/* HERO */}
-      <section className="relative h-[70vh] min-h-[480px] bg-[#1A1A1A] flex items-center overflow-hidden">
+      {/* HERO — Height capped to h-[50vh] min-h-[380px] max-h-[500px] per Part 4 */}
+      <section className="relative h-[50vh] min-h-[380px] max-h-[500px] bg-[#1A1A1A] flex items-center overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85"
+          src={aboutHeroImage}
           alt="KHAVYN Brand Story"
           fill
           priority
           className="object-cover object-center opacity-30"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A1A] via-[#1A1A1A]/80 to-transparent" />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
-          <div className="max-w-2xl space-y-5">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+          <div className="max-w-2xl space-y-4">
             <div className="flex items-center gap-2">
               <div className="h-px w-12 bg-[#C6A664]" />
               <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[#C6A664]">
                 Our Heritage
               </span>
             </div>
-            <h1 className="font-serif text-5xl sm:text-6xl font-bold text-white leading-[1.05] tracking-tight">
+            <h1 className="font-serif text-4xl sm:text-5xl font-bold text-white leading-[1.1] tracking-tight">
               Crafting<br />
               <span className="italic font-normal text-[#C6A664]">Everyday Luxury</span>
             </h1>
             <p className="text-sm sm:text-base text-white/70 leading-relaxed font-light max-w-lg">
-              Born in Pune. Refined in Europe. Worn by modern gentlemen who demand more than fashion — they demand substance.
+              Refined in Europe. Worn by modern gentlemen who demand more than fashion — they demand substance.
             </p>
           </div>
         </div>
@@ -144,29 +169,22 @@ export default function AboutPage() {
                   className="object-cover"
                 />
               </div>
-              {/* Floating stat card */}
-              <div className="absolute -bottom-6 -left-6 bg-[#1A1A1A] text-white p-5 rounded-lg shadow-2xl border border-[#C6A664]/30 max-w-[180px]">
-                <p className="font-serif text-3xl font-bold text-[#C6A664]">230</p>
-                <p className="text-[10px] uppercase tracking-wider text-white/70 mt-1">GSM Heavyweight Knit</p>
-                <p className="text-[10px] text-white/50 mt-1 font-light">Our signature weight standard</p>
-              </div>
+              {/* Note: Floating stat card removed per Part 12 */}
             </div>
           </div>
         </div>
       </section>
 
-      {/* STATS ROW */}
+      {/* STATS ROW — Cleaned per Part 12 & formatted with font-numeric per Part 5 */}
       <section className="py-14 bg-[#F0E9DD] border-y border-[#D8C9B0]/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 max-w-xl mx-auto gap-8 text-center">
             {[
               { val: "100%", label: "Combed Cotton" },
-              { val: "230 GSM", label: "Min. Fabric Weight" },
               { val: "11", label: "Angles Per Product" },
-              { val: "3 Days", label: "Exchange Window" },
             ].map((s) => (
               <div key={s.label} className="space-y-1">
-                <p className="font-serif text-3xl sm:text-4xl font-bold text-[#C6A664]">{s.val}</p>
+                <p className="font-numeric text-3xl sm:text-4xl font-bold text-[#C6A664]">{s.val}</p>
                 <p className="text-[11px] uppercase tracking-wider text-[#1A1A1A]/60">{s.label}</p>
               </div>
             ))}
@@ -246,14 +264,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* TEAM / CRAFTED IN PUNE */}
-      <section className="py-24 bg-[#F0E9DD] border-t border-[#D8C9B0]/40">
+      {/* CRAFTED IN INDIA — Updated per Part 6 & Part 1/2/6 Section C */}
+      <section id="crafted" className="py-24 bg-[#F0E9DD] border-t border-[#D8C9B0]/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-[#D8C9B0]/60 shadow-lg">
               <Image
-                src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=900&auto=format&fit=crop&q=80"
-                alt="KHAVYN Atelier Pune"
+                src={craftedInIndiaImage}
+                alt="KHAVYN Atelier Bangalore & Tripur"
                 fill
                 className="object-cover"
               />
@@ -264,11 +282,11 @@ export default function AboutPage() {
                 Crafted in India
               </span>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A] leading-snug">
-                Designed in Europe.<br />Made with Pride in Pune.
+                Designed in Europe.<br />Made with Pride in Bangalore.
               </h2>
               <div className="h-px w-16 bg-gradient-to-r from-[#C6A664] to-transparent" />
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
-                Our production hub is based in Banglore and Triupur home to some of India&apos;s most skilled garment craftsmen. Every piece passes through a 14-point quality checkpoint before it earns the KHAVYN label.
+                Our production hub is based in Bangalore and Tripur, home to some of India&apos;s most skilled garment craftsmen. Every piece passes through a 14-point quality checkpoint before it earns the KHAVYN label.
               </p>
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
                 We are proudly a Make in India brand — not as a marketing slogan, but as a genuine commitment to the artisans, mills, and textile workers who breathe life into every garment we create.

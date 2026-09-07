@@ -24,6 +24,8 @@ export interface IStoreSettings extends Document {
   heroSubline: string;
   heroImages: string[];
   collectionImages: ICollectionCard[];
+  aboutHeroImage?: string;
+  craftedInIndiaImage?: string;
   freeShippingThreshold: number;
   standardShippingFee: number;
   partialCodAdvanceAmount: number;
@@ -108,6 +110,14 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     collectionImages: {
       type: [CollectionCardSchema],
       default: () => DEFAULT_COLLECTION_IMAGES,
+    },
+    aboutHeroImage: {
+      type: String,
+      default: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
+    },
+    craftedInIndiaImage: {
+      type: String,
+      default: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=900&auto=format&fit=crop&q=80",
     },
     freeShippingThreshold: { type: Number, default: 2499 },
     standardShippingFee: { type: Number, default: 150 },
