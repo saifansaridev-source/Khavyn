@@ -17,6 +17,18 @@ export async function sendPhoneOtp(
   phone: string,
   otpCode: string
 ): Promise<PhoneOtpResponse> {
+  // Feature flag to disable MSG91 SMS OTP dispatch (Email-only verification active)
+  const ENABLE_MSG91_OTP = false;
+
+  // Phone OTP is disabled per email-only verification policy
+  if (!ENABLE_MSG91_OTP) {
+    return {
+      success: true,
+      simulated: true,
+      message: "Phone OTP disabled; account verification is email-only.",
+    };
+  }
+
   const authKey = process.env.MSG91_AUTH_KEY;
   // Clean phone number (strip whitespace, ensure India +91 or raw 10 digits)
   const cleanedPhone = phone.replace(/\D/g, "");
@@ -24,12 +36,6 @@ export async function sendPhoneOtp(
 
   // Development / fallback simulation when MSG91 auth key is not configured
   if (!authKey || authKey.trim() === "" || authKey.includes("XXXXXXXX")) {
-    console.log("--------------------------------------------------");
-    console.log(`[KHAVYN SMS SERVICE - SIMULATED MSG91 OTP]`);
-    console.log(`To Phone: +${formattedPhone}`);
-    console.log(`OTP Code: ${otpCode}`);
-    console.log(`Time: ${new Date().toISOString()}`);
-    console.log("--------------------------------------------------");
     return {
       success: true,
       simulated: true,
@@ -38,7 +44,7 @@ export async function sendPhoneOtp(
   }
 
   try {
-    // MSG91 OTP API v5
+    // MSG91 OTP API v5 (disabled by feature-flag above)
     const url = new URL("https://control.msg91.com/api/v5/otp");
     url.searchParams.set("template_id", process.env.MSG91_TEMPLATE_ID || "khavyn_otp");
     url.searchParams.set("mobile", formattedPhone);

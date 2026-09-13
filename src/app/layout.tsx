@@ -4,6 +4,7 @@ import "./globals.css";
 import { UserSessionProvider } from "@/components/auth/UserSessionProvider";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { OfferPopup } from "@/components/layout/OfferPopup";
+import { PromoPopup } from "@/components/layout/PromoPopup";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -58,6 +59,7 @@ export default function RootLayout({
           {children}
           <WhatsAppButton />
           <OfferPopup />
+          <PromoPopup />
         </UserSessionProvider>
       </body>
     </html>

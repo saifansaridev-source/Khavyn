@@ -2,9 +2,9 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IOtpVerification extends Document {
   email: string;
-  phone: string;
+  phone?: string;
   emailOtpHashed: string;
-  phoneOtpHashed: string;
+  phoneOtpHashed?: string;
   emailVerified: boolean;
   phoneVerified: boolean;
   expiresAt: Date;
@@ -14,9 +14,9 @@ export interface IOtpVerification extends Document {
 const OtpVerificationSchema = new Schema<IOtpVerification>(
   {
     email: { type: String, required: true, index: true },
-    phone: { type: String, required: true },
+    phone: { type: String, required: false },
     emailOtpHashed: { type: String, required: true },
-    phoneOtpHashed: { type: String, required: true },
+    phoneOtpHashed: { type: String, required: false },
     emailVerified: { type: Boolean, default: false },
     phoneVerified: { type: Boolean, default: false },
     expiresAt: {

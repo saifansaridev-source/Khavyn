@@ -25,6 +25,15 @@ const DEFAULT_SETTINGS = {
     frequency: "once_per_session" as "once_per_session" | "every_visit",
   },
   returnPolicyNotice: "Hassle-free 7-day returns & exchanges on all eligible unworn apparel items.",
+  popupEnabled: false,
+  popupImage: "",
+  popupHeadline: "Season Sale",
+  popupSubtext: "Up to 40% off, this week only.",
+  popupCtaText: "Shop Now",
+  popupCtaLink: "/shop",
+  popupDelaySeconds: 3,
+  popupFrequency: "once_per_session" as "every_visit" | "once_per_session" | "once_per_day",
+  popupShowOnMobile: true,
 };
 
 export async function GET() {

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/connect";
 import { Order } from "@/models/Order";
 import { generateInvoicePdf } from "@/lib/invoice/generateInvoicePdf";
+import { getAuthenticatedUser } from "@/lib/userAuth";
+import { getAdminSession } from "@/lib/adminAuth";
 
 export async function GET(
   req: Request,
@@ -26,6 +28,30 @@ export async function GET(
         { success: false, error: "Order not found." },
         { status: 404 }
       );
+    }
+
+    // Authorization check: Admin or the order owner only
+    const adminSession = await getAdminSession();
+    if (!adminSession) {
+      const userSession = await getAuthenticatedUser();
+      if (!userSession) {
+        return NextResponse.json(
+          { success: false, error: "Unauthorized. Please log in to download this invoice." },
+          { status: 401 }
+        );
+      }
+
+      const isOwner =
+        (userSession.userId && String(order.userId) === String(userSession.userId)) ||
+        (userSession.email && order.customerEmail?.toLowerCase() === userSession.email.toLowerCase()) ||
+        (userSession.email && order.shippingAddress?.email?.toLowerCase() === userSession.email.toLowerCase());
+
+      if (!isOwner) {
+        return NextResponse.json(
+          { success: false, error: "Access denied. You do not have permission to download this invoice." },
+          { status: 403 }
+        );
+      }
     }
 
     const pdfBuffer = await generateInvoicePdf({

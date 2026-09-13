@@ -41,9 +41,9 @@ export async function POST(req: Request) {
   try {
     const { email, phone, name } = await req.json();
 
-    if (!email || !phone) {
+    if (!email) {
       return NextResponse.json(
-        { success: false, error: "Email and phone number are required." },
+        { success: false, error: "Email address is required." },
         { status: 400 }
       );
     }
@@ -56,12 +56,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length !== 10) {
-      return NextResponse.json(
-        { success: false, error: "Please enter a valid 10-digit Indian mobile number." },
-        { status: 400 }
-      );
+    // Phone is optional contact info
+    let cleanPhone = "";
+    if (phone && phone.trim()) {
+      cleanPhone = phone.replace(/\D/g, "");
     }
 
     // Rate limit check
@@ -80,21 +78,17 @@ export async function POST(req: Request) {
       otpRateLimiter.set(key, { count: 1, firstAttempt: now });
     }
 
-    // Generate OTPs
+    // Generate Email OTP only
     const emailOtp = generateOtp();
-    const phoneOtp = generateOtp();
-
     const emailOtpHashed = await bcrypt.hash(emailOtp, 10);
-    const phoneOtpHashed = await bcrypt.hash(phoneOtp, 10);
 
     // Store in DB (upsert to handle resend)
     await connectToDatabase();
     await OtpVerification.deleteMany({ email: key }); // Remove old OTPs for this email
     await OtpVerification.create({
       email: key,
-      phone: cleanPhone,
+      phone: cleanPhone || undefined,
       emailOtpHashed,
-      phoneOtpHashed,
       emailVerified: false,
       phoneVerified: false,
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
@@ -107,30 +101,25 @@ export async function POST(req: Request) {
       html: getOtpEmailHtml(name || "", emailOtp),
     });
 
-    // Send phone OTP
-    const phoneResult = await sendPhoneOtp(cleanPhone, phoneOtp);
-
     const emailSent = emailResult.success;
-    const phoneSent = phoneResult.success;
 
-    if (!emailSent && !phoneSent) {
+    if (!emailSent) {
       return NextResponse.json(
-        { success: false, error: "Failed to send verification codes. Please try again." },
+        { success: false, error: "Failed to send verification email. Please try again." },
         { status: 500 }
       );
     }
 
-    // In dev/simulation mode, include OTPs in response for testing
-    const isSimulated = emailResult.simulated || phoneResult.simulated;
+    // In dev/simulation mode, include OTP in response for automated testing
+    const isSimulated = emailResult.simulated || process.env.NODE_ENV !== "production";
 
     return NextResponse.json({
       success: true,
-      message: "Verification codes sent to your email and phone.",
+      message: "Verification code sent to your email.",
       ...(isSimulated && {
         _dev: {
-          note: "Simulation mode — OTPs shown here because email/SMS services are not configured.",
+          note: "Dev/Testing mode OTP",
           emailOtp,
-          phoneOtp,
         },
       }),
     });

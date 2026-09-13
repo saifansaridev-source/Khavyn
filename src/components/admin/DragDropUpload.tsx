@@ -55,40 +55,7 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
     setIsUploading(true);
 
     try {
-      const publicCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-
-      // Direct client-side unsigned upload for video if configured, bypassing serverless limits
-      if (resourceType === "video" && publicCloudName) {
-        try {
-          const directFormData = new FormData();
-          directFormData.append("file", file);
-          directFormData.append("upload_preset", "khavyn_uploads");
-          directFormData.append("folder", folder);
-
-          const directRes = await fetch(
-            `https://api.cloudinary.com/v1_1/${publicCloudName}/video/upload`,
-            {
-              method: "POST",
-              body: directFormData,
-            }
-          );
-
-          if (directRes.ok) {
-            const data = await directRes.json();
-            if (data.secure_url) {
-              onChange(data.secure_url);
-              setManualUrl(data.secure_url);
-              setUploadSuccess(true);
-              setIsUploading(false);
-              return;
-            }
-          }
-        } catch {
-          // Fall back to server upload route below
-        }
-      }
-
-      // Server-side signed upload route
+      // Server-side signed upload route (handles ImageKit for video, Cloudinary for images)
       const formData = new FormData();
       formData.append("file", file);
       formData.append("resourceType", resourceType);

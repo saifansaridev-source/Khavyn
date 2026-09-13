@@ -4,48 +4,71 @@ import React, { useState, useEffect, useRef } from "react";
 
 export const HomePreloader: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const [isFading, setIsFading] = useState(false);
-  const desktopVideoRef = useRef<HTMLVideoElement | null>(null);
-  const mobileVideoRef = useRef<HTMLVideoElement | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [isDoorsOpen, setIsDoorsOpen] = useState(false);
+  const [isLogoVisible, setIsLogoVisible] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>("/k-logo.png");
 
-  const handleFinish = () => {
-    setIsFading(true);
-    setTimeout(() => {
+  const isFinishingRef = useRef(false);
+  const enterTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const finishTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleOpenDoors = () => {
+    if (isFinishingRef.current) return;
+    isFinishingRef.current = true;
+
+    // Trigger door opening slide animation
+    setIsDoorsOpen(true);
+
+    // After the door animation completes (~750ms), unmount preloader & restore scroll
+    finishTimerRef.current = setTimeout(() => {
       setIsVisible(false);
       document.body.style.overflow = "";
-    }, 600);
+    }, 800);
   };
 
   useEffect(() => {
     // Lock body scroll while preloader is active
     document.body.style.overflow = "hidden";
 
-    // Play videos programmatically to ensure autoplay policies are satisfied
-    const playVideos = async () => {
-      try {
-        if (window.innerWidth >= 768 && desktopVideoRef.current) {
-          desktopVideoRef.current.currentTime = 0;
-          await desktopVideoRef.current.play();
-        } else if (window.innerWidth < 768 && mobileVideoRef.current) {
-          mobileVideoRef.current.currentTime = 0;
-          await mobileVideoRef.current.play();
+    // 1. Fetch admin settings to check if preloader is enabled or custom logo URL exists
+    let isMounted = true;
+    fetch("/api/admin/settings")
+      .then((res) => {
+        if (!res.ok) return fetch("/api/settings").then((r) => r.json());
+        return res.json();
+      })
+      .then((data) => {
+        if (!isMounted) return;
+        if (data?.settings?.preloaderEnabled === false) {
+          setIsVisible(false);
+          document.body.style.overflow = "";
+          return;
         }
-      } catch {
-        // Autoplay may be deferred or blocked; safety timer will handle dismissal
-      }
-    };
+        if (data?.settings?.preloaderLogoUrl) {
+          setLogoUrl(data.settings.preloaderLogoUrl);
+        }
+      })
+      .catch(() => {
+        // Silently fall back to default enabled with /k-logo.png
+      });
 
-    playVideos();
+    // 2. Animate logo in (fade + scale entrance)
+    enterTimerRef.current = setTimeout(() => {
+      setIsLogoVisible(true);
+    }, 50);
 
-    // Safety fallback timeout: automatically dismiss after 2.4s if video stalls
-    timerRef.current = setTimeout(() => {
-      handleFinish();
-    }, 2400);
+    // 3. Hold duration (~1.3s), then trigger double-door slide out
+    holdTimerRef.current = setTimeout(() => {
+      handleOpenDoors();
+    }, 1350);
 
     return () => {
+      isMounted = false;
       document.body.style.overflow = "";
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (enterTimerRef.current) clearTimeout(enterTimerRef.current);
+      if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+      if (finishTimerRef.current) clearTimeout(finishTimerRef.current);
     };
   }, []);
 
@@ -53,47 +76,77 @@ export const HomePreloader: React.FC = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] flex items-center justify-center bg-black transition-opacity duration-600 ease-out select-none ${
-        isFading ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
+      className={`fixed inset-0 z-[99999] select-none overflow-hidden ${
+        isDoorsOpen ? "pointer-events-none bg-transparent" : "pointer-events-auto bg-black"
       }`}
       aria-label="Loading KHAVYN"
       role="status"
     >
-      {/* Desktop & Tablet Video (Screen width >= 768px) */}
-      <video
-        ref={desktopVideoRef}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        controls={false}
-        disablePictureInPicture
-        onEnded={handleFinish}
-        className="hidden md:block w-full h-full object-cover bg-black"
+      {/* ─── LEFT DOOR PANEL (slides out to left: translateX(-100%)) ─── */}
+      <div
+        className="absolute top-0 left-0 w-1/2 h-full bg-black overflow-hidden will-change-transform"
+        style={{
+          clipPath: "inset(0 0 0 0)",
+          transform: isDoorsOpen ? "translateX(-100%)" : "translateX(0)",
+          transition: "transform 750ms cubic-bezier(0.65, 0, 0.35, 1)",
+        }}
       >
-        <source src="/logo_preloader_desktop_1.5s.mp4" type="video/mp4" />
-      </video>
+        <div
+          className="absolute top-1/2 flex items-center justify-center pointer-events-none select-none"
+          style={{
+            left: "100%",
+            transform: `translate(-50%, -50%) scale(${isLogoVisible ? 1 : 0.92})`,
+            opacity: isLogoVisible ? 1 : 0,
+            transition:
+              "opacity 500ms cubic-bezier(0.16, 1, 0.3, 1), transform 500ms cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <img
+            src={logoUrl}
+            alt="KHAVYN"
+            className="w-[50vw] max-w-[240px] h-auto md:w-auto md:h-[40vh] md:max-h-[460px] md:max-w-[48vw] object-contain select-none pointer-events-none drop-shadow-[0_14px_35px_rgba(198,166,100,0.3)]"
+            draggable={false}
+            loading="eager"
+          />
+        </div>
+      </div>
 
-      {/* Mobile Video (Screen width < 768px) */}
-      <video
-        ref={mobileVideoRef}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        controls={false}
-        disablePictureInPicture
-        onEnded={handleFinish}
-        className="block md:hidden w-full h-full object-cover bg-black"
+      {/* ─── RIGHT DOOR PANEL (slides out to right: translateX(100%)) ─── */}
+      <div
+        className="absolute top-0 right-0 w-1/2 h-full bg-black overflow-hidden will-change-transform"
+        style={{
+          clipPath: "inset(0 0 0 0)",
+          transform: isDoorsOpen ? "translateX(100%)" : "translateX(0)",
+          transition: "transform 750ms cubic-bezier(0.65, 0, 0.35, 1)",
+        }}
       >
-        <source src="/logo_preloader_mobile_1.5s.mp4" type="video/mp4" />
-      </video>
+        <div
+          className="absolute top-1/2 flex items-center justify-center pointer-events-none select-none"
+          style={{
+            left: "0%",
+            transform: `translate(-50%, -50%) scale(${isLogoVisible ? 1 : 0.92})`,
+            opacity: isLogoVisible ? 1 : 0,
+            transition:
+              "opacity 500ms cubic-bezier(0.16, 1, 0.3, 1), transform 500ms cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <img
+            src={logoUrl}
+            alt="KHAVYN"
+            className="w-[50vw] max-w-[240px] h-auto md:w-auto md:h-[40vh] md:max-h-[460px] md:max-w-[48vw] object-contain select-none pointer-events-none drop-shadow-[0_14px_35px_rgba(198,166,100,0.3)]"
+            draggable={false}
+            loading="eager"
+          />
+        </div>
+      </div>
 
       {/* Subtle Skip CTA */}
       <button
-        onClick={handleFinish}
+        onClick={handleOpenDoors}
         type="button"
-        className="absolute bottom-6 right-6 px-3.5 py-1 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium text-[#C6A664] bg-black/60 backdrop-blur-md border border-[#C6A664]/40 rounded-full hover:bg-[#C6A664] hover:text-black transition-all duration-300 z-10 cursor-pointer shadow-lg"
+        className={`absolute bottom-6 right-6 px-3.5 py-1 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium text-[#C6A664] bg-black/60 backdrop-blur-md border border-[#C6A664]/40 rounded-full hover:bg-[#C6A664] hover:text-black transition-all duration-300 z-20 cursor-pointer shadow-lg ${
+          isDoorsOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
       >
         Skip
       </button>

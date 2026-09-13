@@ -12,11 +12,18 @@ const secretKey = new TextEncoder().encode(SECRET);
 
 export async function POST(req: Request) {
   try {
-    const { email, emailOtp, phoneOtp, name, phone, password } = await req.json();
+    const { email, emailOtp, name, phone, password } = await req.json();
 
-    if (!email || !emailOtp || !phoneOtp) {
+    if (!email || !emailOtp) {
       return NextResponse.json(
-        { success: false, error: "Email, email OTP, and phone OTP are required." },
+        { success: false, error: "Email and verification code are required." },
+        { status: 400 }
+      );
+    }
+
+    if (!password || password.length < 8) {
+      return NextResponse.json(
+        { success: false, error: "Password must be at least 8 characters." },
         { status: 400 }
       );
     }
@@ -52,16 +59,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verify phone OTP
-    const phoneOtpValid = await bcrypt.compare(phoneOtp.toString().trim(), record.phoneOtpHashed);
-    if (!phoneOtpValid) {
-      return NextResponse.json(
-        { success: false, error: "Incorrect phone verification code. Please check and try again." },
-        { status: 400 }
-      );
-    }
-
-    // Both OTPs verified — check if user already exists
+    // Email OTP verified — check if user already exists
     const cleanEmail = email.toLowerCase().trim();
     const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
@@ -74,14 +72,15 @@ export async function POST(req: Request) {
 
     // Hash password and create user
     const passwordHash = await bcrypt.hash(password, 12);
+    const userPhone = (phone || record.phone || "").toString().trim();
     const newUser = await User.create({
       name: (name || "").trim(),
       email: cleanEmail,
-      phone: record.phone,
+      phone: userPhone || undefined,
       passwordHash,
       role: "customer",
       emailVerified: true,
-      phoneVerified: true,
+      phoneVerified: false,
       addresses: [],
       isRestrictedFromCOD: false,
       isActive: true,

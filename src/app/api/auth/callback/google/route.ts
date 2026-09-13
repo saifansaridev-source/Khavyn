@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/connect";
 import { User } from "@/models/User";
 import { SignJWT } from "jose";
+import { getGoogleRedirectUri } from "@/lib/auth/google";
 
 const SECRET = process.env.USER_SESSION_SECRET || "khavyn_user_secret_2026";
 const secretKey = new TextEncoder().encode(SECRET);
@@ -35,9 +36,7 @@ export async function GET(req: Request) {
     );
   }
 
-  const isProd = process.env.NODE_ENV === "production";
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || (isProd ? "https://khavyn.vercel.app" : "http://localhost:3000");
-  const redirectUri = `${appUrl}/api/auth/callback/google`;
+  const redirectUri = getGoogleRedirectUri(req);
 
   try {
     // 1. Exchange authorization code for tokens

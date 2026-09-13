@@ -12,10 +12,17 @@ export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // ─── Admin route protection ───────────────────────────────────────────────
-  if (path.startsWith("/admin/dashboard")) {
+  if (
+    (path.startsWith("/admin") || path.startsWith("/api/admin")) &&
+    path !== "/admin/login" &&
+    path !== "/api/admin/login"
+  ) {
     const token = req.cookies.get("khavyn_admin_token")?.value;
 
     if (!token) {
+      if (path.startsWith("/api/admin")) {
+        return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+      }
       return NextResponse.redirect(new URL("/admin/login", req.url));
     }
 
@@ -23,6 +30,11 @@ export async function proxy(req: NextRequest) {
       await jwtVerify(token, adminSecretKey, { algorithms: ["HS256"] });
       return NextResponse.next();
     } catch {
+      if (path.startsWith("/api/admin")) {
+        const response = NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+        response.cookies.delete("khavyn_admin_token");
+        return response;
+      }
       const response = NextResponse.redirect(new URL("/admin/login", req.url));
       response.cookies.delete("khavyn_admin_token");
       return response;
@@ -80,8 +92,8 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/admin/dashboard/:path*",
-    "/admin/login",
+    "/admin/:path*",
+    "/api/admin/:path*",
     "/account/:path*",
     "/checkout/:path*",
     "/login",

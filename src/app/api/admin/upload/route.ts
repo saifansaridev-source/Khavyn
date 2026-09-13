@@ -58,6 +58,44 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // If uploading video and ImageKit is configured, route to ImageKit
+    const imagekitPrivateKey = process.env.IMAGEKIT_PRIVATE_KEY?.replace(/^["']|["']$/g, "").trim();
+    if (resourceType === "video" && imagekitPrivateKey) {
+      try {
+        const authHeader = "Basic " + Buffer.from(imagekitPrivateKey + ":").toString("base64");
+        const ikFormData = new FormData();
+        ikFormData.append(
+          "file",
+          "data:" + (file.type || "video/mp4") + ";base64," + buffer.toString("base64")
+        );
+        ikFormData.append("fileName", file.name || `video_${Date.now()}.mp4`);
+        const ikFolder = requestedFolder.startsWith("/") ? requestedFolder : `/${requestedFolder}`;
+        ikFormData.append("folder", ikFolder);
+
+        const ikRes = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+          method: "POST",
+          headers: {
+            Authorization: authHeader,
+          },
+          body: ikFormData,
+        });
+
+        const ikData = await ikRes.json();
+        if (ikRes.ok && ikData.url) {
+          return NextResponse.json({
+            success: true,
+            url: ikData.url,
+            publicId: ikData.fileId,
+            format: ikData.fileType || "video",
+            bytes: ikData.size || buffer.length,
+          });
+        }
+        console.warn("ImageKit upload error, falling back to Cloudinary:", ikData);
+      } catch (ikErr) {
+        console.warn("ImageKit upload exception, falling back to Cloudinary:", ikErr);
+      }
+    }
+
     // Upload via stream to Cloudinary
     const result = await new Promise<UploadApiResponse>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(

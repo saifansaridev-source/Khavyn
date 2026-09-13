@@ -32,6 +32,15 @@ export interface IStoreSettings extends Document {
   razorpayKeyId: string;
   razorpayLiveMode: boolean;
   offerPopup: IOfferPopupSettings;
+  popupEnabled: boolean;
+  popupImage: string;
+  popupHeadline: string;
+  popupSubtext: string;
+  popupCtaText: string;
+  popupCtaLink: string;
+  popupDelaySeconds: number;
+  popupFrequency: "every_visit" | "once_per_session" | "once_per_day";
+  popupShowOnMobile: boolean;
   returnPolicyNotice: string;
   updatedAt: Date;
 }
@@ -125,6 +134,19 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     razorpayKeyId: { type: String, default: "rzp_test_placeholder" },
     razorpayLiveMode: { type: Boolean, default: false },
     offerPopup: { type: OfferPopupSchema, default: () => ({}) },
+    popupEnabled: { type: Boolean, default: false },
+    popupImage: { type: String, default: "" },
+    popupHeadline: { type: String, default: "Season Sale" },
+    popupSubtext: { type: String, default: "Up to 40% off, this week only." },
+    popupCtaText: { type: String, default: "Shop Now" },
+    popupCtaLink: { type: String, default: "/shop" },
+    popupDelaySeconds: { type: Number, default: 3 },
+    popupFrequency: {
+      type: String,
+      enum: ["every_visit", "once_per_session", "once_per_day"],
+      default: "once_per_session",
+    },
+    popupShowOnMobile: { type: Boolean, default: true },
     returnPolicyNotice: {
       type: String,
       default: "Hassle-free 7-day returns & exchanges on all eligible unworn apparel items.",

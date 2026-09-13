@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getGoogleRedirectUri } from "@/lib/auth/google";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -17,10 +18,7 @@ export async function GET(req: Request) {
     );
   }
 
-  // Support both production redirect URI and dynamic local dev
-  const isProd = process.env.NODE_ENV === "production";
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || (isProd ? "https://khavyn.vercel.app" : "http://localhost:3000");
-  const redirectUri = `${appUrl}/api/auth/callback/google`;
+  const redirectUri = getGoogleRedirectUri(req);
 
   const stateObj = JSON.stringify({ redirect });
   const state = Buffer.from(stateObj).toString("base64");

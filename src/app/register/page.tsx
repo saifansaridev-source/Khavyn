@@ -41,12 +41,10 @@ export default function RegisterPage() {
 
   // OTP fields
   const [emailOtp, setEmailOtp] = useState("");
-  const [phoneOtp, setPhoneOtp] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
 
   // Dev simulation OTPs (shown when services not configured)
   const [devEmailOtp, setDevEmailOtp] = useState("");
-  const [devPhoneOtp, setDevPhoneOtp] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -89,8 +87,8 @@ export default function RegisterPage() {
       return;
     }
     const cleanPhone = phone.replace(/\D/g, "");
-    if (cleanPhone.length !== 10) {
-      setError("Please enter a valid 10-digit Indian mobile number.");
+    if (cleanPhone && cleanPhone.length !== 10) {
+      setError("Please enter a valid 10-digit Indian mobile number, or leave it blank.");
       return;
     }
 
@@ -105,14 +103,13 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || "Failed to send verification codes. Please try again.");
+        setError(data.error || "Failed to send verification code. Please try again.");
         return;
       }
 
-      // Dev simulation mode: auto-fill OTP inputs for convenience
-      if (data._dev) {
+      // Dev simulation mode: auto-fill OTP input for convenience
+      if (data._dev?.emailOtp) {
         setDevEmailOtp(`Email OTP: ${data._dev.emailOtp}`);
-        setDevPhoneOtp(`Phone OTP: ${data._dev.phoneOtp}`);
       }
 
       setStep("otp");
@@ -124,7 +121,7 @@ export default function RegisterPage() {
     }
   };
 
-  // STEP 2: Submit OTPs → verify & create account
+  // STEP 2: Submit OTP → verify email & create account
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -140,7 +137,6 @@ export default function RegisterPage() {
           name,
           password,
           emailOtp: emailOtp.trim(),
-          phoneOtp: phoneOtp.trim(),
         }),
       });
       const data = await res.json();
@@ -172,16 +168,14 @@ export default function RegisterPage() {
         body: JSON.stringify({ name, email, phone: phone.replace(/\D/g, "") }),
       });
       const data = await res.json();
-      if (data._dev) {
+      if (data._dev?.emailOtp) {
         setDevEmailOtp(`Email OTP: ${data._dev.emailOtp}`);
-        setDevPhoneOtp(`Phone OTP: ${data._dev.phoneOtp}`);
       }
       if (!res.ok || !data.success) {
         setError(data.error || "Failed to resend codes.");
       } else {
         setResendCooldown(60);
         setEmailOtp("");
-        setPhoneOtp("");
       }
     } catch {
       setError("Network error.");
@@ -220,7 +214,7 @@ export default function RegisterPage() {
             <p className="text-white/40 text-sm leading-relaxed">
               {step === "form"
                 ? "Create your account and unlock member-exclusive prices, order tracking, and early access to collections."
-                : `We sent verification codes to ${email} and +91 ${phone.replace(/\D/g, "").replace(/(\d{5})(\d{5})/, "$1 $2")}.`}
+                : `We've sent a 6-digit verification code to ${email}. Please enter it below to activate your account.`}
             </p>
           </div>
 
@@ -283,9 +277,11 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Phone */}
+                {/* Phone — Optional contact field (not used for verification) */}
                 <div className="space-y-2">
-                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">Mobile Number</label>
+                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">
+                    Mobile Number <span className="text-white/20 normal-case text-[10px]">(optional)</span>
+                  </label>
                   <div className="relative flex">
                     <span className="flex items-center px-3 bg-white/5 border border-r-0 border-white/10 rounded-l-xl text-white/40 text-sm select-none">
                       +91
@@ -297,15 +293,15 @@ export default function RegisterPage() {
                       <input
                         id="register-phone"
                         type="tel"
-                        required
                         autoComplete="tel"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                        placeholder="10-digit mobile number"
+                        placeholder="10-digit mobile number (optional)"
                         className="w-full bg-white/5 border border-white/10 rounded-r-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-[#C6A664]/50 focus:ring-1 focus:ring-[#C6A664]/20 transition-all duration-200"
                       />
                     </div>
                   </div>
+                  <p className="text-[10px] text-white/20">Used for delivery coordination only. Not required for account creation.</p>
                 </div>
 
                 {/* Password */}
@@ -429,18 +425,17 @@ export default function RegisterPage() {
                   </div>
                 )}
 
-                {/* Dev simulation hint */}
-                {(devEmailOtp || devPhoneOtp) && (
+                {/* Dev mode OTP hint */}
+                {devEmailOtp && (
                   <div className="rounded-xl bg-[#C6A664]/10 border border-[#C6A664]/30 px-4 py-3 text-xs text-[#C6A664] space-y-1">
-                    <p className="font-semibold uppercase tracking-wider">Dev Mode — Simulated OTPs</p>
-                    {devEmailOtp && <p className="font-mono">{devEmailOtp}</p>}
-                    {devPhoneOtp && <p className="font-mono">{devPhoneOtp}</p>}
+                    <p className="font-semibold uppercase tracking-wider">Dev Mode — Email OTP</p>
+                    <p className="font-mono">{devEmailOtp}</p>
                   </div>
                 )}
 
                 {/* Email OTP */}
                 <div className="space-y-2">
-                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">Email OTP</label>
+                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">Email Verification Code</label>
                   <div className="relative">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
                       <Mail className="w-4 h-4" />
@@ -454,33 +449,14 @@ export default function RegisterPage() {
                       required
                       value={emailOtp}
                       onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                      placeholder="6-digit code from email"
+                      placeholder="6-digit code from your email"
                       className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-[#C6A664]/50 focus:ring-1 focus:ring-[#C6A664]/20 transition-all duration-200 font-mono tracking-[0.3em] text-center"
                     />
                   </div>
+                  <p className="text-[10px] text-white/25">Check your inbox (and spam folder) for the 6-digit code.</p>
                 </div>
 
-                {/* Phone OTP */}
-                <div className="space-y-2">
-                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">Phone OTP</label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
-                      <Phone className="w-4 h-4" />
-                    </div>
-                    <input
-                      id="register-phone-otp"
-                      type="text"
-                      inputMode="numeric"
-                      pattern="\d{6}"
-                      maxLength={6}
-                      required
-                      value={phoneOtp}
-                      onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                      placeholder="6-digit code from SMS"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-[#C6A664]/50 focus:ring-1 focus:ring-[#C6A664]/20 transition-all duration-200 font-mono tracking-[0.3em] text-center"
-                    />
-                  </div>
-                </div>
+                {/* Phone OTP is disabled — email-only verification */}
 
                 {/* Verify button */}
                 <button
@@ -506,7 +482,7 @@ export default function RegisterPage() {
                 <div className="flex items-center justify-between pt-1">
                   <button
                     type="button"
-                    onClick={() => { setStep("form"); setError(""); setEmailOtp(""); setPhoneOtp(""); }}
+                    onClick={() => { setStep("form"); setError(""); setEmailOtp(""); }}
                     className="text-xs text-white/30 hover:text-white/60 transition-colors"
                   >
                     ← Change details

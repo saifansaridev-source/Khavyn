@@ -767,6 +767,18 @@ export default function AdminDashboardPage() {
                 <span>Brand Imagery</span>
               </div>
             </Link>
+
+            <Link
+              href="/admin/promotional-popup"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded text-xs font-semibold uppercase tracking-wider text-[#C6A664] bg-[#C6A664]/10 border border-[#C6A664]/30 hover:bg-[#C6A664]/20 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Megaphone className="w-3.5 h-3.5" />
+                <span>Promotional Popup</span>
+              </div>
+              <span className="text-[10px] font-mono font-bold bg-[#C6A664]/20 text-[#C6A664] px-1.5 py-0.5 rounded">NEW</span>
+            </Link>
           </div>
 
           <div className="pt-6 px-3">
