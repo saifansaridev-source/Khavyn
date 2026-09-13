@@ -26,6 +26,8 @@ export interface IProduct extends Document {
   slug: string;
   collectionName: "Formal Shirts" | "Polo T-Shirts" | "Oversized T-Shirts" | "Round Neck T-Shirts";
   styleCode: string;
+  /** GST HSN code for garment classification (e.g., 6205 for shirts, 6109 for t-shirts) */
+  hsnCode?: string;
   colour: string;
   colourHex: string;
   sizes: string[];
@@ -90,6 +92,7 @@ const ProductSchema = new Schema<IProduct>(
       index: true,
     },
     styleCode: { type: String, required: true, unique: true },
+    hsnCode: { type: String, default: "6205" },
     colour: { type: String, required: true },
     colourHex: { type: String, required: true },
     sizes: { type: [String], default: ["S", "M", "L", "XL"] },

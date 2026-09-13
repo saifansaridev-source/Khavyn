@@ -140,10 +140,10 @@ export default function HomePage() {
       {/* 2. TRUST BADGES ROW */}
       <section className="bg-white border-b border-[#D8C9B0]/40 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-[#D8C9B0]/30 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-4 p-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+            <div className="flex items-center justify-center gap-3 p-3">
               <Diamond className="w-6 h-6 text-[#C6A664] stroke-[1.5] flex-shrink-0" />
-              <div>
+              <div className="text-left">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
                   Premium Quality
                 </h4>
@@ -153,9 +153,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center md:justify-start gap-4 p-3 pt-6 md:pt-3">
+            <div className="flex items-center justify-center gap-3 p-3">
               <Truck className="w-6 h-6 text-[#C6A664] stroke-[1.5] flex-shrink-0" />
-              <div>
+              <div className="text-left">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
                   All Over India Shipping
                 </h4>
@@ -165,9 +165,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center md:justify-start gap-4 p-3 pt-6 md:pt-3">
+            <div className="flex items-center justify-center gap-3 p-3">
               <RotateCw className="w-6 h-6 text-[#C6A664] stroke-[1.5] flex-shrink-0" />
-              <div>
+              <div className="text-left">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
                   Easy Exchange Policy
                 </h4>
@@ -177,9 +177,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center md:justify-start gap-4 p-3 pt-6 md:pt-3">
+            <div className="flex items-center justify-center gap-3 p-3">
               <ShieldCheck className="w-6 h-6 text-[#C6A664] stroke-[1.5] flex-shrink-0" />
-              <div>
+              <div className="text-left">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-[#1A1A1A]">
                   Secure Payments
                 </h4>

@@ -138,19 +138,19 @@ export default function AdminBrandImageryPage() {
   return (
     <div className="min-h-screen bg-[#0F0F0F] text-white flex flex-col">
       {/* Top Bar */}
-      <header className="bg-[#141414] border-b border-white/10 px-6 py-4 sticky top-0 z-30 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <header className="bg-[#141414] border-b border-white/10 px-4 py-3 sm:px-6 sm:py-4 sticky top-0 z-30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0 w-full sm:w-auto">
           <Link
             href="/admin/dashboard"
-            className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70 hover:text-[#C6A664] transition-colors bg-white/5 hover:bg-white/10 px-3 py-2 rounded"
+            className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-white/70 hover:text-[#C6A664] transition-colors bg-white/5 hover:bg-white/10 px-3 py-2 rounded shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Dashboard</span>
           </Link>
-          <div>
-            <h1 className="font-serif text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-              <span>Brand Imagery Atelier</span>
-              <span className="text-[10px] uppercase font-mono tracking-widest bg-[#C6A664]/20 text-[#C6A664] px-2 py-0.5 rounded">
+          <div className="min-w-0 flex-1 sm:flex-initial">
+            <h1 className="font-serif text-base sm:text-xl font-bold text-white flex items-center flex-wrap gap-2 min-w-0">
+              <span className="truncate">Brand Imagery Atelier</span>
+              <span className="text-[10px] uppercase font-mono tracking-widest bg-[#C6A664]/20 text-[#C6A664] px-2 py-0.5 rounded shrink-0">
                 Cloudinary
               </span>
             </h1>
@@ -160,11 +160,11 @@ export default function AdminBrandImageryPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <button
             onClick={handleSaveAll}
             disabled={isSaving || isLoading}
-            className="bg-[#C6A664] text-black hover:bg-white disabled:opacity-50 px-5 py-2 rounded text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2 shadow-lg"
+            className="w-full sm:w-auto min-h-[44px] sm:min-h-0 bg-[#C6A664] text-black hover:bg-white disabled:opacity-50 px-5 py-2.5 sm:py-2 rounded text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 shadow-lg cursor-pointer"
           >
             {isSaving ? (
               <>
@@ -222,7 +222,7 @@ export default function AdminBrandImageryPage() {
         ) : (
           <>
             {/* SECTION A — Signature Collections Images */}
-            <section className="bg-[#141414] border border-white/10 rounded-xl p-6 space-y-6">
+            <section className="bg-[#141414] border border-white/10 rounded-xl p-4 sm:p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -249,13 +249,13 @@ export default function AdminBrandImageryPage() {
                 {collectionImages.map((card, idx) => (
                   <div
                     key={card.slug || idx}
-                    className="bg-black/40 border border-white/10 rounded-lg p-4 space-y-3"
+                    className="bg-black/40 border border-white/10 rounded-lg p-3.5 sm:p-4 space-y-3 min-w-0"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white tracking-wide">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <span className="text-xs font-bold text-white tracking-wide truncate max-w-[70%]">
                         Card #{idx + 1}: {card.title || card.slug}
                       </span>
-                      <span className="text-[10px] font-mono text-[#C6A664] bg-[#C6A664]/10 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-mono text-[#C6A664] bg-[#C6A664]/10 px-2 py-0.5 rounded shrink-0">
                         /{card.slug}
                       </span>
                     </div>
@@ -280,7 +280,7 @@ export default function AdminBrandImageryPage() {
                           onChange={(e) =>
                             handleUpdateCollection(idx, "title", e.target.value)
                           }
-                          className="w-full bg-[#141414] border border-white/20 rounded px-3 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664]"
+                          className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664]"
                         />
                       </div>
                       <div className="space-y-1">
@@ -293,7 +293,7 @@ export default function AdminBrandImageryPage() {
                           onChange={(e) =>
                             handleUpdateCollection(idx, "sub", e.target.value)
                           }
-                          className="w-full bg-[#141414] border border-white/20 rounded px-3 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664]"
+                          className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664]"
                         />
                       </div>
                     </div>
@@ -303,7 +303,7 @@ export default function AdminBrandImageryPage() {
             </section>
 
             {/* SECTION B — About Page Hero Image */}
-            <section className="bg-[#141414] border border-white/10 rounded-xl p-6 space-y-6">
+            <section className="bg-[#141414] border border-white/10 rounded-xl p-4 sm:p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -326,7 +326,7 @@ export default function AdminBrandImageryPage() {
                 </Link>
               </div>
 
-              <div className="max-w-xl">
+              <div className="max-w-xl w-full">
                 <DragDropUpload
                   label="About Page Banner Image"
                   value={aboutHeroImage}
@@ -339,7 +339,7 @@ export default function AdminBrandImageryPage() {
             </section>
 
             {/* SECTION C — Crafted in India Section Image */}
-            <section className="bg-[#141414] border border-white/10 rounded-xl p-6 space-y-6">
+            <section className="bg-[#141414] border border-white/10 rounded-xl p-4 sm:p-6 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -362,7 +362,7 @@ export default function AdminBrandImageryPage() {
                 </Link>
               </div>
 
-              <div className="max-w-xl">
+              <div className="max-w-xl w-full">
                 <DragDropUpload
                   label="Crafted in India Image"
                   value={craftedInIndiaImage}
@@ -375,11 +375,11 @@ export default function AdminBrandImageryPage() {
             </section>
 
             {/* Save All Footer CTA */}
-            <div className="pt-4 flex items-center justify-end">
+            <div className="pt-4 flex items-center justify-center sm:justify-end w-full">
               <button
                 onClick={handleSaveAll}
                 disabled={isSaving}
-                className="bg-[#C6A664] text-black hover:bg-white px-8 py-3.5 rounded text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shadow-xl hover:scale-105"
+                className="w-full sm:w-auto min-h-[44px] justify-center bg-[#C6A664] text-black hover:bg-white px-8 py-3.5 rounded text-xs font-bold uppercase tracking-wider transition-all duration-300 flex items-center gap-2 shadow-xl hover:scale-105 cursor-pointer"
               >
                 {isSaving ? (
                   <>

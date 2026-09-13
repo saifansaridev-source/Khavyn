@@ -3,31 +3,67 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  ArrowRight,
+  CheckCircle,
+  RefreshCw,
+  ShieldCheck,
+} from "lucide-react";
 import { useUserStore } from "@/store/useUserStore";
+
+type Step = "form" | "otp";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { fetchUser, isAuthenticated } = useUserStore();
 
+  // Form fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // Multi-step state
+  const [step, setStep] = useState<Step>("form");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  // OTP fields
+  const [emailOtp, setEmailOtp] = useState("");
+  const [phoneOtp, setPhoneOtp] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  // Dev simulation OTPs (shown when services not configured)
+  const [devEmailOtp, setDevEmailOtp] = useState("");
+  const [devPhoneOtp, setDevPhoneOtp] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (mounted && isAuthenticated) {
       router.replace("/account");
     }
   }, [mounted, isAuthenticated, router]);
+
+  // Cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
 
   const passwordStrength = (): { label: string; color: string; width: string } => {
     if (!password) return { label: "", color: "#333", width: "0%" };
@@ -37,10 +73,10 @@ export default function RegisterPage() {
     if (!/[!@#$%^&*]/.test(password)) return { label: "Good", color: "#22c55e", width: "80%" };
     return { label: "Strong", color: "#10b981", width: "100%" };
   };
-
   const strength = passwordStrength();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // STEP 1: Submit form → send OTPs
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -52,20 +88,65 @@ export default function RegisterPage() {
       setError("Password must be at least 8 characters.");
       return;
     }
+    const cleanPhone = phone.replace(/\D/g, "");
+    if (cleanPhone.length !== 10) {
+      setError("Please enter a valid 10-digit Indian mobile number.");
+      return;
+    }
 
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await fetch("/api/auth/otp/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, phone: cleanPhone }),
       });
-
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(data.error || "Registration failed. Please try again.");
+        setError(data.error || "Failed to send verification codes. Please try again.");
+        return;
+      }
+
+      // Dev simulation mode: auto-fill OTP inputs for convenience
+      if (data._dev) {
+        setDevEmailOtp(`Email OTP: ${data._dev.emailOtp}`);
+        setDevPhoneOtp(`Phone OTP: ${data._dev.phoneOtp}`);
+      }
+
+      setStep("otp");
+      setResendCooldown(60);
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // STEP 2: Submit OTPs → verify & create account
+  const handleOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          phone: phone.replace(/\D/g, ""),
+          name,
+          password,
+          emailOtp: emailOtp.trim(),
+          phoneOtp: phoneOtp.trim(),
+        }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setError(data.error || "Verification failed. Please check your codes and try again.");
         return;
       }
 
@@ -74,6 +155,36 @@ export default function RegisterPage() {
       setTimeout(() => router.push("/account"), 1800);
     } catch {
       setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Resend OTPs
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone: phone.replace(/\D/g, "") }),
+      });
+      const data = await res.json();
+      if (data._dev) {
+        setDevEmailOtp(`Email OTP: ${data._dev.emailOtp}`);
+        setDevPhoneOtp(`Phone OTP: ${data._dev.phoneOtp}`);
+      }
+      if (!res.ok || !data.success) {
+        setError(data.error || "Failed to resend codes.");
+      } else {
+        setResendCooldown(60);
+        setEmailOtp("");
+        setPhoneOtp("");
+      }
+    } catch {
+      setError("Network error.");
     } finally {
       setLoading(false);
     }
@@ -104,10 +215,12 @@ export default function RegisterPage() {
           {/* Header */}
           <div className="text-center mb-10">
             <h1 className="font-serif text-4xl md:text-5xl text-white mb-3 leading-tight">
-              Join KHAVYN
+              {step === "form" ? "Join KHAVYN" : "Verify Your Identity"}
             </h1>
             <p className="text-white/40 text-sm leading-relaxed">
-              Create your account and unlock member-exclusive prices, order tracking, and early access to collections.
+              {step === "form"
+                ? "Create your account and unlock member-exclusive prices, order tracking, and early access to collections."
+                : `We sent verification codes to ${email} and +91 ${phone.replace(/\D/g, "").replace(/(\d{5})(\d{5})/, "$1 $2")}.`}
             </p>
           </div>
 
@@ -121,8 +234,8 @@ export default function RegisterPage() {
                 <h2 className="font-serif text-2xl text-white">Account Created!</h2>
                 <p className="text-white/40 text-sm">Welcome to KHAVYN. Redirecting to your account…</p>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
+            ) : step === "form" ? (
+              <form onSubmit={handleFormSubmit} className="space-y-5">
                 {/* Error alert */}
                 {error && (
                   <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
@@ -167,6 +280,31 @@ export default function RegisterPage() {
                       placeholder="you@example.com"
                       className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-[#C6A664]/50 focus:ring-1 focus:ring-[#C6A664]/20 transition-all duration-200"
                     />
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="space-y-2">
+                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">Mobile Number</label>
+                  <div className="relative flex">
+                    <span className="flex items-center px-3 bg-white/5 border border-r-0 border-white/10 rounded-l-xl text-white/40 text-sm select-none">
+                      +91
+                    </span>
+                    <div className="relative flex-1">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
+                        <Phone className="w-4 h-4" />
+                      </div>
+                      <input
+                        id="register-phone"
+                        type="tel"
+                        required
+                        autoComplete="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                        placeholder="10-digit mobile number"
+                        className="w-full bg-white/5 border border-white/10 rounded-r-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-[#C6A664]/50 focus:ring-1 focus:ring-[#C6A664]/20 transition-all duration-200"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -245,11 +383,11 @@ export default function RegisterPage() {
                 {/* Terms */}
                 <p className="text-xs text-white/25 leading-relaxed">
                   By creating an account, you agree to our{" "}
-                  <Link href="/legal/terms" className="text-[#C6A664]/60 hover:text-[#C6A664] underline underline-offset-2">
+                  <Link href="/policies/terms" className="text-[#C6A664]/60 hover:text-[#C6A664] underline underline-offset-2">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link href="/legal/privacy" className="text-[#C6A664]/60 hover:text-[#C6A664] underline underline-offset-2">
+                  <Link href="/policies/privacy" className="text-[#C6A664]/60 hover:text-[#C6A664] underline underline-offset-2">
                     Privacy Policy
                   </Link>.
                 </p>
@@ -264,15 +402,125 @@ export default function RegisterPage() {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                      <span>Creating Account…</span>
+                      <span>Sending Codes…</span>
                     </>
                   ) : (
                     <>
-                      <span>Create Account</span>
+                      <span>Continue</span>
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
                     </>
                   )}
                 </button>
+              </form>
+            ) : (
+              /* OTP Step */
+              <form onSubmit={handleOtpSubmit} className="space-y-5">
+                {/* Shield icon */}
+                <div className="flex justify-center mb-2">
+                  <div className="w-14 h-14 rounded-full bg-[#C6A664]/10 border border-[#C6A664]/30 flex items-center justify-center">
+                    <ShieldCheck className="w-7 h-7 text-[#C6A664]" />
+                  </div>
+                </div>
+
+                {/* Error alert */}
+                {error && (
+                  <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
+                    {error}
+                  </div>
+                )}
+
+                {/* Dev simulation hint */}
+                {(devEmailOtp || devPhoneOtp) && (
+                  <div className="rounded-xl bg-[#C6A664]/10 border border-[#C6A664]/30 px-4 py-3 text-xs text-[#C6A664] space-y-1">
+                    <p className="font-semibold uppercase tracking-wider">Dev Mode — Simulated OTPs</p>
+                    {devEmailOtp && <p className="font-mono">{devEmailOtp}</p>}
+                    {devPhoneOtp && <p className="font-mono">{devPhoneOtp}</p>}
+                  </div>
+                )}
+
+                {/* Email OTP */}
+                <div className="space-y-2">
+                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">Email OTP</label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
+                      <Mail className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="register-email-otp"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="\d{6}"
+                      maxLength={6}
+                      required
+                      value={emailOtp}
+                      onChange={(e) => setEmailOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="6-digit code from email"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-[#C6A664]/50 focus:ring-1 focus:ring-[#C6A664]/20 transition-all duration-200 font-mono tracking-[0.3em] text-center"
+                    />
+                  </div>
+                </div>
+
+                {/* Phone OTP */}
+                <div className="space-y-2">
+                  <label className="text-xs tracking-widest text-white/40 uppercase font-medium">Phone OTP</label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <input
+                      id="register-phone-otp"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="\d{6}"
+                      maxLength={6}
+                      required
+                      value={phoneOtp}
+                      onChange={(e) => setPhoneOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      placeholder="6-digit code from SMS"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-4 py-3.5 text-white placeholder:text-white/20 text-sm focus:outline-none focus:border-[#C6A664]/50 focus:ring-1 focus:ring-[#C6A664]/20 transition-all duration-200 font-mono tracking-[0.3em] text-center"
+                    />
+                  </div>
+                </div>
+
+                {/* Verify button */}
+                <button
+                  id="register-verify-btn"
+                  type="submit"
+                  disabled={loading}
+                  className="group w-full bg-[#C6A664] hover:bg-[#B8955A] disabled:opacity-60 disabled:cursor-not-allowed text-black font-semibold text-sm tracking-widest uppercase rounded-xl py-4 transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_8px_32px_rgba(198,166,100,0.25)] hover:shadow-[0_8px_40px_rgba(198,166,100,0.4)]"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                      <span>Verifying…</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Verify &amp; Create Account</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    </>
+                  )}
+                </button>
+
+                {/* Resend & back */}
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    onClick={() => { setStep("form"); setError(""); setEmailOtp(""); setPhoneOtp(""); }}
+                    className="text-xs text-white/30 hover:text-white/60 transition-colors"
+                  >
+                    ← Change details
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendCooldown > 0 || loading}
+                    className="flex items-center gap-1.5 text-xs text-[#C6A664]/70 hover:text-[#C6A664] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend codes"}
+                  </button>
+                </div>
               </form>
             )}
           </div>

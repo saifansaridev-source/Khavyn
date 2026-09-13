@@ -9,6 +9,7 @@ export interface IOrderItem {
   quantity: number;
   price: number;
   image: string;
+  hsnCode?: string;
 }
 
 export interface IShippingAddress {
@@ -28,11 +29,23 @@ export interface IOrder extends Document {
   customerEmail: string;
   customerPhone: string;
   items: IOrderItem[];
+  /** Sum of (price × qty) for all items — does NOT include shippingCharge */
+  subtotal: number;
+  /** Flat shipping charge applied to the order (e.g. ₹70) */
+  shippingCharge: number;
+  /** subtotal + shippingCharge = the total amount charged to the customer */
   totalAmount: number;
-  paymentType: "full" | "partial_cod";
+  /** "prepaid" = 100% paid upfront via Razorpay; "partial_cod" = 50% advance via Razorpay + 50% cash on delivery.
+   *  Legacy DB documents may have paymentType="full" — treat as equivalent to "prepaid" when reading. */
+  paymentType: "prepaid" | "partial_cod";
+  /** Amount charged via Razorpay at order time */
   advancePaid: number;
+  /** Amount to be collected at delivery (0 for full prepaid) */
   balanceDue: number;
-  balanceCollected: boolean;
+  /** Whether the COD balance has been collected by the delivery agent */
+  balancePaymentStatus: "pending" | "collected";
+  /** Backward compatible flag: true when balancePaymentStatus === 'collected' */
+  balanceCollected?: boolean;
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
   status:
@@ -44,6 +57,7 @@ export interface IOrder extends Document {
     | "Return Requested"
     | "Returned";
   shippingAddress: IShippingAddress;
+  deliveredAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +71,7 @@ const OrderItemSchema = new Schema<IOrderItem>({
   quantity: { type: Number, required: true },
   price: { type: Number, required: true },
   image: { type: String, required: true },
+  hsnCode: { type: String, default: "6205" },
 });
 
 const ShippingAddressSchema = new Schema<IShippingAddress>({
@@ -77,10 +92,18 @@ const OrderSchema = new Schema<IOrder>(
     customerEmail: { type: String, required: true },
     customerPhone: { type: String, required: true },
     items: [OrderItemSchema],
+    subtotal: { type: Number, required: true },
+    shippingCharge: { type: Number, required: true, default: 70 },
     totalAmount: { type: Number, required: true },
-    paymentType: { type: String, enum: ["full", "partial_cod"], required: true },
+    // "full" is kept in the enum only for backward-compatibility with existing DB documents (treat as "prepaid")
+    paymentType: { type: String, enum: ["prepaid", "partial_cod", "full"], required: true },
     advancePaid: { type: Number, required: true },
     balanceDue: { type: Number, required: true },
+    balancePaymentStatus: {
+      type: String,
+      enum: ["pending", "collected"],
+      default: "pending",
+    },
     balanceCollected: { type: Boolean, default: false },
     razorpayOrderId: { type: String },
     razorpayPaymentId: { type: String },
@@ -95,9 +118,10 @@ const OrderSchema = new Schema<IOrder>(
         "Return Requested",
         "Returned",
       ],
-      default: "Processing",
+      default: "Pending",
     },
     shippingAddress: { type: ShippingAddressSchema, required: true },
+    deliveredAt: { type: Date },
   },
   { timestamps: true }
 );

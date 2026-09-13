@@ -4,94 +4,48 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
-import { ShieldCheck, FileText, Truck, RotateCw, XCircle, CreditCard, ChevronRight } from "lucide-react";
+import {
+  ShieldCheck,
+  FileText,
+  Truck,
+  RotateCw,
+  XCircle,
+  CreditCard,
+  ChevronRight,
+  AlertCircle,
+  Scale,
+  HelpCircle,
+} from "lucide-react";
 
 interface PolicyPageProps {
   params: Promise<{ slug: string }>;
 }
 
 const POLICIES_NAV = [
-  { slug: "privacy", label: "Privacy Policy", icon: ShieldCheck },
   { slug: "terms", label: "Terms & Conditions", icon: FileText },
   { slug: "shipping", label: "Shipping & Delivery", icon: Truck },
-  { slug: "returns", label: "Exchange Policy", icon: RotateCw },
   { slug: "refund", label: "Return & Refund Policy", icon: RotateCw },
-  { slug: "cancellation", label: "Cancellation Policy", icon: XCircle },
+  { slug: "privacy", label: "Privacy Policy", icon: ShieldCheck },
   { slug: "payment", label: "Payment Policy", icon: CreditCard },
   { slug: "cookie", label: "Cookie Policy", icon: FileText },
+  { slug: "cancellation", label: "Cancellation Policy", icon: XCircle },
+  { slug: "exchange", label: "Exchange Policy", icon: RotateCw },
+  { slug: "disclaimer", label: "Disclaimer", icon: AlertCircle },
+  { slug: "intellectual-property", label: "Intellectual Property Policy", icon: Scale },
+  { slug: "consumer-complaint", label: "Consumer Complaint Policy", icon: HelpCircle },
 ];
 
-
-const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { heading: string; body: string }[] }> = {
-  privacy: {
-    title: "Privacy Policy",
-    date: "Effective Date: 01-07-2026",
-    sections: [
-      {
-        heading: "Introduction",
-        body: "Welcome to KHAVYN Fashion Private Limited (\"KHAVYN\", \"we\", \"our\", \"us\").\n\nKHAVYN respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, store, disclose, and safeguard your personal data when you visit www.khavyn.com, purchase products through our website or retail stores, communicate with us, or otherwise interact with our services.\n\nBy accessing or using our website or purchasing our products, you acknowledge that you have read, understood, and agree to the terms of this Privacy Policy.",
-      },
-      {
-        heading: "1. Information We Collect",
-        body: "We may collect the following categories of information:\n\nA. Personal Information\n• Full Name\n• Mobile Number\n• Email Address\n• Billing Address\n• Shipping Address\n• PIN Code\n• Date of Birth (if voluntarily provided)\n• Gender (if voluntarily provided)\n\nB. Order Information\n• Order Number\n• Products Purchased\n• Product Size\n• Product Colour\n• Quantity\n• Purchase Value\n• Invoice Details\n• Order History\n\nC. Payment Information\nPayments are processed securely through authorized third-party payment gateways.\nKHAVYN does not store your:\n• Credit Card Number\n• Debit Card Number\n• CVV\n• UPI PIN\n• Net Banking Password\n• Other sensitive payment credentials\n\nD. Technical Information\nWhen you visit our website, we may automatically collect:\n• IP Address\n• Browser Type\n• Device Information\n• Operating System\n• Language Preferences\n• Date and Time of Visit\n• Pages Viewed\n• Referral Source\n• Website Usage Data\n• Cookies and Similar Technologies\n\nE. Information Collected at Retail Stores\nWhen you shop at a KHAVYN retail store, we may collect:\n• Name\n• Mobile Number\n• Email Address\n• Purchase History\n• Loyalty Programme Details (if applicable)\n• CCTV Footage for safety and security purposes",
-      },
-      {
-        heading: "2. How We Use Your Information",
-        body: "We may use your information to:\n\n• Process and fulfil orders.\n• Deliver products.\n• Verify your identity.\n• Process payments.\n• Provide customer support.\n• Process exchanges, returns, refunds, or warranty claims.\n• Send invoices and order confirmations.\n• Communicate delivery updates.\n• Improve our products and services.\n• Personalize your shopping experience.\n• Detect and prevent fraud.\n• Comply with legal and regulatory obligations.\n• Respond to customer enquiries and complaints.\n\nWhere you have provided consent or where otherwise permitted by law, we may also send you updates regarding new collections, promotions, exclusive offers, events, or marketing communications. You may opt out of marketing communications at any time.",
-      },
-      {
-        heading: "3. Cookies and Similar Technologies",
-        body: "Our website uses cookies and similar technologies to:\n\n• Maintain secure login sessions.\n• Remember your shopping cart.\n• Save your preferences.\n• Improve website performance.\n• Analyse visitor behaviour.\n• Enhance user experience.\n• Support security and fraud prevention.\n\nYou can manage or disable cookies through your browser settings. Some website features may not function properly if essential cookies are disabled.\n\nFor more information, please refer to our Cookie Policy.",
-      },
-      {
-        heading: "4. Sharing of Personal Information",
-        body: "KHAVYN does not sell or rent your personal information.\n\nWe may share your information only when necessary with trusted service providers, including:\n\n• Payment Gateway Providers.\n• Courier and Logistics Partners.\n• Website Hosting Providers.\n• Technology Service Providers.\n• Customer Support Platforms.\n• SMS and Email Service Providers.\n• Analytics and Marketing Service Providers.\n• Professional advisers (such as auditors or legal advisers).\n• Government authorities, regulators, or law enforcement agencies where required by law.\n\nThese parties are required to handle your information in accordance with applicable laws and contractual obligations.",
-      },
-      {
-        heading: "5. Data Security",
-        body: "We implement reasonable administrative, technical, and physical safeguards to protect your personal information, including:\n\n• SSL encryption.\n• Secure servers.\n• Firewalls.\n• Restricted access controls.\n• Password-protected systems.\n• Security monitoring and periodic reviews.\n\nWhile we strive to protect your information, no method of transmission over the internet or electronic storage is completely secure. Accordingly, we cannot guarantee absolute security.",
-      },
-      {
-        heading: "6. Data Retention",
-        body: "We retain your personal information only for as long as reasonably necessary to:\n\n• Fulfil the purposes described in this Privacy Policy.\n• Comply with legal, accounting, tax, or regulatory obligations.\n• Resolve disputes.\n• Enforce our agreements.\n\nWhen personal information is no longer required, we will securely delete, anonymize, or otherwise dispose of it in accordance with applicable laws.",
-      },
-      {
-        heading: "7. Your Rights",
-        body: "Subject to applicable law, you may request to:\n\n• Access your personal information.\n• Correct or update inaccurate information.\n• Request deletion of eligible personal information.\n• Withdraw consent where processing is based on consent.\n• Request information regarding the processing of your personal data.\n• Opt out of promotional communications.\n\nTo exercise these rights, please contact us using the details provided below.",
-      },
-      {
-        heading: "8. Children's Privacy",
-        body: "Our website is intended for individuals who are legally capable of entering into binding contracts under applicable law.\n\nWe do not knowingly collect personal information from children without appropriate authorization. If we become aware that personal information has been collected contrary to applicable law, we will take reasonable steps to delete such information.",
-      },
-      {
-        heading: "9. Third-Party Websites",
-        body: "Our website may contain links to third-party websites or services.\n\nKHAVYN is not responsible for the privacy practices, security, or content of such third-party websites. Users are encouraged to review the privacy policies of those websites before providing personal information.",
-      },
-      {
-        heading: "10. International Data Processing",
-        body: "If you access our website from outside India, your personal information may be processed and stored in India or in other jurisdictions where our service providers operate, subject to applicable legal safeguards.",
-      },
-      {
-        heading: "11. Legal Disclosure",
-        body: "We may disclose personal information where necessary to:\n\n• Comply with applicable laws, regulations, court orders, or lawful requests.\n• Protect the rights, property, or safety of KHAVYN, our customers, employees, or the public.\n• Detect, investigate, or prevent fraud, security incidents, or unlawful activities.\n• Enforce our legal rights, agreements, and policies.",
-      },
-      {
-        heading: "12. Changes to this Privacy Policy",
-        body: "KHAVYN reserves the right to amend or update this Privacy Policy at any time.\n\nThe revised version will be published on www.khavyn.com with the updated Effective Date. Continued use of the website after publication of any changes constitutes acceptance of the revised Privacy Policy.",
-      },
-      {
-        heading: "13. Contact Us",
-        body: "If you have any questions regarding this Privacy Policy or the processing of your personal information, please contact:\n\nPrivacy Officer\nKHAVYN Fashion Private Limited\nEmail: privacy@khavyn.com\nCustomer Care: +91-9373205258\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar,\nNew Sangavi,\nPune – 411027, Maharashtra, India\n\nBy accessing or using www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Privacy Policy.",
-      },
-    ],
-  },
+const POLICY_CONTENT: Record<
+  string,
+  { title: string; date: string; sections: { heading: string; body: string }[] }
+> = {
   terms: {
     title: "Terms & Conditions",
     date: "Effective Date: 01-09-2026",
     sections: [
       {
         heading: "Introduction",
-        body: "Welcome to KHAVYN Fashion Private Limited (\"KHAVYN\", \"Company\", \"we\", \"our\", \"us\").\n\nThese Terms & Conditions (\"Terms\") govern your access to and use of www.khavyn.com, including all purchases, services, content, features, and transactions made through our website and, where applicable, our retail stores.\n\nBy accessing our website, creating an account, placing an order, or purchasing any product, you acknowledge that you have read, understood, and agree to be legally bound by these Terms.",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "Company", "we", "our", "us").\n\nThese Terms & Conditions ("Terms") govern your access to and use of www.khavyn.com, including all purchases, services, content, features, and transactions made through our website and, where applicable, our retail stores.\n\nBy accessing our website, creating an account, placing an order, or purchasing any product, you acknowledge that you have read, understood, and agree to be legally bound by these Terms.',
       },
       {
         heading: "1. Eligibility",
@@ -147,7 +101,7 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
       },
       {
         heading: "14. Limitation of Liability",
-        body: "To the fullest extent permitted by applicable law, KHAVYN shall not be liable for any indirect, incidental, special, consequential, exemplary, or punitive damages arising from or related to:\n\n• Use of or inability to use the website.\n• Delays in processing or delivery.\n• Technical failures.\n• Service interruptions.\n• Loss of data.\n• Unauthorized access to user accounts.\n• Third-party service failures.\n• Any reliance on information available on the website.\n\nNothing in these Terms limits liability that cannot be excluded under applicable law.",
+        body: "To the fullest extent permitted by applicable law, KHAVYN shall not be liable for any indirect, incidental, special, exemplary, or punitive damages arising from or related to:\n\n• Use of or inability to use the website.\n• Delays in processing or delivery.\n• Technical failures.\n• Service interruptions.\n• Loss of data.\n• Unauthorized access to user accounts.\n• Third-party service failures.\n• Any reliance on information available on the website.\n\nNothing in these Terms limits liability that cannot be excluded under applicable law.",
       },
       {
         heading: "15. Indemnity",
@@ -181,7 +135,7 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
     sections: [
       {
         heading: "Introduction",
-        body: "Welcome to KHAVYN Fashion Private Limited (\"KHAVYN\", \"we\", \"our\", \"us\").\n\nThis Shipping & Delivery Policy explains how orders placed through www.khavyn.com are processed, shipped, and delivered. By placing an order with KHAVYN, you acknowledge that you have read, understood, and agree to this Policy.",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nThis Shipping & Delivery Policy explains how orders placed through www.khavyn.com are processed, shipped, and delivered. By placing an order with KHAVYN, you acknowledge that you have read, understood, and agree to this Policy.',
       },
       {
         heading: "1. Order Processing",
@@ -248,115 +202,6 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
         body: "For shipping or delivery-related queries, please contact:\n\nKHAVYN Fashion Private Limited\nCustomer Care: +91-9373205258\nEmail: complaint.khavyn@gmail.com\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar,\nNew Sangavi,\nPune – 411027, Maharashtra, India\n\nBy placing an order on www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Shipping & Delivery Policy.",
       },
     ],
-
-  },
-  returns: {
-    title: "Exchange Policy",
-    date: "Effective Date: 01-09-2026",
-    sections: [
-      {
-        heading: "Introduction",
-        body: "Welcome to KHAVYN Fashion Private Limited (\"KHAVYN\", \"we\", \"our\", \"us\").\n\nAt KHAVYN, we are committed to delivering premium-quality apparel and an exceptional shopping experience. If your purchase meets the eligibility criteria outlined below, you may request an exchange in accordance with this Exchange Policy.\n\nBy placing an order on www.khavyn.com, you agree to this Exchange Policy.",
-      },
-      {
-        heading: "1. Exchange Eligibility",
-        body: "An exchange request may be accepted only if:\n\n• The request is submitted within 3 (three) calendar days from the date of delivery.\n• The product is unused, unworn, unwashed, and undamaged.\n• All original tags, labels, packaging, accessories, invoices, and promotional items are returned with the product.\n• The product is in its original condition and suitable for resale.\n• The product successfully passes our Quality Inspection after it is received at our warehouse.\n\nExchange requests submitted after the above period may not be accepted.",
-      },
-      {
-        heading: "2. Eligible Reasons for Exchange",
-        body: "Subject to verification and quality inspection, exchanges may be permitted for:\n\n• Incorrect size received.\n• Incorrect colour received.\n• Incorrect product delivered.\n• Manufacturing defect.\n• Product damaged during transit.\n• Product received with missing components or accessories (where applicable).\n\nKHAVYN reserves the right to verify all exchange requests before approval.",
-      },
-      {
-        heading: "3. Non-Exchangeable Products",
-        body: "The following items are not eligible for exchange:\n\n• Products returned after 3 days from delivery.\n• Used, worn, washed, altered, ironed, stained, or damaged products.\n• Products without original tags or packaging.\n• Products with perfume, deodorant, smoke, makeup, detergent, pet hair, or other signs of use.\n• Gift cards or store credits.\n• Customized, personalised, embroidered-on-demand, or altered products.\n• Products marked as Final Sale, Clearance, Non-Returnable, or Non-Exchangeable, unless required by applicable law.\n• Products damaged due to improper use, negligence, or incorrect washing by the customer.",
-      },
-      {
-        heading: "4. Exchange Process",
-        body: "To request an exchange:\n\n1. Contact Customer Care within 3 days of delivery.\n2. Provide:\n   o Order Number;\n   o Reason for exchange;\n   o Photographs or videos of the product (if requested).\n3. If approved, KHAVYN will provide further instructions regarding pickup or return shipment.\n4. The returned product will undergo a Quality Inspection after receipt.\n5. If the inspection is successful, the replacement product will be dispatched subject to stock availability.",
-      },
-      {
-        heading: "5. Quality Inspection",
-        body: "Every returned product undergoes a detailed quality inspection.\n\nAn exchange may be rejected if:\n\n• The product has been used or worn.\n• The returned item does not match the original order.\n• Tags or packaging are missing.\n• The product is damaged by the customer.\n• The product fails our quality standards.\n\nKHAVYN's quality inspection findings shall be final for the purpose of determining exchange eligibility.",
-      },
-      {
-        heading: "6. Wrong or Tampered Return",
-        body: "To protect against fraudulent returns, KHAVYN may record a video during the unboxing and inspection of returned parcels.\n\nIf, during inspection, it is found that:\n\n• a different product has been returned;\n• the product has been tampered with;\n• the product is counterfeit or not originally supplied by KHAVYN;\n• essential components, accessories, tags, or packaging are missing due to customer actions; or\n• the returned product is materially different from the item originally delivered,\n\nthe exchange request will be rejected. The returned item may be shipped back to the customer at the customer's cost, and KHAVYN reserves the right to refuse any refund or exchange in such cases.",
-      },
-      {
-        heading: "7. Exchange Subject to Availability",
-        body: "Exchanges are subject to inventory availability.\n\nIf the requested size, colour, or product is unavailable, KHAVYN may, at its discretion:\n\n• offer another available size or colour;\n• offer an equivalent product of equal value (with the customer's consent); or\n• issue store credit or process a refund only where required under our Return & Refund Policy or applicable law.",
-      },
-      {
-        heading: "8. Shipping Charges for Exchanges",
-        body: "If the exchange is due to:\n\n• a manufacturing defect;\n• a damaged product received;\n• an incorrect product shipped by KHAVYN; or\n• an incorrect size or colour dispatched by KHAVYN,\n\nKHAVYN will bear the applicable exchange shipping charges.\n\nFor exchanges requested due to customer preference (such as ordering the wrong size or changing colour preference), exchange shipping or handling charges may apply, where permitted by law. Any applicable charges will be communicated before processing the exchange.",
-      },
-      {
-        heading: "9. Retail Store Purchases",
-        body: "Products purchased from a KHAVYN retail store may be exchanged only at eligible KHAVYN stores, subject to:\n\n• presentation of the original purchase invoice;\n• compliance with this Exchange Policy; and\n• successful quality inspection.\n\nCash refunds for retail store purchases will not be provided unless required by applicable law.",
-      },
-      {
-        heading: "10. Abuse of the Exchange Policy",
-        body: "KHAVYN reserves the right to reject exchange requests or restrict future purchases if a customer is found to have:\n\n• repeatedly misused the exchange process;\n• submitted false or fraudulent claims;\n• returned products that do not match the original order; or\n• otherwise acted in bad faith.",
-      },
-      {
-        heading: "11. Changes to this Policy",
-        body: "KHAVYN reserves the right to modify, update, or revise this Exchange Policy at any time without prior notice. The updated version will be published on www.khavyn.com and will become effective from the date of publication.",
-      },
-      {
-        heading: "12. Contact Us",
-        body: "For exchange requests or assistance, please contact:\n\nKHAVYN Fashion Private Limited\nCustomer Care: +91-9373205258\nEmail: complaint.khavyn@gmail.com\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar, New Sangavi,\nPune – 411027, Maharashtra, India\n\nBy placing an order on www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Exchange Policy.",
-      },
-    ],
-  },
-  cancellation: {
-    title: "Cancellation Policy",
-    date: "Effective Date: 01-09-2026",
-    sections: [
-      {
-        heading: "Introduction",
-        body: "Welcome to KHAVYN Fashion Private Limited (\"KHAVYN\", \"we\", \"our\", \"us\").\n\nAt KHAVYN, we strive to provide a seamless shopping experience. This Cancellation Policy explains the circumstances under which an order may be cancelled by a customer or by KHAVYN. By placing an order on www.khavyn.com, you acknowledge that you have read, understood, and agree to this Cancellation Policy.",
-      },
-      {
-        heading: "1. Customer-Initiated Cancellation",
-        body: "Customers may request cancellation of an order only before the order has entered processing, packing, or shipment.\n\nCancellation requests may be submitted through:\n\n• Your account on www.khavyn.com (where available);\n• Email: complaint.khavyn@gmail.com; or\n• Customer Care: +91-9373205258.\n\nOnce an order has entered processing, packing, or has been dispatched, it cannot be cancelled.\n\nAny request after dispatch shall be governed by KHAVYN's Return & Refund Policy, where applicable.",
-      },
-      {
-        heading: "2. Cancellation After Shipment",
-        body: "Once an order has been dispatched from our warehouse, it cannot be cancelled.\n\nCustomers who no longer wish to keep a delivered product may submit a return request only if the product qualifies under KHAVYN's Return & Refund Policy. Submission of a return request does not guarantee acceptance, and all requests are subject to eligibility, verification, and quality inspection.",
-      },
-      {
-        heading: "3. Partial Cash on Delivery (COD) Orders",
-        body: "KHAVYN offers Partial Cash on Delivery (COD) for eligible orders.\n\nUnder this payment option:\n\n• 50% of the total order value must be paid in advance at the time of placing the order.\n• The remaining 50% is payable at the time of delivery.\n\nCustomers selecting Partial COD are requested to place orders only if they genuinely intend to complete the purchase.\n\nKHAVYN reserves the right to:\n\n• Cancel suspicious, fraudulent, duplicate, or unverifiable Partial COD orders;\n• Restrict, suspend, or permanently disable the Partial COD facility for customers who repeatedly refuse deliveries, misuse the facility, or violate KHAVYN policies;\n• Require full prepaid payment for future purchases at its sole discretion.",
-      },
-      {
-        heading: "4. Cancellation by KHAVYN",
-        body: "KHAVYN reserves the right to cancel any order, in whole or in part, without prior notice, under circumstances including but not limited to:\n\n• Product becoming unavailable or out of stock;\n• Pricing, technical, or typographical errors;\n• Duplicate orders;\n• Incorrect product information;\n• Failure of payment authorization or verification;\n• Failure to receive the required advance payment for eligible Partial COD orders;\n• Suspected fraudulent or unauthorized transactions;\n• Violation of our Terms & Conditions or other published policies;\n• Delivery address being incomplete, incorrect, or non-serviceable;\n• Force majeure events including natural disasters, strikes, transportation disruptions, government restrictions, pandemics, or other events beyond KHAVYN's reasonable control.\n\nWhere payment has already been received for an order cancelled by KHAVYN, an appropriate refund will be processed in accordance with this Policy.",
-      },
-      {
-        heading: "5. Refund for Cancelled Orders",
-        body: "If an order is cancelled before it enters processing or shipment:\n\n• Prepaid Orders: The full amount paid, including applicable taxes, will be refunded to the original payment method.\n• Partial COD Orders: The 50% advance payment will be refunded to the original payment method, provided the cancellation request is approved and received before the order enters processing, packing, or shipment.\n\nIf a customer refuses delivery of a dispatched Partial COD order without a valid reason or otherwise breaches this Cancellation Policy, KHAVYN reserves the right to retain or deduct all or part of the advance payment towards shipping, return shipping, packaging, payment gateway charges, and other reasonable operational costs, to the extent permitted by applicable law and in accordance with our Payment Policy.\n\nApproved refunds are generally processed within 7 to 10 business days. The time required for the refund to reflect in the customer's account may vary depending on the customer's bank or payment service provider.",
-      },
-      {
-        heading: "6. Modification of Orders",
-        body: "Customers may request modifications relating to:\n\n• Product;\n• Size;\n• Colour;\n• Quantity;\n• Shipping Address;\n• Billing Address; or\n• Contact Details,\n\nonly before the order enters processing.\n\nOnce an order has entered processing, packing, or shipment, modifications cannot be guaranteed.\n\nFor Partial COD orders, if an approved modification changes the order value, the advance payment may need to be adjusted before the order is processed.\n\nKHAVYN will make reasonable efforts to accommodate modification requests but does not guarantee that all requests can be fulfilled.",
-      },
-      {
-        heading: "7. Promotional and Limited Edition Orders",
-        body: "Orders placed during:\n\n• Product launches;\n• Limited edition collections;\n• Exclusive releases;\n• Festival campaigns;\n• Flash sales;\n• Clearance events; or\n• Special promotional campaigns,\n\nmay not be eligible for cancellation once confirmed due to limited inventory, operational requirements, or high order volumes.",
-      },
-      {
-        heading: "8. Abuse of the Cancellation Policy",
-        body: "KHAVYN reserves the right to refuse service, suspend customer accounts, cancel future orders, restrict available payment methods, or take any other appropriate action if a customer is found to have:\n\n• Repeatedly cancelled confirmed orders without reasonable cause;\n• Misused promotional offers or discount benefits;\n• Placed fraudulent, fake, or speculative orders;\n• Repeatedly refused delivery without a valid reason;\n• Misused the Partial COD facility;\n• Submitted false information; or\n• Engaged in activities that adversely affect KHAVYN, its operations, employees, logistics partners, or other customers.",
-      },
-      {
-        heading: "9. Relationship with Other Policies",
-        body: "This Cancellation Policy should be read together with KHAVYN's:\n\n• Terms & Conditions;\n• Payment Policy;\n• Shipping & Delivery Policy;\n• Return & Refund Policy;\n• Exchange Policy;\n• Warranty & Product Care Policy; and\n• Privacy Policy.\n\nIn the event of any inconsistency, the policy specifically governing the relevant subject matter shall prevail to the extent of such inconsistency.",
-      },
-      {
-        heading: "10. Contact Us",
-        body: "For cancellation requests or assistance, please contact:\n\nKHAVYN Fashion Private Limited\nCustomer Care: +91-9373205258\nEmail: complaint.khavyn@gmail.com\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar,\nNew Sangavi,\nPune – 411027, Maharashtra, India\n\nBy placing an order on www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Cancellation Policy.",
-      },
-    ],
   },
   refund: {
     title: "Return & Refund Policy",
@@ -364,7 +209,7 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
     sections: [
       {
         heading: "1. Introduction",
-        body: "At KHAVYN Fashion Private Limited (\"KHAVYN\", \"we\", \"our\", or \"us\"), customer satisfaction is important to us. We take great care in manufacturing, inspecting, packaging, and shipping every product.\n\nThis Return & Refund Policy explains the conditions under which products purchased from www.khavyn.com or authorized KHAVYN sales channels may be returned, exchanged, or refunded.\n\nBy placing an order, you agree to this Policy.",
+        body: 'At KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", or "us"), customer satisfaction is important to us. We take great care in manufacturing, inspecting, packaging, and shipping every product.\n\nThis Return & Refund Policy explains the conditions under which products purchased from www.khavyn.com or authorized KHAVYN sales channels may be returned, exchanged, or refunded.\n\nBy placing an order, you agree to this Policy.',
       },
       {
         heading: "2. Return Eligibility",
@@ -440,17 +285,79 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
       },
       {
         heading: "20. Changes to This Policy",
-        body: "KHAVYN reserves the right to amend this Return & Refund Policy at any time. The latest version will be published on www.khavyn.com and shall become effective from the stated \"Last Updated\" date.",
+        body: 'KHAVYN reserves the right to amend this Return & Refund Policy at any time. The latest version will be published on www.khavyn.com and shall become effective from the stated "Last Updated" date.',
       },
     ],
   },
-    payment: {
+  privacy: {
+    title: "Privacy Policy",
+    date: "Effective Date: 01-07-2026",
+    sections: [
+      {
+        heading: "Introduction",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nKHAVYN respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, store, disclose, and safeguard your personal data when you visit www.khavyn.com, purchase products through our website or retail stores, communicate with us, or otherwise interact with our services.\n\nBy accessing or using our website or purchasing our products, you acknowledge that you have read, understood, and agree to the terms of this Privacy Policy.',
+      },
+      {
+        heading: "1. Information We Collect",
+        body: "We may collect the following categories of information:\n\nA. Personal Information\n• Full Name\n• Mobile Number\n• Email Address\n• Billing Address\n• Shipping Address\n• PIN Code\n• Date of Birth (if voluntarily provided)\n• Gender (if voluntarily provided)\n\nB. Order Information\n• Order Number\n• Products Purchased\n• Product Size\n• Product Colour\n• Quantity\n• Purchase Value\n• Invoice Details\n• Order History\n\nC. Payment Information\nPayments are processed securely through authorized third-party payment gateways.\nKHAVYN does not store your:\n• Credit Card Number\n• Debit Card Number\n• CVV\n• UPI PIN\n• Net Banking Password\n• Other sensitive payment credentials\n\nD. Technical Information\nWhen you visit our website, we may automatically collect:\n• IP Address\n• Browser Type\n• Device Information\n• Operating System\n• Language Preferences\n• Date and Time of Visit\n• Pages Viewed\n• Referral Source\n• Website Usage Data\n• Cookies and Similar Technologies\n\nE. Information Collected at Retail Stores\nWhen you shop at a KHAVYN retail store, we may collect:\n• Name\n• Mobile Number\n• Email Address\n• Purchase History\n• Loyalty Programme Details (if applicable)\n• CCTV Footage for safety and security purposes",
+      },
+      {
+        heading: "2. How We Use Your Information",
+        body: "We may use your information to:\n\n• Process and fulfil orders.\n• Deliver products.\n• Verify your identity.\n• Process payments.\n• Provide customer support.\n• Process exchanges, returns, refunds, or warranty claims.\n• Send invoices and order confirmations.\n• Communicate delivery updates.\n• Improve our products and services.\n• Personalize your shopping experience.\n• Detect and prevent fraud.\n• Comply with legal and regulatory obligations.\n• Respond to customer enquiries and complaints.\n\nWhere you have provided consent or where otherwise permitted by law, we may also send you updates regarding new collections, promotions, exclusive offers, events, or marketing communications. You may opt out of marketing communications at any time.",
+      },
+      {
+        heading: "3. Cookies and Similar Technologies",
+        body: "Our website uses cookies and similar technologies to:\n\n• Maintain secure login sessions.\n• Remember your shopping cart.\n• Save your preferences.\n• Improve website performance.\n• Analyse visitor behaviour.\n• Enhance user experience.\n• Support security and fraud prevention.\n\nYou can manage or disable cookies through your browser settings. Some website features may not function properly if essential cookies are disabled.\n\nFor more information, please refer to our Cookie Policy.",
+      },
+      {
+        heading: "4. Sharing of Personal Information",
+        body: "KHAVYN does not sell or rent your personal information.\n\nWe may share your information only when necessary with trusted service providers, including:\n\n• Payment Gateway Providers.\n• Courier and Logistics Partners.\n• Website Hosting Providers.\n• Technology Service Providers.\n• Customer Support Platforms.\n• SMS and Email Service Providers.\n• Analytics and Marketing Service Providers.\n• Professional advisers (such as auditors or legal advisers).\n• Government authorities, regulators, or law enforcement agencies where required by law.\n\nThese parties are required to handle your information in accordance with applicable laws and contractual obligations.",
+      },
+      {
+        heading: "5. Data Security",
+        body: "We implement reasonable administrative, technical, and physical safeguards to protect your personal information, including:\n\n• SSL encryption.\n• Secure servers.\n• Firewalls.\n• Restricted access controls.\n• Password-protected systems.\n• Security monitoring and periodic reviews.\n\nWhile we strive to protect your information, no method of transmission over the internet or electronic storage is completely secure. Accordingly, we cannot guarantee absolute security.",
+      },
+      {
+        heading: "6. Data Retention",
+        body: "We retain your personal information only for as long as reasonably necessary to:\n\n• Fulfil the purposes described in this Privacy Policy.\n• Comply with legal, accounting, tax, or regulatory obligations.\n• Resolve disputes.\n• Enforce our agreements.\n\nWhen personal information is no longer required, we will securely delete, anonymize, or otherwise dispose of it in accordance with applicable laws.",
+      },
+      {
+        heading: "7. Your Rights",
+        body: "Subject to applicable law, you may request to:\n\n• Access your personal information.\n• Correct or update inaccurate information.\n• Request deletion of eligible personal information.\n• Withdraw consent where processing is based on consent.\n• Request information regarding the processing of your personal data.\n• Opt out of promotional communications.\n\nTo exercise these rights, please contact us using the details provided below.",
+      },
+      {
+        heading: "8. Children's Privacy",
+        body: "Our website is intended for individuals who are legally capable of entering into binding contracts under applicable law.\n\nWe do not knowingly collect personal information from children without appropriate authorization. If we become aware that personal information has been collected contrary to applicable law, we will take reasonable steps to delete such information.",
+      },
+      {
+        heading: "9. Third-Party Websites",
+        body: "Our website may contain links to third-party websites or services.\n\nKHAVYN is not responsible for the privacy practices, security, or content of such third-party websites. Users are encouraged to review the privacy policies of those websites before providing personal information.",
+      },
+      {
+        heading: "10. International Data Processing",
+        body: "If you access our website from outside India, your personal information may be processed and stored in India or in other jurisdictions where our service providers operate, subject to applicable legal safeguards.",
+      },
+      {
+        heading: "11. Legal Disclosure",
+        body: "We may disclose personal information where necessary to:\n\n• Comply with applicable laws, regulations, court orders, or lawful requests.\n• Protect the rights, property, or safety of KHAVYN, our customers, employees, or the public.\n• Detect, investigate, or prevent fraud, security incidents, or unlawful activities.\n• Enforce our legal rights, agreements, and policies.",
+      },
+      {
+        heading: "12. Changes to this Privacy Policy",
+        body: "KHAVYN reserves the right to amend or update this Privacy Policy at any time.\n\nThe revised version will be published on www.khavyn.com with the updated Effective Date. Continued use of the website after publication of any changes constitutes acceptance of the revised Privacy Policy.",
+      },
+      {
+        heading: "13. Contact Us",
+        body: "If you have any questions regarding this Privacy Policy or the processing of your personal information, please contact:\n\nPrivacy Officer\nKHAVYN Fashion Private Limited\nEmail: privacy@khavyn.com\nCustomer Care: +91-9373205258\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar,\nNew Sangavi,\nPune – 411027, Maharashtra, India\n\nBy accessing or using www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Privacy Policy.",
+      },
+    ],
+  },
+  payment: {
     title: "Payment Policy",
     date: "Effective Date: 01-09-2026",
     sections: [
       {
         heading: "Introduction",
-        body: "Welcome to KHAVYN Fashion Private Limited (\"KHAVYN\", \"we\", \"our\", \"us\").\n\nThis Payment Policy explains the payment methods, payment terms, and conditions applicable to purchases made through www.khavyn.com and, where applicable, at KHAVYN retail stores. By placing an order with KHAVYN, you agree to this Payment Policy.",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nThis Payment Policy explains the payment methods, payment terms, and conditions applicable to purchases made through www.khavyn.com and, where applicable, at KHAVYN retail stores. By placing an order with KHAVYN, you agree to this Payment Policy.',
       },
       {
         heading: "1. Accepted Payment Methods",
@@ -506,13 +413,13 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
       },
     ],
   },
-    cookie: {
+  cookie: {
     title: "Cookie Policy",
     date: "Effective Date: 01-09-2026",
     sections: [
       {
         heading: "Introduction",
-        body: "Welcome to KHAVYN Fashion Private Limited (\"KHAVYN\", \"we\", \"our\", \"us\").\n\nThis Cookie Policy explains how KHAVYN uses cookies and similar technologies when you visit www.khavyn.com. By continuing to browse or use our website, you consent to our use of cookies as described in this policy, except where you choose to disable or manage them through your browser or our cookie preferences (where available).",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nThis Cookie Policy explains how KHAVYN uses cookies and similar technologies when you visit www.khavyn.com. By continuing to browse or use our website, you consent to our use of cookies as described in this policy, except where you choose to disable or manage them through your browser or our cookie preferences (where available).',
       },
       {
         heading: "1. What Are Cookies?",
@@ -548,7 +455,288 @@ const POLICY_CONTENT: Record<string, { title: string; date: string; sections: { 
       },
     ],
   },
+  cancellation: {
+    title: "Cancellation Policy",
+    date: "Effective Date: 01-09-2026",
+    sections: [
+      {
+        heading: "Introduction",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nAt KHAVYN, we strive to provide a seamless shopping experience. This Cancellation Policy explains the circumstances under which an order may be cancelled by a customer or by KHAVYN. By placing an order on www.khavyn.com, you acknowledge that you have read, understood, and agree to this Cancellation Policy.',
+      },
+      {
+        heading: "1. Customer-Initiated Cancellation",
+        body: "Customers may request cancellation of an order only before the order has entered processing, packing, or shipment.\n\nCancellation requests may be submitted through:\n\n• Your account on www.khavyn.com (where available);\n• Email: complaint.khavyn@gmail.com; or\n• Customer Care: +91-9373205258.\n\nOnce an order has entered processing, packing, or has been dispatched, it cannot be cancelled.\n\nAny request after dispatch shall be governed by KHAVYN's Return & Refund Policy, where applicable.",
+      },
+      {
+        heading: "2. Cancellation After Shipment",
+        body: "Once an order has been dispatched from our warehouse, it cannot be cancelled.\n\nCustomers who no longer wish to keep a delivered product may submit a return request only if the product qualifies under KHAVYN's Return & Refund Policy. Submission of a return request does not guarantee acceptance, and all requests are subject to eligibility, verification, and quality inspection.",
+      },
+      {
+        heading: "3. Partial Cash on Delivery (COD) Orders",
+        body: "KHAVYN offers Partial Cash on Delivery (COD) for eligible orders.\n\nUnder this payment option:\n\n• 50% of the total order value must be paid in advance at the time of placing the order.\n• The remaining 50% is payable at the time of delivery.\n\nCustomers selecting Partial COD are requested to place orders only if they genuinely intend to complete the purchase.\n\nKHAVYN reserves the right to:\n\n• Cancel suspicious, fraudulent, duplicate, or unverifiable Partial COD orders;\n• Restrict, suspend, or permanently disable the Partial COD facility for customers who repeatedly refuse deliveries, misuse the facility, or violate KHAVYN policies;\n• Require full prepaid payment for future purchases at its sole discretion.",
+      },
+      {
+        heading: "4. Cancellation by KHAVYN",
+        body: "KHAVYN reserves the right to cancel any order, in whole or in part, without prior notice, under circumstances including but not limited to:\n\n• Product becoming unavailable or out of stock;\n• Pricing, technical, or typographical errors;\n• Duplicate orders;\n• Incorrect product information;\n• Failure of payment authorization or verification;\n• Failure to receive the required advance payment for eligible Partial COD orders;\n• Suspected fraudulent or unauthorized transactions;\n• Violation of our Terms & Conditions or other published policies;\n• Delivery address being incomplete, incorrect, or non-serviceable;\n• Force majeure events including natural disasters, strikes, transportation disruptions, government restrictions, pandemics, or other events beyond KHAVYN's reasonable control.\n\nWhere payment has already been received for an order cancelled by KHAVYN, an appropriate refund will be processed in accordance with this Policy.",
+      },
+      {
+        heading: "5. Refund for Cancelled Orders",
+        body: "If an order is cancelled before it enters processing or shipment:\n\n• Prepaid Orders: The full amount paid, including applicable taxes, will be refunded to the original payment method.\n• Partial COD Orders: The 50% advance payment will be refunded to the original payment method, provided the cancellation request is approved and received before the order enters processing, packing, or shipment.\n\nIf a customer refuses delivery of a dispatched Partial COD order without a valid reason or otherwise breaches this Cancellation Policy, KHAVYN reserves the right to retain or deduct all or part of the advance payment towards shipping, return shipping, packaging, payment gateway charges, and other reasonable operational costs, to the extent permitted by applicable law and in accordance with our Payment Policy.\n\nApproved refunds are generally processed within 7 to 10 business days. The time required for the refund to reflect in the customer's account may vary depending on the customer's bank or payment service provider.",
+      },
+      {
+        heading: "6. Modification of Orders",
+        body: "Customers may request modifications relating to:\n\n• Product;\n• Size;\n• Colour;\n• Quantity;\n• Shipping Address;\n• Billing Address; or\n• Contact Details,\n\nonly before the order enters processing.\n\nOnce an order has entered processing, packing, or shipment, modifications cannot be guaranteed.\n\nFor Partial COD orders, if an approved modification changes the order value, the advance payment may need to be adjusted before the order is processed.\n\nKHAVYN will make reasonable efforts to accommodate modification requests but does not guarantee that all requests can be fulfilled.",
+      },
+      {
+        heading: "7. Promotional and Limited Edition Orders",
+        body: "Orders placed during:\n\n• Product launches;\n• Limited edition collections;\n• Exclusive releases;\n• Festival campaigns;\n• Flash sales;\n• Clearance events; or\n• Special promotional campaigns,\n\nmay not be eligible for cancellation once confirmed due to limited inventory, operational requirements, or high order volumes.",
+      },
+      {
+        heading: "8. Abuse of the Cancellation Policy",
+        body: "KHAVYN reserves the right to refuse service, suspend customer accounts, cancel future orders, restrict available payment methods, or take any other appropriate action if a customer is found to have:\n\n• Repeatedly cancelled confirmed orders without reasonable cause;\n• Misused promotional offers or discount benefits;\n• Placed fraudulent, fake, or speculative orders;\n• Repeatedly refused delivery without a valid reason;\n• Misused the Partial COD facility;\n• Submitted false information; or\n• Engaged in activities that adversely affect KHAVYN, its operations, employees, logistics partners, or other customers.",
+      },
+      {
+        heading: "9. Relationship with Other Policies",
+        body: "This Cancellation Policy should be read together with KHAVYN's:\n\n• Terms & Conditions;\n• Payment Policy;\n• Shipping & Delivery Policy;\n• Return & Refund Policy;\n• Exchange Policy;\n• Warranty & Product Care Policy; and\n• Privacy Policy.\n\nIn the event of any inconsistency, the policy specifically governing the relevant subject matter shall prevail to the extent of such inconsistency.",
+      },
+      {
+        heading: "10. Contact Us",
+        body: "For cancellation requests or assistance, please contact:\n\nKHAVYN Fashion Private Limited\nCustomer Care: +91-9373205258\nEmail: complaint.khavyn@gmail.com\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar,\nNew Sangavi,\nPune – 411027, Maharashtra, India\n\nBy placing an order on www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Cancellation Policy.",
+      },
+    ],
+  },
+  exchange: {
+    title: "Exchange Policy",
+    date: "Effective Date: 01-09-2026",
+    sections: [
+      {
+        heading: "Introduction",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nAt KHAVYN, we are committed to delivering premium-quality apparel and an exceptional shopping experience. If your purchase meets the eligibility criteria outlined below, you may request an exchange in accordance with this Exchange Policy.\n\nBy placing an order on www.khavyn.com, you agree to this Exchange Policy.',
+      },
+      {
+        heading: "1. Exchange Eligibility",
+        body: "An exchange request may be accepted only if:\n\n• The request is submitted within 3 (three) calendar days from the date of delivery.\n• The product is unused, unworn, unwashed, and undamaged.\n• All original tags, labels, packaging, accessories, invoices, and promotional items are returned with the product.\n• The product is in its original condition and suitable for resale.\n• The product successfully passes our Quality Inspection after it is received at our warehouse.\n\nExchange requests submitted after the above period may not be accepted.",
+      },
+      {
+        heading: "2. Eligible Reasons for Exchange",
+        body: "Subject to verification and quality inspection, exchanges may be permitted for:\n\n• Incorrect size received.\n• Incorrect colour received.\n• Incorrect product delivered.\n• Manufacturing defect.\n• Product damaged during transit.\n• Product received with missing components or accessories (where applicable).\n\nKHAVYN reserves the right to verify all exchange requests before approval.",
+      },
+      {
+        heading: "3. Non-Exchangeable Products",
+        body: "The following items are not eligible for exchange:\n\n• Products returned after 3 days from delivery.\n• Used, worn, washed, altered, ironed, stained, or damaged products.\n• Products without original tags or packaging.\n• Products with perfume, deodorant, smoke, makeup, detergent, pet hair, or other signs of use.\n• Gift cards or store credits.\n• Customized, personalised, embroidered-on-demand, or altered products.\n• Products marked as Final Sale, Clearance, Non-Returnable, or Non-Exchangeable, unless required by applicable law.\n• Products damaged due to improper use, negligence, or incorrect washing by the customer.",
+      },
+      {
+        heading: "4. Exchange Process",
+        body: "To request an exchange:\n\n1. Contact Customer Care within 3 days of delivery.\n2. Provide:\n   o Order Number;\n   o Reason for exchange;\n   o Photographs or videos of the product (if requested).\n3. If approved, KHAVYN will provide further instructions regarding pickup or return shipment.\n4. The returned product will undergo a Quality Inspection after receipt.\n5. If the inspection is successful, the replacement product will be dispatched subject to stock availability.",
+      },
+      {
+        heading: "5. Quality Inspection",
+        body: "Every returned product undergoes a detailed quality inspection.\n\nAn exchange may be rejected if:\n\n• The product has been used or worn.\n• The returned item does not match the original order.\n• Tags or packaging are missing.\n• The product is damaged by the customer.\n• The product fails our quality standards.\n\nKHAVYN's quality inspection findings shall be final for the purpose of determining exchange eligibility.",
+      },
+      {
+        heading: "6. Wrong or Tampered Return",
+        body: "To protect against fraudulent returns, KHAVYN may record a video during the unboxing and inspection of returned parcels.\n\nIf, during inspection, it is found that:\n\n• a different product has been returned;\n• the product has been tampered with;\n• the product is counterfeit or not originally supplied by KHAVYN;\n• essential components, accessories, tags, or packaging are missing due to customer actions; or\n• the returned product is materially different from the item originally delivered,\n\nthe exchange request will be rejected. The returned item may be shipped back to the customer at the customer's cost, and KHAVYN reserves the right to refuse any refund or exchange in such cases.",
+      },
+      {
+        heading: "7. Exchange Subject to Availability",
+        body: "Exchanges are subject to inventory availability.\n\nIf the requested size, colour, or product is unavailable, KHAVYN may, at its discretion:\n\n• offer another available size or colour;\n• offer an equivalent product of equal value (with the customer's consent); or\n• issue store credit or process a refund only where required under our Return & Refund Policy or applicable law.",
+      },
+      {
+        heading: "8. Shipping Charges for Exchanges",
+        body: "If the exchange is due to:\n\n• a manufacturing defect;\n• a damaged product received;\n• an incorrect product shipped by KHAVYN; or\n• an incorrect size or colour dispatched by KHAVYN,\n\nKHAVYN will bear the applicable exchange shipping charges.\n\nFor exchanges requested due to customer preference (such as ordering the wrong size or changing colour preference), exchange shipping or handling charges may apply, where permitted by law. Any applicable charges will be communicated before processing the exchange.",
+      },
+      {
+        heading: "9. Retail Store Purchases",
+        body: "Products purchased from a KHAVYN retail store may be exchanged only at eligible KHAVYN stores, subject to:\n\n• presentation of the original purchase invoice;\n• compliance with this Exchange Policy; and\n• successful quality inspection.\n\nCash refunds for retail store purchases will not be provided unless required by applicable law.",
+      },
+      {
+        heading: "10. Abuse of the Exchange Policy",
+        body: "KHAVYN reserves the right to reject exchange requests or restrict future purchases if a customer is found to have:\n\n• repeatedly misused the exchange process;\n• submitted false or fraudulent claims;\n• returned products that do not match the original order; or\n• otherwise acted in bad faith.",
+      },
+      {
+        heading: "11. Changes to this Policy",
+        body: "KHAVYN reserves the right to modify, update, or revise this Exchange Policy at any time without prior notice. The updated version will be published on www.khavyn.com and will become effective from the date of publication.",
+      },
+      {
+        heading: "12. Contact Us",
+        body: "For exchange requests or assistance, please contact:\n\nKHAVYN Fashion Private Limited\nCustomer Care: +91-9373205258\nEmail: complaint.khavyn@gmail.com\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar, New Sangavi,\nPune – 411027, Maharashtra, India\n\nBy placing an order on www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Exchange Policy.",
+      },
+    ],
+  },
+  disclaimer: {
+    title: "Disclaimer",
+    date: "Effective Date: 01-09-2026",
+    sections: [
+      {
+        heading: "Introduction",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "Company", "we", "our", "us").\n\nThis Disclaimer applies to your access to and use of www.khavyn.com, including all content, information, features, products, and services offered on or through the website. By accessing or using this website, you acknowledge that you have read, understood, and agree to the terms of this Disclaimer.',
+      },
+      {
+        heading: "1. General Information Only",
+        body: "The information provided on www.khavyn.com is published for general informational and retail purposes only. While KHAVYN strives to keep the information accurate, complete, and up to date, we make no representations or warranties of any kind, express or implied, regarding the completeness, accuracy, reliability, suitability, or availability of the website or the information, products, services, or related graphics contained on the website for any purpose.",
+      },
+      {
+        heading: "2. Product Representation and Color Accuracy",
+        body: "KHAVYN makes every reasonable effort to display the colours, textures, finishes, and details of our apparel and products as accurately as possible. However:\n\n• The actual colours you see will depend on your monitor, screen resolution, display calibration, and device settings, and we cannot guarantee that your device's display of any colour will accurately reflect the actual colour of the product.\n• Minor variations in fabric texture, weave, stitching, embroidery placement, or measurements may occur as part of standard manufacturing and artisanal finishing processes.\n• Such variations are inherent to textile production and shall not be considered manufacturing defects or misrepresentations.",
+      },
+      {
+        heading: "3. Sizing and Fit Disclaimer",
+        body: "Product sizing charts and fit recommendations provided on the website are approximate guides intended to assist customers in making informed purchasing decisions. Actual fit may vary depending on individual body proportions, fabric stretch, and styling preferences. Customers are encouraged to review the specific product dimensions and reach out to our Customer Care team for personalized sizing assistance before placing an order.",
+      },
+      {
+        heading: "4. Pricing and Availability",
+        body: "All product prices, specifications, and availability are subject to change at any time without prior notice. While KHAVYN takes all reasonable precautions to prevent typographical, photographic, or pricing errors, occasional technical or clerical inaccuracies may occur. KHAVYN reserves the right to correct any error, inaccuracy, or omission, and to cancel or refuse any order placed for a product listed at an incorrect price or with erroneous information, whether or not the order has been confirmed or payment has been processed.",
+      },
+      {
+        heading: "5. External Links Disclaimer",
+        body: "Our website may contain links to third-party websites, social media platforms, or external resources for convenience and reference. KHAVYN has no control over the nature, content, availability, privacy practices, or security of those external sites. The inclusion of any links does not necessarily imply a recommendation, endorsement, or approval by KHAVYN of the views, products, or services expressed within them. Accessing third-party websites is done entirely at your own risk.",
+      },
+      {
+        heading: "6. Intellectual Property Notice",
+        body: "All brand names, trademarks, logos, emblems, product designs, lookbooks, imagery, text, audio-visual content, and software appearing on www.khavyn.com are the exclusive intellectual property of KHAVYN Fashion Private Limited or its licensors. Unauthorized copying, downloading, reproduction, modification, distribution, or transmission of any content is strictly prohibited under applicable intellectual property laws.",
+      },
+      {
+        heading: "7. Website Availability and Technical Issues",
+        body: "KHAVYN makes every effort to ensure the continuous, secure, and uninterrupted operation of www.khavyn.com. However, KHAVYN takes no responsibility for, and shall not be liable for, the website being temporarily unavailable due to scheduled maintenance, system upgrades, technical issues, server downtime, telecommunications disruptions, cyber incidents, or events beyond our reasonable control.",
+      },
+      {
+        heading: "8. Limitation of Liability",
+        body: "To the maximum extent permitted by applicable law, in no event shall KHAVYN Fashion Private Limited, its directors, officers, employees, affiliates, agents, or partners be liable for any direct, indirect, incidental, special, exemplary, punitive, or consequential damages (including, without limitation, damages for loss of profits, goodwill, data, or business interruption) arising out of or in connection with:\n\n• Your access to, use of, or inability to use this website;\n• Any reliance placed on information, materials, or recommendations published on the website;\n• Any security breach, virus, bug, or technical malfunction affecting your device through website access; or\n• Any product purchase, delivery delay, or transaction conducted through the website, except as expressly provided under our published policies.\n\nNothing in this Disclaimer shall exclude or limit liability that cannot be excluded or limited under the Consumer Protection Act, 2019 or other mandatory provisions of Indian law.",
+      },
+      {
+        heading: "9. Indemnification",
+        body: "You agree to defend, indemnify, and hold harmless KHAVYN Fashion Private Limited, its directors, officers, employees, and agents from and against any claims, liabilities, damages, judgments, awards, losses, costs, or expenses (including reasonable legal fees) arising out of or relating to your violation of this Disclaimer, your misuse of the website, or your infringement of any third-party rights.",
+      },
+      {
+        heading: "10. Governing Law and Jurisdiction",
+        body: "This Disclaimer shall be governed by, construed, and enforced in accordance with the substantive laws of India. Subject to applicable consumer protection legislation, any dispute, controversy, or claim arising out of or in connection with this Disclaimer shall fall under the exclusive jurisdiction of the competent courts in Pune, Maharashtra, India.",
+      },
+      {
+        heading: "11. Changes to this Disclaimer",
+        body: "KHAVYN reserves the right to amend, revise, or update this Disclaimer at any time without prior notification. The latest version will always be published on www.khavyn.com with the updated Effective Date. Continued use of the website following any modifications constitutes your formal acceptance of the updated Disclaimer.",
+      },
+      {
+        heading: "12. Contact Us",
+        body: "If you have any questions or concerns regarding this Disclaimer or any aspect of our website, please contact:\n\nLegal & Compliance Department\nKHAVYN Fashion Private Limited\nCustomer Care: +91-9373205258\nEmail: legal@khavyn.com\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar, New Sangavi,\nPune – 411027, Maharashtra, India\n\nBy accessing or using www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Disclaimer.",
+      },
+    ],
+  },
+  "intellectual-property": {
+    title: "Intellectual Property Policy",
+    date: "Effective Date: 01-09-2026",
+    sections: [
+      {
+        heading: "Introduction",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nThis Intellectual Property Policy explains the ownership, protection, and permitted use of the intellectual property associated with www.khavyn.com, KHAVYN products, branding, and related materials. By accessing or using our website, you agree to comply with this Policy.',
+      },
+      {
+        heading: "1. Ownership of Intellectual Property",
+        body: "Unless otherwise stated, all intellectual property rights relating to KHAVYN are owned by or licensed to KHAVYN Fashion Private Limited.\n\nThis includes, but is not limited to:\n• The KHAVYN brand name.\n• Logos, trademarks, service marks, trade dress, and brand elements.\n• Product names and collection names.\n• Product designs, artwork, graphics, illustrations, icons, and layouts.\n• Website design, user interface, source code, software, and functionality.\n• Product photographs, videos, advertisements, and promotional materials.\n• Catalogues, brochures, lookbooks, banners, and digital content.\n• Written content, descriptions, blogs, articles, and marketing copy.\n• Packaging designs, labels, tags, and branding materials.\n• Any other intellectual property displayed on our website or associated with our business.\n\nThese materials are protected under applicable intellectual property laws, including copyright, trademark, design, and other proprietary rights.",
+      },
+      {
+        heading: "2. Trademark Rights",
+        body: "The names KHAVYN, KHAVYN Fashion Private Limited, associated logos, word marks, slogans, and other distinctive brand identifiers are valuable intellectual property.\n\nNo person may:\n• Use any KHAVYN trademark or logo without prior written permission.\n• Register any trademark, business name, domain name, or social media account that is identical or confusingly similar to KHAVYN.\n• Use KHAVYN branding in a manner that may mislead customers or imply sponsorship, endorsement, or affiliation where none exists.\n\nWhere trademark applications are pending or registrations have been obtained, KHAVYN reserves all rights available under applicable law.",
+      },
+      {
+        heading: "3. Copyright",
+        body: "All content published on www.khavyn.com is protected by copyright laws.\n\nThis includes:\n• Text.\n• Images.\n• Videos.\n• Product photographs.\n• Product descriptions.\n• Website graphics.\n• Design elements.\n• Layouts.\n• Catalogues.\n• Marketing materials.\n• Downloadable content.\n\nNo content may be copied, reproduced, modified, translated, distributed, published, displayed, sold, licensed, or otherwise exploited without KHAVYN's prior written consent, except as permitted by applicable law.",
+      },
+      {
+        heading: "4. Permitted Use",
+        body: "You may:\n• Access and browse our website for personal, lawful, and non-commercial purposes.\n• Purchase products for personal or legitimate business use.\n• Share links to our website or official social media pages, provided such sharing does not misrepresent KHAVYN or infringe our rights.\n\nNo ownership or intellectual property rights are transferred to you by using our website or purchasing our products.",
+      },
+      {
+        heading: "5. Prohibited Activities",
+        body: "Without our prior written permission, you must not:\n• Copy or reproduce any content from our website.\n• Use our product photographs for commercial purposes.\n• Reproduce our product designs or packaging.\n• Modify, adapt, or create derivative works from our content.\n• Reverse engineer, decompile, or interfere with our website or software.\n• Remove copyright, trademark, or proprietary notices.\n• Use our branding in advertising, marketing, or promotional materials.\n• Sell, license, distribute, or commercially exploit our intellectual property.\n• Scrape, harvest, or systematically collect website content using automated means without authorization.",
+      },
+      {
+        heading: "6. User-Generated Content",
+        body: "If you submit reviews, photographs, videos, testimonials, feedback, or other content to KHAVYN through our website or social media channels, you confirm that:\n• you own or have the necessary rights to the content;\n• the content does not infringe the rights of any third party; and\n• the content is lawful and appropriate.\n\nBy submitting such content, you grant KHAVYN a non-exclusive, worldwide, royalty-free, transferable, and sublicensable licence to use, reproduce, publish, display, adapt, and distribute the content for marketing, promotional, operational, and business purposes, subject to applicable law.",
+      },
+      {
+        heading: "7. Reporting Intellectual Property Infringement",
+        body: "If you believe that any content on www.khavyn.com infringes your intellectual property rights, please send a written notice containing:\n• Your name and contact details.\n• A description of the intellectual property allegedly infringed.\n• The URL or location of the allegedly infringing material.\n• Supporting evidence of your ownership or authority.\n• A statement that the information provided is accurate and made in good faith.\n\nKHAVYN will review genuine complaints and take appropriate action where warranted.",
+      },
+      {
+        heading: "8. Enforcement of Rights",
+        body: "KHAVYN actively protects its intellectual property and reserves the right to:\n• remove unauthorized use of its content or branding;\n• issue cease-and-desist notices;\n• suspend access to users who violate this Policy;\n• report infringements to relevant authorities or online platforms; and\n• pursue civil or criminal remedies available under applicable law, including claims for damages and injunctive relief.",
+      },
+      {
+        heading: "9. Third-Party Intellectual Property",
+        body: "Any trademarks, logos, product names, or other intellectual property belonging to third parties that may appear on our website remain the property of their respective owners.\n\nTheir appearance does not imply sponsorship, endorsement, or affiliation unless expressly stated.",
+      },
+      {
+        heading: "10. Changes to this Policy",
+        body: "KHAVYN reserves the right to amend or update this Intellectual Property Policy at any time without prior notice.\n\nThe latest version will always be published on www.khavyn.com and will become effective from the date of publication.",
+      },
+      {
+        heading: "11. Contact Us",
+        body: "For questions, permissions, licensing requests, or to report intellectual property concerns, please contact:\n\nKHAVYN Fashion Private Limited\nEmail: legal@khavyn.com\nCustomer Care: +91-9373205258\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar, New Sangavi,\nPune – 411027, Maharashtra, India\n\nBy accessing or using www.khavyn.com, you acknowledge that you have read, understood, and agreed to this Intellectual Property Policy.",
+      },
+    ],
+  },
+  "consumer-complaint": {
+    title: "Consumer Complaint Policy",
+    date: "Effective Date: 01-09-2026",
+    sections: [
+      {
+        heading: "Introduction",
+        body: 'Welcome to KHAVYN Fashion Private Limited ("KHAVYN", "we", "our", "us").\n\nAt KHAVYN, customer satisfaction is our priority. We are committed to providing premium-quality products and responsive customer service. This Consumer Complaint Policy explains how customers can raise complaints and how KHAVYN will handle them in a fair, transparent, and timely manner.\n\nBy purchasing products from www.khavyn.com or an authorized KHAVYN retail store, you agree to this Policy.',
+      },
+      {
+        heading: "1. Purpose",
+        body: "This Policy is intended to:\n\n• Provide customers with a clear complaint resolution process.\n• Ensure complaints are handled promptly and fairly.\n• Improve our products and services through customer feedback.\n• Comply with applicable consumer protection and e-commerce laws.",
+      },
+      {
+        heading: "2. Complaints Covered",
+        body: "Customers may submit complaints relating to, including but not limited to:\n\n• Incorrect or damaged products.\n• Manufacturing defects.\n• Missing items in an order.\n• Delivery delays.\n• Payment-related concerns.\n• Refund or exchange requests.\n• Website or checkout issues.\n• Customer service experience.\n• Product quality concerns.\n• Billing or invoice issues.\n• Any other issue relating to KHAVYN products or services.",
+      },
+      {
+        heading: "3. How to Submit a Complaint",
+        body: "To help us resolve your complaint efficiently, please provide:\n\n• Full Name.\n• Order Number or Invoice Number (if applicable).\n• Registered Mobile Number.\n• Email Address.\n• Description of the issue.\n• Photographs or videos, where relevant.\n• Any other supporting documents.\n\nComplaints may be submitted through:\nEmail: complaint.khavyn@gmail.com\nCustomer Care: +91-9373205258\nWebsite: www.khavyn.com",
+      },
+      {
+        heading: "4. Complaint Registration",
+        body: "After receiving your complaint, KHAVYN will make reasonable efforts to:\n\n• Acknowledge receipt within 48 business hours.\n• Assign a reference number or otherwise identify the complaint for tracking.\n• Request any additional information, if necessary.",
+      },
+      {
+        heading: "5. Investigation Process",
+        body: "Each complaint is reviewed individually. Depending on the nature of the complaint, KHAVYN may:\n\n• Verify order and payment records.\n• Review photographs or videos submitted by the customer.\n• Inspect returned products.\n• Consult logistics or courier partners.\n• Review quality control records.\n• Contact the customer for clarification or additional information.\n\nCustomers are expected to cooperate during the investigation.",
+      },
+      {
+        heading: "6. Resolution Timeline",
+        body: "Our target service timelines are:\n\n• Complaint Acknowledgement: Within 48 business hours.\n• Initial Review: Within 5 business days.\n• Final Resolution: Generally within 15 business days.\n\nComplex cases involving courier investigations, payment verification, or third-party reviews may require additional time. If so, customers will be informed of the revised timeline.",
+      },
+      {
+        heading: "7. Possible Resolutions",
+        body: "Depending on the outcome of the investigation, KHAVYN may, where appropriate:\n\n• Replace the product.\n• Repair the product (where feasible).\n• Approve an exchange.\n• Process a refund in accordance with our Return & Refund Policy.\n• Offer store credit, where appropriate.\n• Provide clarification or guidance.\n• Decline the complaint where it is found to be inconsistent with our published policies or unsupported by the available evidence.",
+      },
+      {
+        heading: "8. Customer Responsibilities",
+        body: "Customers are requested to:\n\n• Provide accurate and complete information.\n• Preserve invoices and proof of purchase.\n• Report issues promptly after delivery or purchase.\n• Follow product care instructions.\n• Cooperate during the investigation process.\n• Avoid altering or repairing products before inspection if the complaint relates to a manufacturing defect.",
+      },
+      {
+        heading: "9. Fraudulent or Misleading Complaints",
+        body: "KHAVYN reserves the right to reject complaints that are found to be:\n\n• False or misleading.\n• Fraudulent.\n• Based on altered or substituted products.\n• Submitted with forged documents or fabricated evidence.\n• Intended to misuse company policies.\n\nWhere fraud or unlawful conduct is suspected, KHAVYN reserves the right to take appropriate legal or administrative action.",
+      },
+      {
+        heading: "10. Relationship with Other Policies",
+        body: "This Consumer Complaint Policy should be read together with our:\n\n• Privacy Policy\n• Terms & Conditions\n• Shipping & Delivery Policy\n• Cancellation Policy\n• Exchange Policy\n• Return & Refund Policy\n• Payment Policy\n• Warranty & Product Care Policy\n• Grievance Redressal Policy\n\nWhere there is any inconsistency, the policy specifically applicable to the issue will govern.",
+      },
+      {
+        heading: "11. Changes to this Policy",
+        body: "KHAVYN may amend or update this Consumer Complaint Policy at any time without prior notice.\n\nThe latest version will always be available on www.khavyn.com and will become effective from the date of publication.",
+      },
+      {
+        heading: "12. Contact Us",
+        body: "For complaints or assistance, please contact:\n\nConsumer Care\nKHAVYN Fashion Private Limited\nCustomer Care: +91-9373205258\nEmail: complaint.khavyn@gmail.com\nWebsite: www.khavyn.com\n\nRegistered Office:\nSr. No. 80/16, Kavita Apartment,\nSamarth Nagar,\nNew Sangavi,\nPune – 411027, Maharashtra, India\n\nBusiness Hours:\nMonday to Saturday: 10:00 AM – 6:00 PM (IST)\nClosed on Sundays and Public Holidays.\n\nBy using www.khavyn.com or purchasing products from KHAVYN, you acknowledge that you have read, understood, and agreed to this Consumer Complaint Policy.",
+      },
+    ],
+  },
 };
+
+// Aliasing returns to exchange for legacy URLs
+POLICY_CONTENT["returns"] = POLICY_CONTENT["exchange"];
 
 export default async function PolicyPage({ params }: PolicyPageProps) {
   const { slug } = await params;
@@ -576,7 +764,6 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 flex-1 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-
           {/* Left Navigation Sidebar */}
           <aside className="lg:col-span-4 space-y-3">
             <div className="bg-[#F5F3EF] border border-[#D8C9B0]/50 rounded-xl p-5 space-y-2 sticky top-24 shadow-sm">
@@ -585,21 +772,26 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
               </h3>
               {POLICIES_NAV.map((nav) => {
                 const Icon = nav.icon;
-                const isActive = nav.slug === slug;
+                const isActive = nav.slug === slug || (slug === "returns" && nav.slug === "exchange");
                 return (
                   <Link
                     key={nav.slug}
                     href={`/policies/${nav.slug}`}
-                    className={`flex items-center justify-between p-3 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${isActive
-                      ? "bg-[#1A1A1A] text-[#C6A664] shadow-md"
-                      : "text-[#1A1A1A]/70 hover:bg-[#FAF7F2] hover:text-[#1A1A1A]"
-                      }`}
+                    className={`flex items-center justify-between p-3 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#1A1A1A] text-[#C6A664] shadow-md"
+                        : "text-[#1A1A1A]/70 hover:bg-[#FAF7F2] hover:text-[#1A1A1A]"
+                    }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${isActive ? "text-[#C6A664]" : "text-[#1A1A1A]/50"}`} />
+                      <Icon
+                        className={`w-4 h-4 ${isActive ? "text-[#C6A664]" : "text-[#1A1A1A]/50"}`}
+                      />
                       <span>{nav.label}</span>
                     </div>
-                    <ChevronRight className={`w-3.5 h-3.5 ${isActive ? "text-[#C6A664]" : "text-[#1A1A1A]/30"}`} />
+                    <ChevronRight
+                      className={`w-3.5 h-3.5 ${isActive ? "text-[#C6A664]" : "text-[#1A1A1A]/30"}`}
+                    />
                   </Link>
                 );
               })}
@@ -628,11 +820,13 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
                 GSTIN: 27AAMCK8767F1ZW • Registered Office: Samarth Nagar, New Sangavi, Pune – 411027, Maharashtra
               </p>
               <p className="text-[11px] text-white/40 pt-1">
-                For questions regarding this policy, email <a href="mailto:legal@khavyn.com" className="text-[#C6A664] hover:underline">legal@khavyn.com</a>
+                For questions regarding this policy, email{" "}
+                <a href="mailto:legal@khavyn.com" className="text-[#C6A664] hover:underline">
+                  legal@khavyn.com
+                </a>
               </p>
             </div>
           </main>
-
         </div>
       </div>
 

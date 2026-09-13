@@ -3,18 +3,26 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { useWishlistStore } from "@/store/useWishlistStore";
 import { useCartStore } from "@/store/useCartStore";
+import { useUserStore } from "@/store/useUserStore";
 import { Heart, ShoppingBag, Trash2, ArrowRight, Sparkles } from "lucide-react";
 
 export default function WishlistPage() {
+  const router = useRouter();
   const { items, toggleWishlist, clearWishlist } = useWishlistStore();
   const { addItem, openCart } = useCartStore();
+  const { isAuthenticated } = useUserStore();
 
   const handleMoveToCart = (item: any) => {
+    if (!isAuthenticated) {
+      router.push("/login?redirect=/wishlist");
+      return;
+    }
     addItem({
       productId: item.productId,
       name: item.name,

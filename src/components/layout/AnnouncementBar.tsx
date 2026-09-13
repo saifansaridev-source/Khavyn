@@ -19,11 +19,11 @@ export const AnnouncementBar: React.FC = () => {
   }, []);
 
   return (
-    <div className="w-full bg-[#1A1A1A] border-b border-[#C6A664]/30 text-[#C6A664] py-2 px-4 text-[11px] sm:text-xs tracking-[0.2em] uppercase text-center font-medium select-none">
-      <span className="inline-flex items-center justify-center gap-3">
-        <span className="text-[#C6A664]/80">◈</span>
-        <span>{text}</span>
-        <span className="text-[#C6A664]/80">◈</span>
+    <div className="w-full max-w-full overflow-hidden bg-[#1A1A1A] border-b border-[#C6A664]/30 text-[#C6A664] py-2 px-3 sm:px-4 text-[10px] sm:text-[11px] tracking-[0.08em] sm:tracking-[0.15em] uppercase text-center font-medium select-none">
+      <span className="inline-flex items-center justify-center gap-1.5 sm:gap-3 flex-wrap">
+        <span className="hidden sm:inline text-[#C6A664]/80">◈</span>
+        <span className="leading-relaxed">{text}</span>
+        <span className="hidden sm:inline text-[#C6A664]/80">◈</span>
       </span>
     </div>
   );

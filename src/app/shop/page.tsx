@@ -113,21 +113,23 @@ export default function ShopPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">
         {/* Top Controls Bar */}
-        <div className="flex items-center justify-between pb-6 border-b border-[#D8C9B0]/40 mb-8">
-          <button
-            onClick={() => setMobileFilterOpen(true)}
-            className="lg:hidden inline-flex items-center gap-2 bg-[#1A1A1A] text-white px-4 py-2 rounded text-xs font-semibold uppercase tracking-wider"
-          >
-            <Filter className="w-4 h-4 text-[#C6A664]" />
-            <span>Filters</span>
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-6 border-b border-[#D8C9B0]/40 mb-8">
+          <div className="flex items-center justify-between sm:justify-start gap-3">
+            <button
+              onClick={() => setMobileFilterOpen(true)}
+              className="lg:hidden inline-flex items-center gap-2 bg-[#1A1A1A] text-white px-4 py-2 rounded text-xs font-semibold uppercase tracking-wider"
+            >
+              <Filter className="w-4 h-4 text-[#C6A664]" />
+              <span>Filters</span>
+            </button>
 
-          <p className="text-xs text-[#1A1A1A]/70 uppercase tracking-widest font-medium">
-            Showing <span className="font-bold text-[#1A1A1A]">{filteredProducts.length}</span> Products
-          </p>
+            <p className="text-xs text-[#1A1A1A]/70 uppercase tracking-widest font-medium">
+              Showing <span className="font-bold text-[#1A1A1A]">{filteredProducts.length}</span> Products
+            </p>
+          </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#1A1A1A]/60 hidden sm:inline uppercase tracking-wider">
+            <span className="text-xs text-[#1A1A1A]/60 uppercase tracking-wider">
               Sort by:
             </span>
             <select

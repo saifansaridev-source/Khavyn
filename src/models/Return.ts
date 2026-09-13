@@ -2,15 +2,28 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IReturnRequest extends Document {
   orderId: string;
-  userId: string;
-  customerName: string;
-  customerEmail: string;
+  productId: string;
+  productName?: string;
+  productImage?: string;
+  productSize?: string;
+  customerId: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
   type: "return" | "exchange";
-  reason: string;
+  reason:
+    | "Incorrect size"
+    | "Incorrect product"
+    | "Manufacturing defect"
+    | "Damaged in transit"
+    | "Other"
+    | string;
   exchangeSize?: string;
-  evidenceUrls: string[];
-  status: "Pending" | "Inspection Approved" | "Rejected" | "Completed";
-  inspectionNotes?: string;
+  images: string[]; // Cloudinary URLs
+  evidenceUrls?: string[]; // Backward-compatible alias
+  status: "pending" | "under_review" | "approved" | "rejected";
+  adminNotes?: string;
+  reviewedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,23 +31,44 @@ export interface IReturnRequest extends Document {
 const ReturnRequestSchema = new Schema<IReturnRequest>(
   {
     orderId: { type: String, required: true, index: true },
-    userId: { type: String, required: true, index: true },
-    customerName: { type: String, required: true },
-    customerEmail: { type: String, required: true },
-    type: { type: String, enum: ["return", "exchange"], required: true },
-    reason: { type: String, required: true },
+    productId: { type: String, required: true, index: true },
+    productName: { type: String },
+    productImage: { type: String },
+    productSize: { type: String },
+    customerId: { type: String, required: true, index: true },
+    customerName: { type: String },
+    customerEmail: { type: String },
+    customerPhone: { type: String },
+    type: {
+      type: String,
+      enum: ["return", "exchange"],
+      required: true,
+      default: "return",
+    },
+    reason: {
+      type: String,
+      required: true,
+    },
     exchangeSize: { type: String },
+    images: { type: [String], default: [] },
     evidenceUrls: { type: [String], default: [] },
     status: {
       type: String,
-      enum: ["Pending", "Inspection Approved", "Rejected", "Completed"],
-      default: "Pending",
+      enum: ["pending", "under_review", "approved", "rejected"],
+      default: "pending",
+      index: true,
     },
-    inspectionNotes: { type: String },
+    adminNotes: { type: String, default: "" },
+    reviewedAt: { type: Date },
   },
   { timestamps: true }
 );
 
+
+
 export const ReturnRequest: Model<IReturnRequest> =
   mongoose.models.ReturnRequest ||
   mongoose.model<IReturnRequest>("ReturnRequest", ReturnRequestSchema);
+
+// Backward compatibility alias
+export const Return = ReturnRequest;

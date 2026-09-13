@@ -237,7 +237,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Payment Badges */}
-          <div className="flex items-center space-x-3 text-xs bg-white/5 px-4 py-2 rounded border border-white/10">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-xs bg-white/5 px-4 py-2 rounded border border-white/10 max-w-full">
             <span className="text-[10px] uppercase tracking-wider text-[#C6A664]">Secured by</span>
             <span className="font-semibold text-white/90">VISA</span>
             <span>•</span>

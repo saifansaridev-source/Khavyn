@@ -76,6 +76,47 @@ export default function AdminDashboardPage() {
       }
     };
     fetchAdminSettings();
+
+    const fetchReturnRequests = async () => {
+      try {
+        const res = await fetch("/api/admin/returns");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.returnRequests) && data.returnRequests.length > 0) {
+            setReturnsQueue(
+              data.returnRequests.map((r: any) => ({
+                id: r._id?.toString() || r.id,
+                orderId: r.orderId,
+                customer: r.customerName || r.customerEmail || "Customer",
+                customerEmail: r.customerEmail,
+                customerPhone: r.customerPhone,
+                productName: r.productName,
+                productSize: r.productSize,
+                type: r.type === "exchange" ? "Size Exchange" : "Return & Refund",
+                rawType: r.type,
+                reason: r.reason,
+                exchangeSize: r.exchangeSize,
+                status: r.status,
+                images:
+                  r.images && r.images.length > 0
+                    ? r.images
+                    : r.evidenceUrls && r.evidenceUrls.length > 0
+                    ? r.evidenceUrls
+                    : r.evidencePhoto
+                    ? [r.evidencePhoto]
+                    : [],
+                adminNotes: r.adminNotes || "",
+                reviewedAt: r.reviewedAt,
+                createdAt: r.createdAt,
+              }))
+            );
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load returns from DB:", err);
+      }
+    };
+    fetchReturnRequests();
   }, [fetchProducts]);
 
   const [activeSection, setActiveSection] = useState<
@@ -145,7 +186,7 @@ export default function AdminDashboardPage() {
       advancePaid: 2499,
       balanceDue: 0,
       balanceCollected: true,
-      paymentType: "full",
+      paymentType: "prepaid",
       status: "Delivered",
       trackingId: "AWB-991204812",
       date: "2026-07-27",
@@ -177,7 +218,7 @@ export default function AdminDashboardPage() {
       advancePaid: 1899,
       balanceDue: 0,
       balanceCollected: true,
-      paymentType: "full",
+      paymentType: "prepaid",
       status: "Pending",
       trackingId: "Pending Generation",
       date: "2026-08-01",
@@ -190,26 +231,36 @@ export default function AdminDashboardPage() {
   const [selectedOrderDetails, setSelectedOrderDetails] = useState<any | null>(null);
 
   // 3. RETURNS STATE
-  const [returnsQueue, setReturnsQueue] = useState([
+  const [returnsQueue, setReturnsQueue] = useState<any[]>([
     {
       id: "RET-1092",
       orderId: "KHV-719302",
       customer: "Ananya Deshmukh",
+      customerEmail: "ananya@example.com",
       type: "Size Exchange",
       reason: "Requested size L -> XL exchange for relaxed shoulder drape",
-      status: "Pending Inspection",
-      evidencePhoto: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop&q=80",
+      exchangeSize: "XL",
+      status: "pending",
+      images: [
+        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop&q=80",
+      ],
+      adminNotes: "",
     },
     {
       id: "RET-1093",
       orderId: "KHV-849201",
       customer: "Vikramaditya Sharma",
+      customerEmail: "vikram@example.com",
       type: "Defect Report",
       reason: "Small seam thread loose on left collar",
-      status: "Pending Inspection",
-      evidencePhoto: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&auto=format&fit=crop&q=80",
+      status: "pending",
+      images: [
+        "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&auto=format&fit=crop&q=80",
+      ],
+      adminNotes: "",
     },
   ]);
+  const [returnNotes, setReturnNotes] = useState<{ [id: string]: string }>({});
 
   // 4. CUSTOMERS STATE
   const [customersList, setCustomersList] = useState([
@@ -446,18 +497,44 @@ export default function AdminDashboardPage() {
     addAuditLog("TOGGLE_COD_BALANCE", "FINANCE", `Toggled COD balance for ${orderId}`);
   };
 
-  const handleApproveReturn = (returnId: string) => {
+  const handleApproveReturn = async (returnId: string) => {
+    const notes = returnNotes[returnId] || "";
+    try {
+      await fetch(`/api/admin/returns/${returnId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "approved", adminNotes: notes }),
+      });
+    } catch (e) {
+      console.error("Failed to approve return:", e);
+    }
     setReturnsQueue((prev) =>
       prev.map((r) =>
-        r.id === returnId ? { ...r, status: "Approved - Exchange Granted" } : r
+        r.id === returnId
+          ? { ...r, status: "approved", adminNotes: notes }
+          : r
       )
     );
     addAuditLog("APPROVE_RETURN", "RETURNS", `Approved return ${returnId}`);
   };
 
-  const handleRejectReturn = (returnId: string) => {
+  const handleRejectReturn = async (returnId: string) => {
+    const notes = returnNotes[returnId] || "";
+    try {
+      await fetch(`/api/admin/returns/${returnId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "rejected", adminNotes: notes }),
+      });
+    } catch (e) {
+      console.error("Failed to reject return:", e);
+    }
     setReturnsQueue((prev) =>
-      prev.map((r) => (r.id === returnId ? { ...r, status: "Rejected" } : r))
+      prev.map((r) =>
+        r.id === returnId
+          ? { ...r, status: "rejected", adminNotes: notes }
+          : r
+      )
     );
     addAuditLog("REJECT_RETURN", "RETURNS", `Rejected return ${returnId}`);
   };

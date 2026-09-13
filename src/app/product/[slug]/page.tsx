@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, notFound } from "next/navigation";
-import { Header } from "@/components/layout/Header";
+import { Header } from "@/components/layout/Header";   
 import { Footer } from "@/components/layout/Footer";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { WishlistButton } from "@/components/product/WishlistButton";
@@ -26,7 +26,7 @@ import {
 import { SEED_PRODUCTS, ProductSeedInput } from "@/lib/data/productsData";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
-
+import { useUserStore } from "@/store/useUserStore";
 import { useProductStore } from "@/store/useProductStore";
 
 interface ProductPageProps {
@@ -116,6 +116,7 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
   const { addItem } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWishlistStore();
+  const { isAuthenticated } = useUserStore();
 
   // All color variants in the same collection from dynamic product store
   const collectionVariants = storeProducts.filter(
@@ -150,6 +151,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   };
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=/product/${product.slug}`);
+      return;
+    }
     addItem({
       productId: product.styleCode,
       name: product.name,
@@ -166,6 +171,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   };
 
   const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=/product/${product.slug}`);
+      return;
+    }
     handleAddToCart();
     window.location.href = "/checkout";
   };

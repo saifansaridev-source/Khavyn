@@ -159,23 +159,23 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
   };
 
   return (
-    <div className="space-y-2 bg-[#141414] border border-white/10 rounded-lg p-3.5 transition-all">
+    <div className="w-full space-y-2 bg-[#141414] border border-white/10 rounded-lg p-3.5 transition-all">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-2 min-w-0">
           {resourceType === "video" ? (
-            <Film className="w-3.5 h-3.5 text-[#C6A664]" />
+            <Film className="w-3.5 h-3.5 text-[#C6A664] shrink-0" />
           ) : (
-            <UploadCloud className="w-3.5 h-3.5 text-[#C6A664]" />
+            <UploadCloud className="w-3.5 h-3.5 text-[#C6A664] shrink-0" />
           )}
-          <span className="text-[11px] uppercase font-bold text-[#C6A664] tracking-wider">
+          <span className="text-[11px] uppercase font-bold text-[#C6A664] tracking-wider truncate">
             {label}
           </span>
         </div>
         <button
           type="button"
           onClick={() => setShowUrlInput(!showUrlInput)}
-          className="text-[10px] text-white/50 hover:text-white flex items-center gap-1 transition-colors"
+          className="text-[10px] text-white/50 hover:text-white flex items-center gap-1 transition-colors shrink-0 py-1"
           title="Toggle manual URL paste"
         >
           <LinkIcon className="w-2.5 h-2.5" />
@@ -206,17 +206,17 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
 
       {/* Manual URL Input Bar */}
       {showUrlInput && (
-        <form onSubmit={handleManualUrlSubmit} className="flex gap-2">
+        <form onSubmit={handleManualUrlSubmit} className="flex flex-col sm:flex-row gap-2 w-full">
           <input
             type="url"
             value={manualUrl}
             onChange={(e) => setManualUrl(e.target.value)}
             placeholder={`https://res.cloudinary.com/... or any ${resourceType} URL`}
-            className="flex-1 bg-black/50 border border-white/20 rounded px-2.5 py-1.5 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664]"
+            className="flex-1 w-full min-w-0 bg-black/50 border border-white/20 rounded px-2.5 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664]"
           />
           <button
             type="submit"
-            className="bg-[#C6A664] hover:bg-white text-black font-semibold text-xs px-3 py-1.5 rounded transition-colors"
+            className="w-full sm:w-auto min-h-[36px] bg-[#C6A664] hover:bg-white text-black font-semibold text-xs px-3 py-1.5 rounded transition-colors shrink-0 cursor-pointer"
           >
             Apply
           </button>
@@ -225,7 +225,7 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
 
       {/* Live Preview Area */}
       {value ? (
-        <div className="relative rounded-md border border-[#C6A664]/50 overflow-hidden bg-black group">
+        <div className="relative rounded-md border border-[#C6A664]/50 overflow-hidden bg-black group w-full">
           {resourceType === "video" ? (
             <div className="relative aspect-video w-full bg-black flex items-center justify-center">
               <video
@@ -246,11 +246,11 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
           )}
 
           {/* Overlay Actions */}
-          <div className="absolute inset-0 bg-black/65 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
+          <div className="absolute inset-0 bg-black/65 sm:opacity-0 group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="bg-[#C6A664] text-black hover:bg-white text-xs px-3 py-1.5 rounded font-semibold transition-colors flex items-center gap-1.5 shadow"
+              className="bg-[#C6A664] text-black hover:bg-white text-xs px-3.5 py-2 rounded font-semibold transition-colors flex items-center gap-1.5 shadow min-h-[38px] cursor-pointer"
             >
               <UploadCloud className="w-3.5 h-3.5" />
               <span>Replace</span>
@@ -258,17 +258,17 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
             <button
               type="button"
               onClick={handleClear}
-              className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded font-semibold transition-colors flex items-center gap-1.5 shadow"
+              className="bg-red-600 hover:bg-red-500 text-white text-xs px-3.5 py-2 rounded font-semibold transition-colors flex items-center gap-1.5 shadow min-h-[38px] cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
               <span>Remove</span>
             </button>
           </div>
 
-          <div className="px-2.5 py-1.5 bg-black/90 border-t border-white/10 flex items-center justify-between text-[10px] text-white/60">
-            <span className="truncate max-w-[200px] font-mono">{value}</span>
+          <div className="px-2.5 py-1.5 bg-black/90 border-t border-white/10 flex items-center justify-between text-[10px] text-white/60 gap-2">
+            <span className="truncate flex-1 min-w-0 font-mono">{value}</span>
             {uploadSuccess && (
-              <span className="text-emerald-400 flex items-center gap-1">
+              <span className="text-emerald-400 flex items-center gap-1 shrink-0">
                 <CheckCircle2 className="w-3 h-3" /> Uploaded
               </span>
             )}
@@ -281,7 +281,7 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => !isUploading && fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 min-h-[120px] ${
+          className={`w-full border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 min-h-[120px] ${
             isDragOver
               ? "border-[#C6A664] bg-[#C6A664]/10"
               : "border-white/20 bg-white/[0.02] hover:border-[#C6A664]/60 hover:bg-white/[0.04]"

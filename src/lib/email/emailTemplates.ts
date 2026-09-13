@@ -53,21 +53,15 @@ export function wrapInLuxuryEmailTemplate({
   `;
 }
 
-export function getWelcomeEmailHtml(customerName: string): string {
-  const content = `
-    <h2 style="font-family: 'Georgia', serif; font-size: 22px; color: #1A1A1A; margin-top: 0;">Welcome to KHAVYN, ${customerName}</h2>
-    <p>We are delighted to welcome you to the world of modern European luxury menswear.</p>
-    <p>At KHAVYN, every piece is crafted with meticulous attention to detail — from our bio-washed combed long-staple cottons to custom matte hardware and structured drapes built for effortlessness.</p>
-    <p>As a member, you enjoy exclusive access to new collection previews, priority concierge support, and tailored fit assistance.</p>
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="https://www.khavyn.com/shop" class="btn-primary">EXPLORE THE COLLECTION</a>
-    </div>
-  `;
-  return wrapInLuxuryEmailTemplate({
-    title: "Welcome to KHAVYN — Crafting Everyday Luxury",
-    preheader: "Welcome to KHAVYN. Discover timeless European menswear.",
-    contentHtml: content,
-  });
+import { getWelcomeEmailHtml as getBrandedWelcomeEmailHtml } from "@/lib/emailTemplates/welcome";
+
+export function getWelcomeEmailHtml(
+  customerNameOrProps?: string | { customerName?: string; shopUrl?: string }
+): string {
+  if (typeof customerNameOrProps === "string") {
+    return getBrandedWelcomeEmailHtml({ customerName: customerNameOrProps });
+  }
+  return getBrandedWelcomeEmailHtml(customerNameOrProps);
 }
 
 export function getPasswordResetEmailHtml(adminName: string, resetUrl: string): string {
