@@ -53,21 +53,34 @@ export default function AdminDashboardPage() {
     fetchProducts();
     const fetchAdminSettings = async () => {
       try {
-        const res = await fetch("/api/admin/settings");
+        const res = await fetch(`/api/admin/settings?_t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           if (data?.settings) {
+            const s = data.settings;
+            const offer = s.offerPopup || {};
             setStoreSettings((prev) => ({
               ...prev,
-              ...data.settings,
+              ...s,
               heroImages:
-                Array.isArray(data.settings.heroImages) && data.settings.heroImages.length > 0
-                  ? data.settings.heroImages
-                  : (data.settings.heroImage ? [data.settings.heroImage] : prev.heroImages),
+                Array.isArray(s.heroImages) && s.heroImages.length > 0
+                  ? s.heroImages
+                  : (s.heroImage ? [s.heroImage] : prev.heroImages),
               offerPopup: {
                 ...prev.offerPopup,
-                ...(data.settings.offerPopup || {}),
+                ...offer,
               },
+              // Hydrate top-level popup fields, falling back to offerPopup values for older records
+              popupEnabled: typeof s.popupEnabled === "boolean" ? s.popupEnabled : Boolean(offer.enabled),
+              popupImage: s.popupImage || prev.popupImage || "",
+              popupHeadline: s.popupHeadline || offer.title || prev.popupHeadline,
+              popupSubtext: s.popupSubtext || offer.subtitle || prev.popupSubtext,
+              popupCouponCode: s.popupCouponCode ?? offer.couponCode ?? prev.popupCouponCode ?? "",
+              popupCtaText: s.popupCtaText || offer.ctaText || prev.popupCtaText,
+              popupCtaLink: s.popupCtaLink || offer.ctaLink || prev.popupCtaLink,
+              popupDelaySeconds: typeof s.popupDelaySeconds === "number" ? s.popupDelaySeconds : prev.popupDelaySeconds,
+              popupFrequency: s.popupFrequency || offer.frequency || prev.popupFrequency,
+              popupShowOnMobile: typeof s.popupShowOnMobile === "boolean" ? s.popupShowOnMobile : prev.popupShowOnMobile,
             }));
           }
         }
@@ -350,8 +363,9 @@ export default function AdminDashboardPage() {
     partialCodAdvanceAmount: 500,
     razorpayLiveMode: false,
     razorpayKeyId: "rzp_live_KHAVYN2026_PRODUCTION",
+    // Legacy nested offerPopup (kept for backwards compatibility with old data)
     offerPopup: {
-      enabled: true,
+      enabled: false,
       title: "EXCLUSIVE PRIVATE PRIVILEGE",
       subtitle: "Unlock 10% off your inaugural KHAVYN order + complimentary express shipping nationwide.",
       couponCode: "KHAVYN10",
@@ -360,6 +374,17 @@ export default function AdminDashboardPage() {
       ctaLink: "/shop",
       frequency: "once_per_session" as "once_per_session" | "every_visit",
     },
+    // Top-level popup fields — these are what PromoPopup.tsx reads
+    popupEnabled: false,
+    popupImage: "",
+    popupHeadline: "Season Sale",
+    popupSubtext: "Up to 40% off, this week only.",
+    popupCouponCode: "",
+    popupCtaText: "Shop Now",
+    popupCtaLink: "/shop",
+    popupDelaySeconds: 3,
+    popupFrequency: "once_per_session" as "every_visit" | "once_per_session" | "once_per_day",
+    popupShowOnMobile: true,
     returnPolicyNotice: "Hassle-free 7-day returns & exchanges on all eligible unworn apparel items.",
   });
   const [settingsSaveNotice, setSettingsSaveNotice] = useState(false);
@@ -1394,175 +1419,243 @@ export default function AdminDashboardPage() {
               </div>
 
               <form onSubmit={handleSaveStoreSettings} className="space-y-6">
-                {/* Promotional Offer Popup Configuration */}
-                <div className="bg-[#1F1F1F] border border-[#C6A664]/40 rounded-lg p-6 space-y-4 shadow-lg">
+                {/* Promotional Offer Popup Configuration — writes to top-level popup* fields read by PromoPopup.tsx */}
+                <div className="bg-[#1F1F1F] border border-[#C6A664]/40 rounded-lg p-6 space-y-5 shadow-lg">
+                  {/* Header + Enable Toggle */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
                     <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-[#C6A664]" />
-                      <span>Promotional Offer Popup Modal (Storefront)</span>
+                      <span>Promotional Popup (Storefront)</span>
                     </h3>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
                       <input
                         type="checkbox"
-                        checked={storeSettings.offerPopup.enabled}
+                        checked={storeSettings.popupEnabled}
                         onChange={(e) =>
                           setStoreSettings({
                             ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              enabled: e.target.checked,
-                            },
+                            popupEnabled: e.target.checked,
+                            offerPopup: { ...storeSettings.offerPopup, enabled: e.target.checked },
                           })
                         }
                         className="w-4 h-4 rounded text-[#C6A664] focus:ring-0"
                       />
                       <span className="text-xs font-bold uppercase tracking-wider text-[#C6A664]">
-                        {storeSettings.offerPopup.enabled ? "Popup Active" : "Popup Disabled"}
+                        {storeSettings.popupEnabled ? "Popup Active" : "Popup Disabled"}
                       </span>
                     </label>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Headline */}
                     <div>
                       <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
                         Popup Main Headline *
                       </label>
                       <input
                         type="text"
-                        value={storeSettings.offerPopup.title}
+                        value={storeSettings.popupHeadline}
                         onChange={(e) =>
                           setStoreSettings({
                             ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              title: e.target.value,
-                            },
+                            popupHeadline: e.target.value,
+                            offerPopup: { ...storeSettings.offerPopup, title: e.target.value },
                           })
                         }
+                        placeholder="e.g. Season Sale"
                         className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
                       />
                     </div>
 
+                    {/* Coupon Code */}
                     <div>
                       <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
-                        Privilege Coupon Code
+                        Coupon Code (optional)
                       </label>
                       <input
                         type="text"
-                        value={storeSettings.offerPopup.couponCode}
+                        value={storeSettings.popupCouponCode ?? ""}
                         onChange={(e) =>
                           setStoreSettings({
                             ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              couponCode: e.target.value.toUpperCase(),
-                            },
+                            popupCouponCode: e.target.value.toUpperCase(),
+                            offerPopup: { ...storeSettings.offerPopup, couponCode: e.target.value.toUpperCase() },
                           })
                         }
+                        placeholder="e.g. KHAVYN10"
                         className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs font-mono font-bold text-[#C6A664] focus:outline-none focus:border-[#C6A664]"
                       />
                     </div>
 
+                    {/* Subtext — full width */}
                     <div className="md:col-span-2">
                       <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
-                        Popup Subtitle / Offer Message *
+                        Popup Subtext / Offer Message *
                       </label>
                       <input
                         type="text"
-                        value={storeSettings.offerPopup.subtitle}
+                        value={storeSettings.popupSubtext}
                         onChange={(e) =>
                           setStoreSettings({
                             ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              subtitle: e.target.value,
-                            },
+                            popupSubtext: e.target.value,
+                            offerPopup: { ...storeSettings.offerPopup, subtitle: e.target.value },
                           })
                         }
+                        placeholder="e.g. Up to 40% off, this week only."
                         className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
                       />
                     </div>
 
-                    <div>
+                    {/* Popup Banner Image */}
+                    <div className="md:col-span-2">
                       <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
-                        Free Shipping / Highlight Tag Text
+                        Banner Image URL (optional — Cloudinary or Unsplash)
                       </label>
                       <input
                         type="text"
-                        value={storeSettings.offerPopup.discountText}
-                        onChange={(e) =>
-                          setStoreSettings({
-                            ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              discountText: e.target.value,
-                            },
-                          })
-                        }
-                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                        value={storeSettings.popupImage}
+                        onChange={(e) => setStoreSettings({ ...storeSettings, popupImage: e.target.value })}
+                        placeholder="https://res.cloudinary.com/... or leave blank for K logo fallback"
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6A664]"
                       />
+                      {storeSettings.popupImage && (
+                        <div className="mt-2 relative h-28 w-full rounded overflow-hidden border border-white/10 bg-black/40">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={storeSettings.popupImage}
+                            alt="Popup banner preview"
+                            className="w-full h-full object-cover object-center"
+                            onError={(e) => { (e.target as HTMLElement).style.display = "none"; }}
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
-                        Display Frequency
-                      </label>
-                      <select
-                        value={storeSettings.offerPopup.frequency}
-                        onChange={(e) =>
-                          setStoreSettings({
-                            ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              frequency: e.target.value as any,
-                            },
-                          })
-                        }
-                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
-                      >
-                        <option value="once_per_session">Once Per Session (Recommended)</option>
-                        <option value="every_visit">Every Page Visit</option>
-                      </select>
-                    </div>
-
+                    {/* CTA Text */}
                     <div>
                       <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
                         CTA Button Label
                       </label>
                       <input
                         type="text"
-                        value={storeSettings.offerPopup.ctaText}
+                        value={storeSettings.popupCtaText}
                         onChange={(e) =>
                           setStoreSettings({
                             ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              ctaText: e.target.value,
-                            },
+                            popupCtaText: e.target.value,
+                            offerPopup: { ...storeSettings.offerPopup, ctaText: e.target.value },
                           })
                         }
+                        placeholder="e.g. Shop Now"
                         className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
                       />
                     </div>
 
+                    {/* CTA Link */}
                     <div>
                       <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
                         CTA Target URL
                       </label>
                       <input
                         type="text"
-                        value={storeSettings.offerPopup.ctaLink}
+                        value={storeSettings.popupCtaLink}
                         onChange={(e) =>
                           setStoreSettings({
                             ...storeSettings,
-                            offerPopup: {
-                              ...storeSettings.offerPopup,
-                              ctaLink: e.target.value,
-                            },
+                            popupCtaLink: e.target.value,
+                            offerPopup: { ...storeSettings.offerPopup, ctaLink: e.target.value },
                           })
+                        }
+                        placeholder="/shop or full URL"
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      />
+                    </div>
+
+                    {/* Delay (seconds) */}
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        Delay Before Showing (seconds)
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={30}
+                        value={storeSettings.popupDelaySeconds}
+                        onChange={(e) =>
+                          setStoreSettings({ ...storeSettings, popupDelaySeconds: Number(e.target.value) })
                         }
                         className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
                       />
+                    </div>
+
+                    {/* Display Frequency */}
+                    <div>
+                      <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">
+                        Display Frequency
+                      </label>
+                      <select
+                        value={storeSettings.popupFrequency}
+                        onChange={(e) =>
+                          setStoreSettings({
+                            ...storeSettings,
+                            popupFrequency: e.target.value as "every_visit" | "once_per_session" | "once_per_day",
+                            offerPopup: { ...storeSettings.offerPopup, frequency: e.target.value as any },
+                          })
+                        }
+                        className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-[#C6A664]"
+                      >
+                        <option value="once_per_session">Once Per Browser Session (Recommended)</option>
+                        <option value="once_per_day">Once Per Day</option>
+                        <option value="every_visit">Every Page Visit</option>
+                      </select>
+                    </div>
+
+                    {/* Show on Mobile toggle */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-3 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={storeSettings.popupShowOnMobile}
+                          onChange={(e) =>
+                            setStoreSettings({ ...storeSettings, popupShowOnMobile: e.target.checked })
+                          }
+                          className="w-4 h-4 rounded text-[#C6A664] focus:ring-0"
+                        />
+                        <span className="text-xs text-white/80">
+                          Show popup on mobile devices
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Live Mini-Preview */}
+                  <div className="border-t border-white/10 pt-4">
+                    <p className="text-[10px] uppercase font-bold text-white/40 mb-3 tracking-widest">Live Preview</p>
+                    <div className="w-full max-w-[280px] mx-auto bg-[#141414] border border-[#C6A664]/30 rounded-xl overflow-hidden shadow-lg">
+                      {storeSettings.popupImage ? (
+                        <div className="h-24 w-full overflow-hidden bg-black">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={storeSettings.popupImage} alt="preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLElement).style.display = "none"; }} />
+                        </div>
+                      ) : (
+                        <div className="h-16 bg-gradient-to-br from-black via-[#1f190e] to-black flex items-center justify-center border-b border-[#C6A664]/20">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src="/k-logo.png" alt="K" className="h-8 w-auto opacity-90" />
+                        </div>
+                      )}
+                      <div className="p-3 text-center space-y-1">
+                        <p className="font-serif text-sm font-bold text-white truncate">{storeSettings.popupHeadline || "Headline"}</p>
+                        <p className="text-[10px] text-white/60 leading-snug line-clamp-2">{storeSettings.popupSubtext || "Subtext"}</p>
+                        {storeSettings.popupCouponCode && (
+                          <p className="text-[10px] font-mono font-bold text-[#C6A664]">CODE: {storeSettings.popupCouponCode}</p>
+                        )}
+                        <div className="pt-1">
+                          <span className="inline-block bg-[#C6A664] text-black text-[10px] font-bold uppercase tracking-wide px-3 py-1.5 rounded-lg">
+                            {storeSettings.popupCtaText || "Shop Now"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

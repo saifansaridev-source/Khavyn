@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { X, ArrowRight, Sparkles } from "lucide-react";
+import { X, ArrowRight, Sparkles, Copy, Check } from "lucide-react";
 
-interface PromoPopupConfig {
+interface UnifiedPromoPopupConfig {
   popupEnabled: boolean;
   popupImage: string;
   popupHeadline: string;
   popupSubtext: string;
+  popupCouponCode: string;
   popupCtaText: string;
   popupCtaLink: string;
   popupDelaySeconds: number;
@@ -16,11 +17,12 @@ interface PromoPopupConfig {
   popupShowOnMobile: boolean;
 }
 
-const DEFAULT_CONFIG: PromoPopupConfig = {
+const DEFAULT_CONFIG: UnifiedPromoPopupConfig = {
   popupEnabled: false,
   popupImage: "",
   popupHeadline: "Season Sale",
   popupSubtext: "Up to 40% off, this week only. Handcrafted European luxury tailored in India.",
+  popupCouponCode: "",
   popupCtaText: "Shop Now",
   popupCtaLink: "/shop",
   popupDelaySeconds: 3,
@@ -28,12 +30,13 @@ const DEFAULT_CONFIG: PromoPopupConfig = {
   popupShowOnMobile: true,
 };
 
-const SESSION_KEY = "khavyn_promo_popup_seen";
-const DAILY_KEY = "khavyn_promo_popup_last_seen";
+const BASE_SESSION_KEY = "khavyn_promo_seen";
+const BASE_DAILY_KEY = "khavyn_promo_last_seen";
 
 export const PromoPopup: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [config, setConfig] = useState<PromoPopupConfig>(DEFAULT_CONFIG);
+  const [copied, setCopied] = useState(false);
+  const [config, setConfig] = useState<UnifiedPromoPopupConfig>(DEFAULT_CONFIG);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -42,32 +45,46 @@ export const PromoPopup: React.FC = () => {
     const loadConfigAndSchedule = async () => {
       let activeConfig = DEFAULT_CONFIG;
       try {
-        // Try admin endpoint first, falling back cleanly to public settings route
-        const res = await fetch("/api/admin/settings");
-        const data = res.ok
-          ? await res.json()
-          : await (await fetch("/api/settings")).json();
+        // Cache-busting fetch ensures changes saved in admin are received instantly
+        const res = await fetch(`/api/settings?_t=${Date.now()}`, {
+          cache: "no-store",
+          headers: { Pragma: "no-cache" },
+        });
 
-        if (data?.settings) {
-          activeConfig = {
-            popupEnabled: !!data.settings.popupEnabled,
-            popupImage: data.settings.popupImage || "",
-            popupHeadline: data.settings.popupHeadline || DEFAULT_CONFIG.popupHeadline,
-            popupSubtext: data.settings.popupSubtext || DEFAULT_CONFIG.popupSubtext,
-            popupCtaText: data.settings.popupCtaText || DEFAULT_CONFIG.popupCtaText,
-            popupCtaLink: data.settings.popupCtaLink || DEFAULT_CONFIG.popupCtaLink,
-            popupDelaySeconds:
-              typeof data.settings.popupDelaySeconds === "number"
-                ? data.settings.popupDelaySeconds
-                : DEFAULT_CONFIG.popupDelaySeconds,
-            popupFrequency: data.settings.popupFrequency || DEFAULT_CONFIG.popupFrequency,
-            popupShowOnMobile:
-              typeof data.settings.popupShowOnMobile === "boolean"
-                ? data.settings.popupShowOnMobile
-                : DEFAULT_CONFIG.popupShowOnMobile,
-          };
-          if (!ignore) {
-            setConfig(activeConfig);
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.settings) {
+            const s = data.settings;
+            const offer = s.offerPopup || {};
+
+            // Unified check: active if either popupEnabled OR offerPopup.enabled is true
+            const isEnabled =
+              typeof s.popupEnabled === "boolean"
+                ? s.popupEnabled
+                : Boolean(offer.enabled);
+
+            activeConfig = {
+              popupEnabled: isEnabled,
+              popupImage: s.popupImage || "",
+              popupHeadline: s.popupHeadline || offer.title || DEFAULT_CONFIG.popupHeadline,
+              popupSubtext: s.popupSubtext || offer.subtitle || DEFAULT_CONFIG.popupSubtext,
+              popupCouponCode: offer.couponCode || "",
+              popupCtaText: s.popupCtaText || offer.ctaText || DEFAULT_CONFIG.popupCtaText,
+              popupCtaLink: s.popupCtaLink || offer.ctaLink || DEFAULT_CONFIG.popupCtaLink,
+              popupDelaySeconds:
+                typeof s.popupDelaySeconds === "number"
+                  ? s.popupDelaySeconds
+                  : DEFAULT_CONFIG.popupDelaySeconds,
+              popupFrequency: s.popupFrequency || offer.frequency || DEFAULT_CONFIG.popupFrequency,
+              popupShowOnMobile:
+                typeof s.popupShowOnMobile === "boolean"
+                  ? s.popupShowOnMobile
+                  : DEFAULT_CONFIG.popupShowOnMobile,
+            };
+
+            if (!ignore) {
+              setConfig(activeConfig);
+            }
           }
         }
       } catch {
@@ -76,35 +93,32 @@ export const PromoPopup: React.FC = () => {
 
       if (ignore) return;
 
-      // Rule 1: If popup is disabled, do nothing
+      // Rule 1: If popup is disabled in settings, do not display
       if (!activeConfig.popupEnabled) return;
 
       // Rule 2: Check mobile viewport restriction
-      const isMobile = window.innerWidth < 768;
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
       if (!activeConfig.popupShowOnMobile && isMobile) return;
 
-      // Rule 3: Check frequency throttling
+      // Rule 3: Frequency check
+      const sessionKey = `${BASE_SESSION_KEY}_${activeConfig.popupHeadline.replace(/\s+/g, "_")}`;
       if (activeConfig.popupFrequency === "once_per_session") {
         try {
-          if (sessionStorage.getItem(SESSION_KEY) === "true") return;
-        } catch {
-          // sessionStorage blocked/unavailable
-        }
+          if (sessionStorage.getItem(sessionKey) === "true") return;
+        } catch {}
       } else if (activeConfig.popupFrequency === "once_per_day") {
         try {
-          const lastSeenStr = localStorage.getItem(DAILY_KEY);
+          const lastSeenStr = localStorage.getItem(BASE_DAILY_KEY);
           if (lastSeenStr) {
             const lastSeen = parseInt(lastSeenStr, 10);
             if (!isNaN(lastSeen) && Date.now() - lastSeen < 24 * 60 * 60 * 1000) {
               return;
             }
           }
-        } catch {
-          // localStorage blocked/unavailable
-        }
+        } catch {}
       }
 
-      // Rule 4: Schedule popup presentation after configured delay
+      // Rule 4: Display after configured delay
       const delayMs = Math.max(0, (activeConfig.popupDelaySeconds ?? 3) * 1000);
       timerRef.current = setTimeout(() => {
         if (!ignore) {
@@ -126,13 +140,22 @@ export const PromoPopup: React.FC = () => {
 
     // Record dismissal according to frequency settings
     try {
+      const sessionKey = `${BASE_SESSION_KEY}_${config.popupHeadline.replace(/\s+/g, "_")}`;
       if (config.popupFrequency === "once_per_session") {
-        sessionStorage.setItem(SESSION_KEY, "true");
+        sessionStorage.setItem(sessionKey, "true");
+        // Also suppress legacy offerPopup key if present
+        sessionStorage.setItem("khavyn_offer_popup_seen", "true");
       } else if (config.popupFrequency === "once_per_day") {
-        localStorage.setItem(DAILY_KEY, Date.now().toString());
+        localStorage.setItem(BASE_DAILY_KEY, Date.now().toString());
       }
-    } catch {
-      // Storage unavailable in private browsing mode
+    } catch {}
+  };
+
+  const handleCopyCode = () => {
+    if (navigator?.clipboard && config.popupCouponCode) {
+      navigator.clipboard.writeText(config.popupCouponCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
     }
   };
 
@@ -149,7 +172,7 @@ export const PromoPopup: React.FC = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, config.popupFrequency]);
+  }, [isOpen, config.popupHeadline]);
 
   if (!isOpen) return null;
 
@@ -215,6 +238,26 @@ export const PromoPopup: React.FC = () => {
           <p className="text-xs sm:text-sm text-white/70 leading-relaxed max-w-[340px] font-light">
             {config.popupSubtext}
           </p>
+
+          {/* Optional Coupon Code Pill with 1-Click Copy */}
+          {config.popupCouponCode && (
+            <div className="pt-1 flex items-center justify-center">
+              <button
+                type="button"
+                onClick={handleCopyCode}
+                title="Click to copy coupon code"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-black/60 border border-[#C6A664]/40 hover:border-[#C6A664] rounded-lg text-xs font-mono font-bold text-[#C6A664] transition-colors cursor-pointer shadow"
+              >
+                <span>CODE: {config.popupCouponCode}</span>
+                {copied ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5 text-[#C6A664]/70" />
+                )}
+                <span className="text-[10px] text-white/50">{copied ? "Copied!" : "Copy"}</span>
+              </button>
+            </div>
+          )}
 
           <div className="w-full pt-2">
             <Link

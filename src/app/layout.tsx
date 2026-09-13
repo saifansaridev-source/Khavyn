@@ -3,7 +3,6 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { UserSessionProvider } from "@/components/auth/UserSessionProvider";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
-import { OfferPopup } from "@/components/layout/OfferPopup";
 import { PromoPopup } from "@/components/layout/PromoPopup";
 
 const cormorant = Cormorant_Garamond({
@@ -58,7 +57,6 @@ export default function RootLayout({
         <UserSessionProvider>
           {children}
           <WhatsAppButton />
-          <OfferPopup />
           <PromoPopup />
         </UserSessionProvider>
       </body>

@@ -1,14 +1,40 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, AlertTriangle, Check, Layers, RefreshCw } from "lucide-react";
+import { ArrowLeft, Save, AlertTriangle, Check, RefreshCw } from "lucide-react";
 import { SEED_PRODUCTS, ProductSeedInput } from "@/lib/data/productsData";
 
 export default function AdminInventoryPage() {
-  const [productsList, setProductsList] = useState<ProductSeedInput[]>(SEED_PRODUCTS);
+  const [productsList, setProductsList] = useState<ProductSeedInput[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [savingCode, setSavingCode] = useState<string | null>(null);
   const [savedSuccessCode, setSavedSuccessCode] = useState<string | null>(null);
+
+  const loadProducts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/products?_t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.products) && data.products.length > 0) {
+          setProductsList(data.products);
+          setIsLoading(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to fetch products from API, using seed data:", err);
+    }
+    // Fallback to seed products
+    setProductsList(SEED_PRODUCTS);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
 
   const handleStockChange = (styleCode: string, size: "S" | "M" | "L" | "XL", val: number) => {
     setProductsList((prev) =>

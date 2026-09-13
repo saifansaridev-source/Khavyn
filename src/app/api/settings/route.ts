@@ -1,6 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db/connect";
 import { StoreSettings } from "@/models/StoreSettings";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const DEFAULT_SETTINGS = {
   announcementText: "COMPLIMENTARY EXPRESS SHIPPING ACROSS INDIA ON ORDERS ABOVE ₹2,499 • 50% ADVANCE PARTIAL COD AVAILABLE",
@@ -36,18 +39,24 @@ const DEFAULT_SETTINGS = {
   popupShowOnMobile: true,
 };
 
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+};
+
 export async function GET() {
   try {
     const db = await connectToDatabase();
     if (db) {
       let settings = await StoreSettings.findOne().lean();
       if (!settings) {
-        settings = await StoreSettings.create(DEFAULT_SETTINGS);
+        settings = (await StoreSettings.create(DEFAULT_SETTINGS)).toObject();
       }
-      return NextResponse.json({ success: true, settings });
+      return NextResponse.json({ success: true, settings }, { headers: NO_CACHE_HEADERS });
     }
-    return NextResponse.json({ success: true, settings: DEFAULT_SETTINGS });
+    return NextResponse.json({ success: true, settings: DEFAULT_SETTINGS }, { headers: NO_CACHE_HEADERS });
   } catch (err: any) {
-    return NextResponse.json({ success: true, settings: DEFAULT_SETTINGS });
+    return NextResponse.json({ success: true, settings: DEFAULT_SETTINGS }, { headers: NO_CACHE_HEADERS });
   }
 }
