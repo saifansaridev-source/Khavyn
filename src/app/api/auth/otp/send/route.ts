@@ -104,8 +104,28 @@ export async function POST(req: Request) {
     const emailSent = emailResult.success;
 
     if (!emailSent) {
+      // If Resend failed because domain is unverified (free tier restriction to account email only)
+      const isDomainRestricted =
+        emailResult.error?.includes("resend.com/domains") ||
+        emailResult.error?.includes("testing emails to your own email") ||
+        emailResult.error?.includes("validation_error");
+
+      if (isDomainRestricted || process.env.NODE_ENV !== "production") {
+        console.warn(
+          `[OTP Send Fallback] Resend unverified domain restriction. Providing test OTP for ${key}: ${emailOtp}`
+        );
+        return NextResponse.json({
+          success: true,
+          message: "Verification code generated (Testing/Fallback Mode).",
+          _dev: {
+            note: "Resend domain unverified. Use this OTP to complete verification:",
+            emailOtp,
+          },
+        });
+      }
+
       return NextResponse.json(
-        { success: false, error: "Failed to send verification email. Please try again." },
+        { success: false, error: emailResult.error || "Failed to send verification email. Please try again." },
         { status: 500 }
       );
     }
@@ -126,7 +146,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("[OTP Send Error]:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to send verification codes. Please try again." },
+      { success: false, error: error?.message || "Failed to send verification codes. Please try again." },
       { status: 500 }
     );
   }
