@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { SEED_PRODUCTS } from "@/lib/data/productsData";
+import { BLOG_POSTS } from "@/lib/data/blogsData";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.khavyn.com";
@@ -14,6 +15,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${baseUrl}/shop`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/blogs`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.9,
@@ -64,5 +71,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...productRoutes];
+  // Dynamic blog routes (15 articles)
+  const blogRoutes: MetadataRoute.Sitemap = BLOG_POSTS.map((post) => ({
+    url: `${baseUrl}/blogs/${post.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
+
+  return [...staticRoutes, ...productRoutes, ...blogRoutes];
 }

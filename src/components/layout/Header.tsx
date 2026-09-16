@@ -124,6 +124,12 @@ export const Header: React.FC = () => {
                 About Us
               </Link>
               <Link
+                href="/blogs"
+                className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]"
+              >
+                Blog
+              </Link>
+              <Link
                 href="/contact"
                 className="hover:text-[#C6A664] transition-colors py-1 border-b-2 border-transparent hover:border-[#C6A664]"
               >
@@ -247,6 +253,7 @@ export const Header: React.FC = () => {
               <Link href="/shop" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-[#C6A664] pb-2 border-b border-white/10">Shop All</Link>
               <Link href="/collections" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-[#C6A664] pb-2 border-b border-white/10">Our Collections</Link>
               <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-[#C6A664] pb-2 border-b border-white/10">About Us</Link>
+              <Link href="/blogs" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-[#C6A664] pb-2 border-b border-white/10">Blog</Link>
               {mounted && isAuthenticated ? (
                 <>
                   <Link href="/account" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-[#C6A664] pb-2 border-b border-white/10">My Account</Link>
