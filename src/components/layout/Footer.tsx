@@ -190,6 +190,11 @@ export const Footer: React.FC = () => {
                   Cookie Policy
                 </Link>
               </li>
+              <li>
+                <Link href="/policies/content-security" className="hover:text-[#C6A664] transition-colors">
+                  Content Security & Permissions
+                </Link>
+              </li>
             </ul>
           </div>
 

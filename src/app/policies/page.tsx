@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
-import { ShieldCheck, FileText, Truck, RotateCw, XCircle, CreditCard, ArrowRight } from "lucide-react";
+import { ShieldCheck, FileText, Truck, RotateCw, XCircle, CreditCard, ArrowRight, Shield } from "lucide-react";
 
 const POLICIES_LIST = [
   {
@@ -41,6 +41,12 @@ const POLICIES_LIST = [
     title: "Payment Policy",
     icon: CreditCard,
     desc: "Supported payment gateways, 256-bit SSL encryption, 100% Prepaid options, and 50% Partial COD mechanism.",
+  },
+  {
+    slug: "content-security",
+    title: "Content Security & Permissions Policy",
+    icon: Shield,
+    desc: "CSP controls, browser permissions, HTTPS encryption, framing protection, and authorized third-party security standards.",
   },
 ];
 

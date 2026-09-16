@@ -271,7 +271,7 @@ export default function AboutPage() {
             <div className="relative aspect-[16/10] rounded-lg overflow-hidden border border-[#D8C9B0]/60 shadow-lg">
               <Image
                 src={craftedInIndiaImage}
-                alt="KHAVYN Atelier Bangalore & Tripur"
+                alt="KHAVYN Atelier Bangalore & tiruppur"
                 fill
                 className="object-cover"
               />
@@ -286,7 +286,7 @@ export default function AboutPage() {
               </h2>
               <div className="h-px w-16 bg-gradient-to-r from-[#C6A664] to-transparent" />
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
-                Our production hub is based in Bangalore and Tripur, home to some of India&apos;s most skilled garment craftsmen. Every piece passes through a 14-point quality checkpoint before it earns the KHAVYN label.
+                Our production hub is based in Bangalore and tiruppur, home to some of India&apos;s most skilled garment craftsmen. Every piece passes through a 14-point quality checkpoint before it earns the KHAVYN label.
               </p>
               <p className="text-sm text-[#1A1A1A]/75 leading-relaxed font-light">
                 We are proudly a Make in India brand — not as a marketing slogan, but as a genuine commitment to the artisans, mills, and textile workers who breathe life into every garment we create.

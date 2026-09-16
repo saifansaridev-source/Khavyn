@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Scale,
   HelpCircle,
+  Shield,
 } from "lucide-react";
 
 interface PolicyPageProps {
@@ -30,6 +31,7 @@ const POLICIES_NAV = [
   { slug: "cookie", label: "Cookie Policy", icon: FileText },
   { slug: "cancellation", label: "Cancellation Policy", icon: XCircle },
   { slug: "exchange", label: "Exchange Policy", icon: RotateCw },
+  { slug: "content-security", label: "Content Security & Permissions", icon: Shield },
   { slug: "disclaimer", label: "Disclaimer", icon: AlertCircle },
   { slug: "intellectual-property", label: "Intellectual Property Policy", icon: Scale },
   { slug: "consumer-complaint", label: "Consumer Complaint Policy", icon: HelpCircle },
@@ -733,10 +735,86 @@ const POLICY_CONTENT: Record<
       },
     ],
   },
+  "content-security": {
+    title: "Content Security & Permissions Policy",
+    date: "Last Updated: 16 September 2026",
+    sections: [
+      {
+        heading: "Introduction",
+        body: "At KHAVYN Fashion Private Limited (“KHAVYN”, “we”, “us” or “our”), we are committed to maintaining appropriate security measures for our website and protecting customers while they browse, create accounts, make purchases, communicate with us and use other features available through our website.\n\nThis Content Security & Permissions Policy explains the security controls used or intended to be used on the KHAVYN website, including Content Security Policy (CSP) and Permissions Policy controls.",
+      },
+      {
+        heading: "1. Content Security Policy",
+        body: "KHAVYN may implement a Content Security Policy (“CSP”) as an additional layer of website security.\n\nCSP helps control the sources from which website content and resources may be loaded, including scripts, stylesheets, fonts, images, media, frames and network connections.\n\nThe purpose of these controls is to reduce security risks such as cross-site scripting (XSS), unauthorized content injection and the execution of unapproved third-party resources.\n\nWhere technically appropriate, KHAVYN may restrict website resources to KHAVYN-controlled sources and specifically authorized third-party service providers.",
+      },
+      {
+        heading: "2. Authorized Third-Party Services",
+        body: "Certain website functionality may require KHAVYN to permit resources or connections from trusted third-party service providers.\n\nThese may include, as applicable:\n• Payment gateways and payment-processing partners;\n• Shipping and logistics providers;\n• Analytics and website-performance services;\n• Advertising and marketing platforms;\n• Customer-support and communication services;\n• Email and notification service providers;\n• Content delivery networks (CDNs);\n• Review, authentication and fraud-prevention services; and\n• Other technology providers necessary for operating the KHAVYN website.\n\nAccess to third-party domains should be limited to services required for legitimate website functionality.",
+      },
+      {
+        heading: "3. Payment Security",
+        body: "KHAVYN may use authorized third-party payment gateways for processing online transactions.\n\nPayment-related scripts, frames and network connections should only be permitted from KHAVYN and the payment service providers integrated with the website.\n\nSensitive payment information processed directly by a payment gateway is subject to the security practices, terms and privacy policies of the respective payment service provider.\n\nKHAVYN does not intend to grant unrestricted website access to unrelated third-party payment services.",
+      },
+      {
+        heading: "4. Browser Permissions",
+        body: "KHAVYN follows the principle of limiting browser permissions to those reasonably required for website functionality.\n\nUnless a feature specifically requires them and the appropriate permission is enabled, the KHAVYN website should not request access to sensitive device capabilities such as:\n• Camera;\n• Microphone;\n• Precise location;\n• Bluetooth;\n• USB devices;\n• Accelerometer;\n• Gyroscope; or\n• Magnetometer.\n\nWhere browser functionality such as payment processing, fullscreen content, autoplay or picture-in-picture is required, permissions may be restricted to KHAVYN or specifically authorized services.",
+      },
+      {
+        heading: "5. Customer Location Information",
+        body: "KHAVYN may request customers to provide delivery-related information, including address, landmark and other location details necessary to process and deliver an order.\n\nSuch information is different from accessing a customer's device-based precise geolocation.\n\nDevice geolocation should remain disabled unless KHAVYN introduces a feature that specifically requires it and appropriate consent or permission is obtained.",
+      },
+      {
+        heading: "6. Secure Connections",
+        body: "KHAVYN intends to use HTTPS/SSL encryption to protect communications between customers' browsers and the KHAVYN website.\n\nWhere technically appropriate, security controls may also be implemented to require secure HTTPS connections and prevent website resources from being loaded through insecure HTTP connections.",
+      },
+      {
+        heading: "7. Framing and Content Protection",
+        body: "KHAVYN may restrict unauthorized websites from embedding or framing KHAVYN webpages.\n\nThese controls are intended to reduce risks associated with clickjacking and unauthorized presentation or manipulation of KHAVYN website content.",
+      },
+      {
+        heading: "8. Content-Type and Referrer Protection",
+        body: "KHAVYN may implement browser security headers designed to:\n• Prevent browsers from incorrectly interpreting the content type of website resources;\n• Limit unnecessary disclosure of referring-page information to external websites; and\n• Strengthen isolation between KHAVYN and unrelated websites where technically appropriate.",
+      },
+      {
+        heading: "9. Cookies, Analytics and Advertising Technologies",
+        body: "The KHAVYN website may use cookies, analytics tools, advertising technologies and similar technologies for website functionality, performance measurement, customer experience, marketing and other purposes described in KHAVYN's Privacy Policy and Cookie Policy.\n\nContent Security Policy settings do not replace customer consent requirements or KHAVYN's obligations under applicable privacy and data-protection requirements.",
+      },
+      {
+        heading: "10. Third-Party Websites and Services",
+        body: "KHAVYN's website may contain links to or integrations with third-party websites and services.\n\nThird-party websites operate independently and may maintain their own security, privacy, cookie and permissions practices. KHAVYN does not control the security practices of independent third-party websites after a customer leaves the KHAVYN website.\n\nCustomers are encouraged to review the applicable policies of such third parties.",
+      },
+      {
+        heading: "11. Security Monitoring and Updates",
+        body: "KHAVYN may periodically review and update its website security configuration to reflect:\n• Changes to website functionality;\n• Addition or removal of third-party services;\n• Changes to payment or logistics integrations;\n• New browser-security standards;\n• Identified security risks; and\n• Applicable legal or regulatory requirements.\n\nSecurity configurations may therefore change without requiring amendments to every provision of this public-facing policy.",
+      },
+      {
+        heading: "12. Responsible Website Use",
+        body: "Users must not attempt to circumvent KHAVYN's website security controls, obtain unauthorized access to systems or customer information, introduce malicious code, interfere with website functionality, or use the website for unlawful purposes.\n\nKHAVYN reserves the right to restrict access and take appropriate action where unauthorized or potentially harmful activity is detected.",
+      },
+      {
+        heading: "13. No Guarantee of Absolute Security",
+        body: "KHAVYN takes reasonable measures intended to protect its website and customer information. However, no website, electronic communication, internet transmission or information-security system can be guaranteed to be completely secure.\n\nCustomers should also take appropriate precautions, including protecting their account credentials and using secure devices and internet connections.",
+      },
+      {
+        heading: "14. Relationship With Other KHAVYN Policies",
+        body: "This policy should be read together with KHAVYN's Privacy Policy, Cookie Policy, Terms & Conditions, Shipping & Delivery Policy, Cancellation Policy, Return & Refund Policy, Exchange Policy, Disclaimer and Grievance Policy.\n\nWhere personal information is collected or processed, KHAVYN's Privacy Policy and other applicable policies will govern such processing.",
+      },
+      {
+        heading: "15. Changes to This Policy",
+        body: "KHAVYN may modify this Content Security & Permissions Policy from time to time to reflect changes in technology, website functionality, business practices, security requirements or applicable law.\n\nThe revised policy may be published on the KHAVYN website with an updated “Last Updated” date.",
+      },
+      {
+        heading: "16. Contact",
+        body: "For questions or concerns regarding this policy or the security of the KHAVYN website, customers may contact KHAVYN Fashion Private Limited through the contact information published on www.khavyn.com.",
+      },
+    ],
+  },
 };
 
 // Aliasing returns to exchange for legacy URLs
 POLICY_CONTENT["returns"] = POLICY_CONTENT["exchange"];
+POLICY_CONTENT["content-security-policy"] = POLICY_CONTENT["content-security"];
+POLICY_CONTENT["content-security-permissions"] = POLICY_CONTENT["content-security"];
 
 export default async function PolicyPage({ params }: PolicyPageProps) {
   const { slug } = await params;

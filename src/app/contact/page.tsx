@@ -81,7 +81,7 @@ const faqs: FAQItem[] = [
     q: "Where are KHAVYN garments manufactured?",
     a: (
       <span>
-        All KHAVYN garments are drafted with European architectural proportions and tailored at our dedicated production hub in Bangalore and Tripur, India. Every creation reflects our steadfast Make in India commitment and passes a 14-point checkpoint before earning the KHAVYN mark.
+        All KHAVYN garments are drafted with European architectural proportions and tailored at our dedicated production hub in Bangalore and tiruppur, India. Every creation reflects our steadfast Make in India commitment and passes a 14-point checkpoint before earning the KHAVYN mark.
       </span>
     ),
   },
