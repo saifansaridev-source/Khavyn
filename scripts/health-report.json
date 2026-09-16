@@ -1,0 +1,56 @@
+{
+  "mongo": {
+    "status": "Working",
+    "connected": true,
+    "database": "test",
+    "collections": [],
+    "productCount": 0,
+    "sampleProductName": "N/A"
+  },
+  "google": {
+    "status": "Configured",
+    "clientIdPreview": "258616472491-2s...",
+    "validFormat": true
+  },
+  "cloudinary": {
+    "status": "Working",
+    "uploadSuccess": true,
+    "secureUrl": "https://res.cloudinary.com/g1j6jq35/image/upload/v1789317251/khavyn_audit_test/fpbxfctmwbyjhoxdls4y.png",
+    "urlLoadable": true,
+    "cloudName": "g1j6jq35"
+  },
+  "razorpay": {
+    "status": "Working",
+    "mode": "LIVE",
+    "keyIdPrefix": "rzp_live_",
+    "isLive": true,
+    "apiAuthSuccess": true,
+    "authError": null
+  },
+  "shiprocket": {
+    "status": "Working",
+    "authenticated": true,
+    "pickupAddressesCount": 1,
+    "hasPickupAddress": true,
+    "pickupAddresses": [
+      {
+        "id": 102198578,
+        "pickup_location": "Home",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "pin_code": "411027"
+      }
+    ]
+  },
+  "imagekit": {
+    "status": "Working",
+    "uploadedUrl": "https://ik.imagekit.io/khavynfashion/khavyn-audit/audit-test_RJqnSVCMp5.txt",
+    "fileId": "6aa6d087ead997d09a710e4f",
+    "urlLoadable": true
+  },
+  "resend": {
+    "status": "Broken",
+    "apiKeyValid": false,
+    "error": "This API key is restricted to only send emails"
+  }
+}

@@ -8,7 +8,7 @@ export const AnnouncementBar: React.FC = () => {
   );
 
   useEffect(() => {
-    fetch("/api/admin/settings")
+    fetch(`/api/settings?_t=${Date.now()}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.settings?.announcementText) {

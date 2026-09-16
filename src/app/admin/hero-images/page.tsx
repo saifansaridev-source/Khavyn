@@ -15,6 +15,7 @@ import {
   RefreshCw,
   ExternalLink,
 } from "lucide-react";
+import { DragDropUpload } from "@/components/admin/DragDropUpload";
 
 export default function AdminHeroImagesPage() {
   const [heroImages, setHeroImages] = useState<string[]>([]);
@@ -323,49 +324,15 @@ export default function AdminHeroImagesPage() {
                   </div>
                 </div>
 
-                {/* Input & Preview */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
-                  <div className="md:col-span-8 space-y-2">
-                    <label className="text-[10px] uppercase font-bold tracking-wider text-white/70 block">
-                      Image URL (Cloudinary / Unsplash / CDN)
-                    </label>
-                    <input
-                      type="text"
-                      value={imgUrl}
-                      onChange={(e) => handleUrlChange(index, e.target.value)}
-                      placeholder="https://res.cloudinary.com/... or https://images.unsplash.com/..."
-                      className="w-full bg-[#141414] border border-white/20 rounded-lg px-3.5 py-2.5 text-xs font-mono text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664] transition-colors"
-                    />
-                    <p className="text-[11px] text-white/40">
-                      Recommended specs: 1920×1080px or higher, landscape orientation, compressed WebP/JPEG format.
-                    </p>
-                  </div>
-
-                  {/* Live Image Preview */}
-                  <div className="md:col-span-4">
-                    <label className="text-[10px] uppercase font-bold tracking-wider text-white/70 block mb-2">
-                      Live Preview
-                    </label>
-                    {imgUrl.trim() ? (
-                      <div className="relative h-28 sm:h-32 w-full rounded-lg overflow-hidden border border-white/15 bg-black/60 shadow-inner group">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={imgUrl}
-                          alt={`Slide ${index + 1} preview`}
-                          className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = "none";
-                          }}
-                        />
-                        <div className="absolute inset-0 pointer-events-none border border-white/10 rounded-lg" />
-                      </div>
-                    ) : (
-                      <div className="h-28 sm:h-32 w-full rounded-lg border border-dashed border-white/15 flex items-center justify-center text-[11px] text-white/40 bg-black/20 text-center p-3">
-                        Enter a valid image URL to preview slide
-                      </div>
-                    )}
-                  </div>
-                </div>
+                {/* Drag and Drop Image Upload to Cloudinary */}
+                <DragDropUpload
+                  label={`Hero Slide #${index + 1}`}
+                  value={imgUrl}
+                  onChange={(url) => handleUrlChange(index, url)}
+                  resourceType="image"
+                  folder="khavyn/hero"
+                  helperText="Recommended specs: 1920×1080px or higher, landscape orientation, compressed WebP/JPEG format."
+                />
               </div>
             ))}
 

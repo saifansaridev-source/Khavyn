@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { UploadCloud, X, Film, Loader2, AlertCircle, CheckCircle2, Link as LinkIcon } from "lucide-react";
+import { UploadCloud, X, Film, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 
 /**
- * Reusable Drag-and-Drop Cloudinary Upload Component
- *
- * Requirements for Video Uploads:
- * To bypass serverless body size limits for large videos, the admin should configure an
- * unsigned upload preset named "khavyn_uploads" in their Cloudinary Console:
- * Settings -> Upload -> Add upload preset -> Signing Mode: Unsigned.
+ * Reusable Drag-and-Drop Media Upload Component
+ * - Images are routed directly to Cloudinary
+ * - Videos are routed directly to ImageKit (fast binary upload to /khavyn/product-videos)
+ * - Pure drag-and-drop / file selector with clean remove support
  */
 
 interface DragDropUploadProps {
@@ -26,15 +24,13 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
   value,
   onChange,
   resourceType = "image",
-  folder = "khavyn/products",
+  folder = resourceType === "video" ? "khavyn/product-videos" : "khavyn/products",
   helperText,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [showUrlInput, setShowUrlInput] = useState(false);
-  const [manualUrl, setManualUrl] = useState(value || "");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,7 +51,50 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
     setIsUploading(true);
 
     try {
-      // Server-side signed upload route (handles ImageKit for video, Cloudinary for images)
+      // 1. Direct ImageKit Upload for videos (fastest — bypasses serverless body limits)
+      if (resourceType === "video") {
+        let uploaded = false;
+        try {
+          const authRes = await fetch("/api/admin/imagekit/auth");
+          if (authRes.ok) {
+            const authData = await authRes.json();
+            if (authData.token && authData.signature && authData.publicKey) {
+              const ikFormData = new FormData();
+              ikFormData.append("file", file);
+              ikFormData.append("fileName", file.name || `video_${Date.now()}.mp4`);
+              ikFormData.append("publicKey", authData.publicKey);
+              ikFormData.append("signature", authData.signature);
+              ikFormData.append("expire", String(authData.expire));
+              ikFormData.append("token", authData.token);
+              const targetFolder = folder.startsWith("/") ? folder : `/${folder}`;
+              ikFormData.append("folder", targetFolder);
+
+              const ikUploadRes = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+                method: "POST",
+                body: ikFormData,
+              });
+
+              const ikUploadData = await ikUploadRes.json();
+              if (ikUploadRes.ok && ikUploadData.url) {
+                onChange(ikUploadData.url);
+                setUploadSuccess(true);
+                uploaded = true;
+              } else {
+                console.warn("Direct ImageKit client upload failed, trying server route:", ikUploadData);
+              }
+            }
+          }
+        } catch (ikDirectErr) {
+          console.warn("Direct ImageKit upload encountered error, falling back to server route:", ikDirectErr);
+        }
+
+        if (uploaded) {
+          setIsUploading(false);
+          return;
+        }
+      }
+
+      // 2. Server-side upload route (Cloudinary for images, ImageKit server-side for videos)
       const formData = new FormData();
       formData.append("file", file);
       formData.append("resourceType", resourceType);
@@ -71,18 +110,21 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
       if (!res.ok || !data.success) {
         throw new Error(
           data.error ||
-            "Upload failed. Please ensure Cloudinary credentials are configured in .env.local."
+            (resourceType === "video"
+              ? "Failed to upload video to ImageKit."
+              : "Failed to upload image to Cloudinary.")
         );
       }
 
       onChange(data.url);
-      setManualUrl(data.url);
       setUploadSuccess(true);
     } catch (err: any) {
       console.error("Upload error:", err);
       setUploadError(
         err.message ||
-          "Upload error. Please check your Cloudinary configuration or internet connection."
+          (resourceType === "video"
+            ? "Upload error. Please check ImageKit configuration or file size."
+            : "Upload error. Please check Cloudinary configuration or network connection.")
       );
     } finally {
       setIsUploading(false);
@@ -114,15 +156,11 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
 
   const handleClear = () => {
     onChange("");
-    setManualUrl("");
     setUploadError(null);
     setUploadSuccess(false);
-  };
-
-  const handleManualUrlSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onChange(manualUrl.trim());
-    setShowUrlInput(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -139,15 +177,9 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
             {label}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowUrlInput(!showUrlInput)}
-          className="text-[10px] text-white/50 hover:text-white flex items-center gap-1 transition-colors shrink-0 py-1"
-          title="Toggle manual URL paste"
-        >
-          <LinkIcon className="w-2.5 h-2.5" />
-          <span>{showUrlInput ? "Dropzone" : "Paste URL"}</span>
-        </button>
+        <span className="text-[9px] uppercase tracking-wider text-white/40 font-mono">
+          {resourceType === "video" ? "ImageKit 20GB Storage" : "Cloudinary CDN"}
+        </span>
       </div>
 
       {helperText && (
@@ -169,25 +201,6 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
             <X className="w-3.5 h-3.5" />
           </button>
         </div>
-      )}
-
-      {/* Manual URL Input Bar */}
-      {showUrlInput && (
-        <form onSubmit={handleManualUrlSubmit} className="flex flex-col sm:flex-row gap-2 w-full">
-          <input
-            type="url"
-            value={manualUrl}
-            onChange={(e) => setManualUrl(e.target.value)}
-            placeholder={`https://res.cloudinary.com/... or any ${resourceType} URL`}
-            className="flex-1 w-full min-w-0 bg-black/50 border border-white/20 rounded px-2.5 py-2 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#C6A664]"
-          />
-          <button
-            type="submit"
-            className="w-full sm:w-auto min-h-[36px] bg-[#C6A664] hover:bg-white text-black font-semibold text-xs px-3 py-1.5 rounded transition-colors shrink-0 cursor-pointer"
-          >
-            Apply
-          </button>
-        </form>
       )}
 
       {/* Live Preview Area */}
@@ -212,22 +225,14 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
             </div>
           )}
 
-          {/* Overlay Actions */}
+          {/* Overlay Actions — ONLY Remove button (Replace button removed per Bug 2) */}
           <div className="absolute inset-0 bg-black/65 sm:opacity-0 group-hover:opacity-100 sm:group-focus-within:opacity-100 transition-opacity flex items-center justify-center gap-2 p-2">
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="bg-[#C6A664] text-black hover:bg-white text-xs px-3.5 py-2 rounded font-semibold transition-colors flex items-center gap-1.5 shadow min-h-[38px] cursor-pointer"
-            >
-              <UploadCloud className="w-3.5 h-3.5" />
-              <span>Replace</span>
-            </button>
-            <button
-              type="button"
               onClick={handleClear}
-              className="bg-red-600 hover:bg-red-500 text-white text-xs px-3.5 py-2 rounded font-semibold transition-colors flex items-center gap-1.5 shadow min-h-[38px] cursor-pointer"
+              className="bg-red-600 hover:bg-red-500 text-white text-xs px-4 py-2 rounded font-semibold transition-colors flex items-center gap-1.5 shadow min-h-[38px] cursor-pointer"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
               <span>Remove</span>
             </button>
           </div>
@@ -267,10 +272,12 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
             <div className="flex flex-col items-center gap-2 py-2">
               <Loader2 className="w-6 h-6 text-[#C6A664] animate-spin" />
               <p className="text-xs font-semibold text-white">
-                Uploading to Cloudinary ({folder})...
+                {resourceType === "video"
+                  ? `Uploading video to ImageKit (${folder})...`
+                  : `Uploading image to Cloudinary (${folder})...`}
               </p>
               <p className="text-[10px] text-white/50 font-light">
-                Please wait while media is processed
+                Please wait while media is being processed
               </p>
             </div>
           ) : (
@@ -290,7 +297,7 @@ export const DragDropUpload: React.FC<DragDropUploadProps> = ({
                     : "or click to select JPG, PNG, WebP"}
                 </p>
                 <p className="text-[9px] text-[#C6A664]/70 font-mono pt-0.5">
-                  Folder: {folder}
+                  Target: {resourceType === "video" ? `ImageKit (${folder})` : `Cloudinary (${folder})`}
                 </p>
               </div>
             </>

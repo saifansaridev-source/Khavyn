@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { useCartStore } from "@/store/useCartStore";
+import { useUserStore } from "@/store/useUserStore";
 import { SHIPPING_FLAT_RATE } from "@/lib/config";
 import {
   ShieldCheck,
@@ -18,10 +19,26 @@ import {
   CheckCircle2,
   AlertCircle,
   RefreshCw,
+  MapPin,
 } from "lucide-react";
+
+interface SavedAddress {
+  _id: string;
+  label: string;
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  isDefault: boolean;
+}
 
 export default function CheckoutPage() {
   const { items, getCartTotal, clearCart } = useCartStore();
+  const { user } = useUserStore();
   const subtotal = getCartTotal();
   const shippingCharge = SHIPPING_FLAT_RATE;
   const grandTotal = subtotal + shippingCharge;
@@ -37,9 +54,99 @@ export default function CheckoutPage() {
     pincode: "",
   });
 
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("new");
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [orderConfirmed, setOrderConfirmed] = useState<any>(null);
+
+  // Load saved addresses and autofill form for logged in user
+  useEffect(() => {
+    async function loadAddresses() {
+      setIsLoadingAddresses(true);
+      try {
+        const res = await fetch("/api/user/addresses");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.addresses) && data.addresses.length > 0) {
+            setSavedAddresses(data.addresses);
+            const defaultAddr =
+              data.addresses.find((a: SavedAddress) => a.isDefault) || data.addresses[0];
+            setSelectedAddressId(defaultAddr._id);
+
+            const streetParts = [
+              defaultAddr.addressLine1,
+              defaultAddr.addressLine2,
+              defaultAddr.landmark ? `Near ${defaultAddr.landmark}` : "",
+            ].filter(Boolean);
+
+            setFormData({
+              fullName: defaultAddr.fullName || user?.name || "",
+              email: user?.email || "",
+              phone: defaultAddr.phone || "",
+              street: streetParts.join(", ") || defaultAddr.addressLine1 || "",
+              city: defaultAddr.city || "",
+              state: defaultAddr.state || "",
+              pincode: defaultAddr.pincode || "",
+            });
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load user addresses:", err);
+      } finally {
+        setIsLoadingAddresses(false);
+      }
+
+      // If user is logged in with no saved addresses, prefill name and email
+      if (user) {
+        setFormData((prev) => ({
+          ...prev,
+          fullName: prev.fullName || user.name || "",
+          email: prev.email || user.email || "",
+        }));
+      }
+    }
+
+    loadAddresses();
+  }, [user]);
+
+  const handleSelectAddress = (addrId: string) => {
+    setSelectedAddressId(addrId);
+    if (addrId === "new") {
+      setFormData({
+        fullName: user?.name || "",
+        email: user?.email || "",
+        phone: "",
+        street: "",
+        city: "",
+        state: "",
+        pincode: "",
+      });
+      return;
+    }
+
+    const addr = savedAddresses.find((a) => a._id === addrId);
+    if (addr) {
+      const streetParts = [
+        addr.addressLine1,
+        addr.addressLine2,
+        addr.landmark ? `Near ${addr.landmark}` : "",
+      ].filter(Boolean);
+
+      setFormData({
+        fullName: addr.fullName || user?.name || "",
+        email: user?.email || "",
+        phone: addr.phone || "",
+        street: streetParts.join(", ") || addr.addressLine1 || "",
+        city: addr.city || "",
+        state: addr.state || "",
+        pincode: addr.pincode || "",
+      });
+    }
+  };
 
   // 50% advance includes subtotal + shipping charge
   const advanceToPay =
@@ -301,6 +408,85 @@ export default function CheckoutPage() {
                 <h3 className="font-serif text-lg font-bold text-[#1A1A1A] uppercase tracking-wider border-b border-[#D8C9B0]/50 pb-3">
                   1. Shipping & Contact Details
                 </h3>
+
+                {/* Saved Address Selector (Autofill support) */}
+                {savedAddresses.length > 0 && (
+                  <div className="bg-white border border-[#D8C9B0] rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] uppercase tracking-wider font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-[#C6A664]" />
+                        <span>Select From Saved Addresses</span>
+                      </label>
+                      <span className="text-[10px] text-[#C6A664] font-medium font-mono">
+                        {savedAddresses.length} saved
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {savedAddresses.map((addr) => {
+                        const isSelected = selectedAddressId === addr._id;
+                        return (
+                          <div
+                            key={addr._id}
+                            onClick={() => handleSelectAddress(addr._id)}
+                            className={`p-3 rounded border text-xs cursor-pointer transition-all flex items-start gap-3 ${
+                              isSelected
+                                ? "border-[#1A1A1A] bg-[#FAF7F2] ring-1 ring-[#1A1A1A]"
+                                : "border-[#D8C9B0]/60 hover:border-[#1A1A1A]/40 bg-white"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="savedAddressOption"
+                              checked={isSelected}
+                              onChange={() => handleSelectAddress(addr._id)}
+                              className="mt-0.5 text-[#1A1A1A] focus:ring-[#C6A664] cursor-pointer"
+                            />
+                            <div className="flex-1 space-y-0.5 leading-snug">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-[#1A1A1A]">{addr.fullName}</span>
+                                <span className="px-1.5 py-0.5 bg-[#1A1A1A]/5 text-[#1A1A1A] text-[9px] font-mono rounded uppercase font-semibold">
+                                  {addr.label}
+                                </span>
+                                {addr.isDefault && (
+                                  <span className="text-[9px] text-[#C6A664] font-semibold tracking-wide uppercase">
+                                    • Default Address
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[#1A1A1A]/80 text-[11px]">
+                                {[addr.addressLine1, addr.addressLine2, addr.landmark].filter(Boolean).join(", ")}
+                              </p>
+                              <p className="text-[#1A1A1A]/70 text-[11px]">
+                                {addr.city}, {addr.state} — <span className="font-mono">{addr.pincode}</span> | Tel: {addr.phone}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      <div
+                        onClick={() => handleSelectAddress("new")}
+                        className={`p-2.5 rounded border text-xs cursor-pointer transition-all flex items-center gap-2.5 ${
+                          selectedAddressId === "new"
+                            ? "border-[#1A1A1A] bg-[#FAF7F2] ring-1 ring-[#1A1A1A]"
+                            : "border-[#D8C9B0]/60 hover:border-[#1A1A1A]/40 bg-white"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="savedAddressOption"
+                          checked={selectedAddressId === "new"}
+                          onChange={() => handleSelectAddress("new")}
+                          className="text-[#1A1A1A] focus:ring-[#C6A664] cursor-pointer"
+                        />
+                        <span className="font-semibold text-[#1A1A1A]">
+                          + Deliver to a new / different address
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>

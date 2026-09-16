@@ -31,13 +31,10 @@ export const HomePreloader: React.FC = () => {
     // Lock body scroll while preloader is active
     document.body.style.overflow = "hidden";
 
-    // 1. Fetch admin settings to check if preloader is enabled or custom logo URL exists
+    // 1. Fetch public settings to check if preloader is enabled or custom logo URL exists
     let isMounted = true;
-    fetch("/api/admin/settings")
-      .then((res) => {
-        if (!res.ok) return fetch("/api/settings").then((r) => r.json());
-        return res.json();
-      })
+    fetch(`/api/settings?_t=${Date.now()}`)
+      .then((res) => res.json())
       .then((data) => {
         if (!isMounted) return;
         if (data?.settings?.preloaderEnabled === false) {

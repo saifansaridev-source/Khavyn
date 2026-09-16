@@ -54,23 +54,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert incoming File/Blob to Node.js Buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // If uploading video and ImageKit is configured, route to ImageKit
+    // Route video uploads strictly to ImageKit
     const imagekitPrivateKey = process.env.IMAGEKIT_PRIVATE_KEY?.replace(/^["']|["']$/g, "").trim();
-    if (resourceType === "video" && imagekitPrivateKey) {
+    if (resourceType === "video") {
+      if (!imagekitPrivateKey) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "ImageKit credentials are missing on the server. Please ensure IMAGEKIT_PRIVATE_KEY is configured in .env.local.",
+          },
+          { status: 500 }
+        );
+      }
+
       try {
         const authHeader = "Basic " + Buffer.from(imagekitPrivateKey + ":").toString("base64");
         const ikFormData = new FormData();
-        ikFormData.append(
-          "file",
-          "data:" + (file.type || "video/mp4") + ";base64," + buffer.toString("base64")
-        );
+        // Send file directly as Blob/File without base64 conversion
+        ikFormData.append("file", file, file.name || `video_${Date.now()}.mp4`);
         ikFormData.append("fileName", file.name || `video_${Date.now()}.mp4`);
-        const ikFolder = requestedFolder.startsWith("/") ? requestedFolder : `/${requestedFolder}`;
-        ikFormData.append("folder", ikFolder);
+        const targetVideoFolder = requestedFolder.includes("product")
+          ? "/khavyn/product-videos"
+          : (requestedFolder.startsWith("/") ? requestedFolder : `/${requestedFolder}`);
+        ikFormData.append("folder", targetVideoFolder);
 
         const ikRes = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
           method: "POST",
@@ -87,14 +93,32 @@ export async function POST(req: NextRequest) {
             url: ikData.url,
             publicId: ikData.fileId,
             format: ikData.fileType || "video",
-            bytes: ikData.size || buffer.length,
+            bytes: ikData.size || file.size,
           });
         }
-        console.warn("ImageKit upload error, falling back to Cloudinary:", ikData);
-      } catch (ikErr) {
-        console.warn("ImageKit upload exception, falling back to Cloudinary:", ikErr);
+
+        return NextResponse.json(
+          {
+            success: false,
+            error: ikData.message || "Failed to upload video to ImageKit. Please check file format and size.",
+          },
+          { status: 500 }
+        );
+      } catch (ikErr: any) {
+        console.error("ImageKit upload exception:", ikErr);
+        return NextResponse.json(
+          {
+            success: false,
+            error: ikErr.message || "Exception while uploading video to ImageKit.",
+          },
+          { status: 500 }
+        );
       }
     }
+
+    // Convert incoming File/Blob to Node.js Buffer for Cloudinary images
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     // Upload via stream to Cloudinary
     const result = await new Promise<UploadApiResponse>((resolve, reject) => {

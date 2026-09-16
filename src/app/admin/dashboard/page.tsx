@@ -591,17 +591,23 @@ export default function AdminDashboardPage() {
   const handleSaveStoreSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch("/api/admin/settings", {
+      const res = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(storeSettings),
       });
+      if (res.ok) {
+        setSettingsSaveNotice(true);
+        setTimeout(() => setSettingsSaveNotice(false), 3000);
+        addAuditLog("UPDATE_STORE_SETTINGS", "SETTINGS", "Updated global store configuration & offer popup");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to save store settings to server. Please try again.");
+      }
     } catch (err) {
       console.error("Failed to save store settings to server", err);
+      alert("Network error while saving store settings.");
     }
-    setSettingsSaveNotice(true);
-    setTimeout(() => setSettingsSaveNotice(false), 3000);
-    addAuditLog("UPDATE_STORE_SETTINGS", "SETTINGS", "Updated global store configuration & offer popup");
   };
 
   const addAuditLog = (action: string, module: string, details: string) => {
@@ -1781,35 +1787,17 @@ export default function AdminDashboardPage() {
                               </div>
                             </div>
 
-                            <input
-                              type="text"
+                            <DragDropUpload
+                              label={`Hero Slide #${imgIdx + 1}`}
                               value={imgUrl}
-                              placeholder="https://res.cloudinary.com/... or https://images.unsplash.com/..."
-                              onChange={(e) => {
+                              folder="khavyn/hero"
+                              resourceType="image"
+                              onChange={(newUrl) => {
                                 const updated = [...storeSettings.heroImages];
-                                updated[imgIdx] = e.target.value;
+                                updated[imgIdx] = newUrl;
                                 setStoreSettings({ ...storeSettings, heroImages: updated });
                               }}
-                              className="w-full bg-[#0D0D0D] border border-white/20 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6A664]"
                             />
-
-                            {imgUrl ? (
-                              <div className="relative h-24 w-full rounded overflow-hidden border border-white/10 bg-black/40">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={imgUrl}
-                                  alt={`Slide ${imgIdx + 1} preview`}
-                                  className="w-full h-full object-cover object-top"
-                                  onError={(e) => {
-                                    (e.target as HTMLElement).style.display = "none";
-                                  }}
-                                />
-                              </div>
-                            ) : (
-                              <div className="h-14 w-full rounded border border-dashed border-white/10 flex items-center justify-center text-[10px] text-white/40">
-                                Enter a valid image URL above to preview
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -1845,28 +1833,18 @@ export default function AdminDashboardPage() {
                           Card {idx + 1} — {card.slug}
                         </p>
 
-                        <div>
-                          <label className="text-[10px] uppercase font-bold text-white/70 block mb-1">Image URL (Cloudinary)</label>
-                          <input
-                            type="text"
-                            value={card.image}
-                            onChange={(e) => {
-                              const updated = [...storeSettings.collectionImages];
-                              updated[idx] = { ...updated[idx], image: e.target.value };
-                              setStoreSettings({ ...storeSettings, collectionImages: updated });
-                            }}
-                            placeholder="https://res.cloudinary.com/..."
-                            className="w-full bg-[#0F0F0F] border border-white/20 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#C6A664]"
-                          />
-                          {card.image && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={card.image}
-                              alt={card.title}
-                              className="mt-2 h-32 w-full object-cover rounded border border-white/10"
-                            />
-                          )}
-                        </div>
+                        <DragDropUpload
+                          label={`Card ${idx + 1} Image`}
+                          value={card.image}
+                          folder="khavyn/collections"
+                          resourceType="image"
+                          helperText="High-res portrait shot (800x1000px) recommended"
+                          onChange={(newUrl) => {
+                            const updated = [...storeSettings.collectionImages];
+                            updated[idx] = { ...updated[idx], image: newUrl };
+                            setStoreSettings({ ...storeSettings, collectionImages: updated });
+                          }}
+                        />
 
                         <div className="grid grid-cols-2 gap-3">
                           <div>

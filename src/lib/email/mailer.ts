@@ -23,7 +23,7 @@ export async function sendEmail({
         },
         body: JSON.stringify({
           from: `KHAVYN Concierge <${smtpFrom}>`,
-          to: [to],
+          to: [to], 
           subject,
           html,
         }),
