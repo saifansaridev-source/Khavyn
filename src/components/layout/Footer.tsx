@@ -29,10 +29,10 @@ export const Footer: React.FC = () => {
   return (
     <footer className="bg-[#1A1A1A] text-white border-t border-[#C6A664]/30 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 6-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 pb-12 border-b border-white/10">
+        {/* Grid: 2 columns on mobile, 2/4 on md, 6 columns on lg */}
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-6 gap-8 sm:gap-10 pb-12 border-b border-white/10">
           {/* Column 1: Brand */}
-          <div className="lg:col-span-1 space-y-4">
+          <div className="col-span-2 lg:col-span-1 space-y-4">
             <Link href="/" className="inline-block">
               <img
                 src="/logo.png"
@@ -40,7 +40,7 @@ export const Footer: React.FC = () => {
                 className="h-12 sm:h-14 w-auto object-contain hover:opacity-90 transition-opacity"
               />
             </Link>
-            <p className="text-xs text-white/70 leading-relaxed">
+            <p className="text-xs text-white/70 leading-relaxed max-w-sm lg:max-w-none">
               Premium European luxury fashion house for modern menswear. Designed with unyielding commitment to craftsmanship, timeless aesthetics, and ultimate fabric comfort.
             </p>
 
@@ -75,9 +75,8 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-
           {/* Column 2: Shop */}
-          <div className="space-y-3">
+          <div className="col-span-1 space-y-3">
             <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
               Signature Shop
             </h4>
@@ -111,7 +110,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 3: Customer Care */}
-          <div className="space-y-3">
+          <div className="col-span-1 space-y-3">
             <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
               Customer Care
             </h4>
@@ -150,11 +149,11 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 4: Policies */}
-          <div className="space-y-3">
+          <div className="col-span-2 sm:col-span-1 lg:col-span-1 space-y-3">
             <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
               Legal & Policies
             </h4>
-            <ul className="space-y-2 text-xs text-white/70">
+            <ul className="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-2 text-xs text-white/70">
               <li>
                 <Link href="/policies/privacy" className="hover:text-[#C6A664] transition-colors">
                   Privacy Policy
@@ -199,7 +198,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Column 5 & 6: Newsletter with K Logo below */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="col-span-2 lg:col-span-2 space-y-4">
             <h4 className="font-serif text-sm font-semibold tracking-wider text-[#C6A664] uppercase">
               Private Privileges
             </h4>

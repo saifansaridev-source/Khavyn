@@ -102,7 +102,7 @@ export default function ShopPage() {
       <Header />
 
       {/* Header Banner */}
-      <div className="bg-[#1A1A1A] text-white py-12 px-4 text-center border-b border-[#C6A664]/30">
+      <div className="bg-[#1A1A1A] text-white py-6 sm:py-7 px-4 text-center border-b border-[#C6A664]/30">
         <span className="text-[10px] uppercase tracking-[0.3em] text-[#C6A664] font-semibold">
           THE COMPLETE KHAVYN WARDROBE
         </span>
