@@ -52,7 +52,13 @@ const NO_CACHE_HEADERS = {
 
 export async function GET() {
   try {
-    const db = await connectToDatabase();
+    // FIX 2 — Retry connectToDatabase once with 300ms backoff on cold-start/timeout
+    let db = await connectToDatabase();
+    if (!db) {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      db = await connectToDatabase();
+    }
+
     if (db) {
       let settings = await StoreSettings.findOne().lean();
       if (!settings) {
@@ -60,9 +66,27 @@ export async function GET() {
       }
       return NextResponse.json({ success: true, settings }, { headers: NO_CACHE_HEADERS });
     }
-    return NextResponse.json({ success: true, settings: DEFAULT_SETTINGS }, { headers: NO_CACHE_HEADERS });
+
+    // FIX 1 — Stop silently falling back to DEFAULT_SETTINGS on connection failure
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Database temporarily unavailable, please retry",
+        settings: DEFAULT_SETTINGS,
+      },
+      { status: 503, headers: NO_CACHE_HEADERS }
+    );
   } catch (err: any) {
-    return NextResponse.json({ success: true, settings: DEFAULT_SETTINGS }, { headers: NO_CACHE_HEADERS });
+    // FIX 1 — Log the real error and return 503 with actual error message included
+    console.error("GET /api/admin/settings error:", err);
+    return NextResponse.json(
+      {
+        success: false,
+        error: err?.message || "Database temporarily unavailable, please retry",
+        settings: DEFAULT_SETTINGS,
+      },
+      { status: 503, headers: NO_CACHE_HEADERS }
+    );
   }
 }
 

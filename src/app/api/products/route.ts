@@ -12,28 +12,50 @@ import {
 const DEFAULT_IMAGE =
   "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1000&auto=format&fit=crop&q=80";
 
+function formatErrorMessage(err: any): string {
+  if (!err) return "Database error. Please try again.";
+  if (err.code === 11000) {
+    const fields = Object.keys(err.keyPattern || err.keyValue || {});
+    const fieldName = fields.length > 0 ? fields.join(", ") : "slug or identifier";
+    return `Duplicate key collision on ${fieldName}. Please use a unique product name or style code.`;
+  }
+  if (err.name === "ValidationError") {
+    const errorDetails = Object.values(err.errors || {})
+      .map((e: any) => e.message)
+      .filter(Boolean)
+      .join("; ");
+    return errorDetails || err.message || "Validation failed on product schema.";
+  }
+  return typeof err.message === "string"
+    ? err.message.replace(/:\s*Cast to .* failed.*$/, "")
+    : "An unexpected error occurred while saving to the database.";
+}
+
 function normalizeProductPayload(body: any) {
-  const colour = (body.colour || "Classic Gold").trim();
-  const collectionName = (body.collectionName || "Formal Shirts").trim();
+  // FIX 2 — Strip immutable/internal fields before $set or create
+  const { _id, __v, createdAt, updatedAt, ...cleanBody } = body || {};
+
+  const colour = (cleanBody.colour || "Classic Gold").trim();
+  const collectionName = (cleanBody.collectionName || "Formal Shirts").trim();
   const styleCode = (
-    body.styleCode || `KHV-${Math.floor(1000 + Math.random() * 9000)}`
+    cleanBody.styleCode || `KHV-${Math.floor(1000 + Math.random() * 9000)}`
   ).trim();
 
   // Auto-generate name if empty or generic
-  let name = (body.name || "").trim();
+  let name = (cleanBody.name || "").trim();
   if (!name) {
     name = `${colour} Signature ${collectionName}`;
   }
 
   // Auto-generate URL-safe slug
-  let slug = (body.slug || "").trim();
+  let slug = (cleanBody.slug || "").trim();
   if (!slug) {
     slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   }
 
   // Synchronize Hex and RGB values
-  let colourHex = (body.colourHex || "#C6A664").trim();
-  let colourRgb = (body.colourRgb || "").trim();
+  let colourHex = (cleanBody.colourHex || "#C6A664").trim();
+  let colourRgb = (cleanBody.colourRgb || "").trim();
 
   if (colourRgb && (!colourHex || colourHex === "#C6A664")) {
     const parsed = parseRgbString(colourRgb);
@@ -49,40 +71,40 @@ function normalizeProductPayload(body: any) {
   }
 
   // Normalize Images
-  const frontImg = body.images?.front || DEFAULT_IMAGE;
+  const frontImg = cleanBody.images?.front || DEFAULT_IMAGE;
   const images = {
     front: frontImg,
-    side: body.images?.side || frontImg,
-    back: body.images?.back || frontImg,
-    angle45: body.images?.angle45 || frontImg,
-    fabricTexture: body.images?.fabricTexture || frontImg,
-    embroidery: body.images?.embroidery || frontImg,
-    collarLabel: body.images?.collarLabel || frontImg,
-    modelFront: body.images?.modelFront || frontImg,
-    modelSide: body.images?.modelSide || frontImg,
-    modelBack: body.images?.modelBack || frontImg,
-    model45: body.images?.model45 || frontImg,
-    ...(body.images || {}),
+    side: cleanBody.images?.side || frontImg,
+    back: cleanBody.images?.back || frontImg,
+    angle45: cleanBody.images?.angle45 || frontImg,
+    fabricTexture: cleanBody.images?.fabricTexture || frontImg,
+    embroidery: cleanBody.images?.embroidery || frontImg,
+    collarLabel: cleanBody.images?.collarLabel || frontImg,
+    modelFront: cleanBody.images?.modelFront || frontImg,
+    modelSide: cleanBody.images?.modelSide || frontImg,
+    modelBack: cleanBody.images?.modelBack || frontImg,
+    model45: cleanBody.images?.model45 || frontImg,
+    ...(cleanBody.images || {}),
   };
 
   // Normalize Stock & Sizes
   const stock = {
-    S: Number(body.stock?.S ?? 15),
-    M: Number(body.stock?.M ?? 25),
-    L: Number(body.stock?.L ?? 20),
-    XL: Number(body.stock?.XL ?? 10),
-    ...(body.stock || {}),
+    S: Number(cleanBody.stock?.S ?? 15),
+    M: Number(cleanBody.stock?.M ?? 25),
+    L: Number(cleanBody.stock?.L ?? 20),
+    XL: Number(cleanBody.stock?.XL ?? 10),
+    ...(cleanBody.stock || {}),
   };
 
   // Derive active sizes
-  let sizes = Array.isArray(body.sizes) && body.sizes.length > 0 ? body.sizes : [];
+  let sizes = Array.isArray(cleanBody.sizes) && cleanBody.sizes.length > 0 ? cleanBody.sizes : [];
   if (sizes.length === 0) {
     sizes = Object.keys(stock).filter((k) => stock[k] > 0);
     if (sizes.length === 0) sizes = ["S", "M", "L", "XL"];
   }
 
-  return {
-    ...body,
+  const payload: any = {
+    ...cleanBody,
     name,
     slug,
     styleCode,
@@ -90,46 +112,66 @@ function normalizeProductPayload(body: any) {
     colour,
     colourHex,
     colourRgb,
-    price: Number(body.price || 2999),
-    compareAtPrice: Number(body.compareAtPrice || 4999),
+    price: Number(cleanBody.price || 2999),
+    compareAtPrice: Number(cleanBody.compareAtPrice || 4999),
     images,
     stock,
     sizes,
-    videoUrl: body.videoUrl || "",
-    material: body.material || "100% Combed Long-Staple Cotton",
-    fabricWeight: body.fabricWeight || "240 GSM",
-    fit: body.fit || "Tailored Contemporary Fit",
-    collarType: body.collarType || "Structured Spread Collar",
-    sleeve: body.sleeve || "Full Sleeves with Double-Button Cuffs",
-    closure: body.closure || "Mother-of-Pearl Button Placket",
-    occasion: body.occasion || ["Business", "Evening", "Smart Casual"],
+    videoUrl: cleanBody.videoUrl || "",
+    material: cleanBody.material || "100% Combed Long-Staple Cotton",
+    fabricWeight: cleanBody.fabricWeight || "240 GSM",
+    fit: cleanBody.fit || "Tailored Contemporary Fit",
+    collarType: cleanBody.collarType || "Structured Spread Collar",
+    sleeve: cleanBody.sleeve || "Full Sleeves with Double-Button Cuffs",
+    closure: cleanBody.closure || "Mother-of-Pearl Button Placket",
+    occasion: cleanBody.occasion || ["Business", "Evening", "Smart Casual"],
     description:
-      body.description ||
+      cleanBody.description ||
       "Masterfully engineered with premium bio-washed combed cotton for an unyielding drape, silken finish, and unmatched everyday luxury.",
     whyYoullLoveIt:
-      body.whyYoullLoveIt ||
+      cleanBody.whyYoullLoveIt ||
       "Breathable, lightweight, and structured to retain crispness from desk to dinner without crease compromise.",
     styleRecommendation:
-      body.styleRecommendation ||
+      cleanBody.styleRecommendation ||
       "Pair with tailored trousers and handcrafted leather loafers for an effortlessly elevated ensemble.",
-    careInstructions: body.careInstructions || [
+    careInstructions: cleanBody.careInstructions || [
       "Machine wash cold inside-out on gentle cycle",
       "Do not bleach or tumble dry",
       "Warm iron on reverse side",
     ],
-    keyFeatures: body.keyFeatures || [
+    keyFeatures: cleanBody.keyFeatures || [
       "100% Bio-Washed Combed Cotton",
       "Reinforced Collar Architecture",
       "Single-Needle Clean Seam Tailoring",
       "Signature KHAVYN Emblem",
     ],
-    packageContains: body.packageContains || "1 Unit Luxury Garment",
-    countryOfOrigin: body.countryOfOrigin || "India",
-    isBestSeller: Boolean(body.isBestSeller),
-    isNewArrival: Boolean(body.isNewArrival ?? true),
-    customBadge: body.customBadge || "",
-    returnPolicyApplicable: body.returnPolicyApplicable !== false,
+    packageContains: cleanBody.packageContains || "1 Unit Luxury Garment",
+    countryOfOrigin: cleanBody.countryOfOrigin || "India",
+    isBestSeller: Boolean(cleanBody.isBestSeller),
+    isNewArrival: Boolean(cleanBody.isNewArrival ?? true),
+    customBadge: cleanBody.customBadge || "",
+    returnPolicyApplicable: cleanBody.returnPolicyApplicable !== false,
   };
+
+  // Absolute guarantee: remove immutable and internal fields
+  delete payload._id;
+  delete payload.__v;
+  delete payload.createdAt;
+  delete payload.updatedAt;
+
+  return payload;
+}
+
+// FIX 3 — Shared helper to resolve slug collisions across different style codes
+async function resolveUniqueSlug(slug: string, styleCode: string): Promise<string> {
+  let uniqueSlug = slug;
+  const existing = (await Product.findOne({ slug: uniqueSlug }).lean()) as any;
+  if (existing && existing.styleCode !== styleCode) {
+    const cleanSuffix = styleCode.slice(-4).toLowerCase().replace(/[^a-z0-9]/g, "");
+    const suffix = cleanSuffix || Math.floor(100 + Math.random() * 900).toString();
+    uniqueSlug = `${slug}-${suffix}`;
+  }
+  return uniqueSlug;
 }
 
 export async function GET() {
@@ -152,71 +194,118 @@ export async function POST(req: NextRequest) {
     const rawBody = await req.json();
     const payload = normalizeProductPayload(rawBody);
 
-    try {
-      const db = await connectToDatabase();
-      if (db) {
-        // Ensure unique slug if already taken by another style code
-        let uniqueSlug = payload.slug;
-        const existing = await Product.findOne({ slug: uniqueSlug });
-        if (existing && existing.styleCode !== payload.styleCode) {
-          uniqueSlug = `${payload.slug}-${Math.floor(100 + Math.random() * 900)}`;
-        }
-        payload.slug = uniqueSlug;
-
-        // Upsert into MongoDB by styleCode so duplicate calls safely update
-        const saved = await Product.findOneAndUpdate(
-          { styleCode: payload.styleCode },
-          { $set: payload },
-          { new: true, upsert: true }
-        );
-        return NextResponse.json({ success: true, product: saved });
-      }
-    } catch (dbErr: any) {
-      console.warn("MongoDB write encountered error, falling back to dynamic store:", dbErr);
+    // FIX 1 — Do not swallow DB errors; verify connection first
+    const db = await connectToDatabase();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, error: "Database connection unavailable. Please try again." },
+        { status: 503 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Product saved in dynamic store.",
-      product: payload,
-    });
+    // FIX 3 — Handle slug collisions
+    payload.slug = await resolveUniqueSlug(payload.slug, payload.styleCode);
+
+    try {
+      const saved = await Product.findOneAndUpdate(
+        { styleCode: payload.styleCode },
+        { $set: payload },
+        { new: true, upsert: true }
+      );
+      return NextResponse.json({ success: true, product: saved });
+    } catch (dbErr: any) {
+      console.error("MongoDB error in POST /api/products:", dbErr);
+      // FIX 4 — Safe upsert retry on duplicate key (E11000)
+      if (dbErr.code === 11000 || dbErr.message?.includes("E11000")) {
+        try {
+          payload.slug = `${payload.slug}-${Math.floor(1000 + Math.random() * 9000)}`;
+          const retrySaved = await Product.findOneAndUpdate(
+            { styleCode: payload.styleCode },
+            { $set: payload },
+            { new: true, upsert: true }
+          );
+          return NextResponse.json({ success: true, product: retrySaved });
+        } catch (retryErr: any) {
+          console.error("Retry failed in POST /api/products:", retryErr);
+          return NextResponse.json(
+            { success: false, error: formatErrorMessage(retryErr) },
+            { status: 500 }
+          );
+        }
+      }
+      return NextResponse.json(
+        { success: false, error: formatErrorMessage(dbErr) },
+        { status: 500 }
+      );
+    }
   } catch (err: any) {
     console.error("POST /api/products error:", err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: formatErrorMessage(err) },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(req: NextRequest) {
   try {
     const rawBody = await req.json();
-    if (!rawBody.styleCode) {
+    if (!rawBody?.styleCode) {
       return NextResponse.json({ success: false, error: "Missing style code" }, { status: 400 });
     }
 
     const payload = normalizeProductPayload(rawBody);
 
-    try {
-      const db = await connectToDatabase();
-      if (db) {
-        const updated = await Product.findOneAndUpdate(
-          { styleCode: payload.styleCode },
-          { $set: payload },
-          { new: true, upsert: true }
-        );
-        return NextResponse.json({ success: true, product: updated });
-      }
-    } catch (dbErr: any) {
-      console.warn("MongoDB update encountered error, falling back to dynamic store:", dbErr);
+    // FIX 1 — Do not swallow DB errors; verify connection first
+    const db = await connectToDatabase();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, error: "Database connection unavailable. Please try again." },
+        { status: 503 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Product updated in dynamic store.",
-      product: payload,
-    });
+    // FIX 3 — Handle slug collisions in PUT before findOneAndUpdate
+    payload.slug = await resolveUniqueSlug(payload.slug, payload.styleCode);
+
+    try {
+      const updated = await Product.findOneAndUpdate(
+        { styleCode: payload.styleCode },
+        { $set: payload },
+        { new: true, upsert: true }
+      );
+      return NextResponse.json({ success: true, product: updated });
+    } catch (dbErr: any) {
+      console.error("MongoDB error in PUT /api/products:", dbErr);
+      // FIX 4 — Safe upsert retry on duplicate key (E11000)
+      if (dbErr.code === 11000 || dbErr.message?.includes("E11000")) {
+        try {
+          payload.slug = `${payload.slug}-${Math.floor(1000 + Math.random() * 9000)}`;
+          const retryUpdated = await Product.findOneAndUpdate(
+            { styleCode: payload.styleCode },
+            { $set: payload },
+            { new: true, upsert: true }
+          );
+          return NextResponse.json({ success: true, product: retryUpdated });
+        } catch (retryErr: any) {
+          console.error("Retry failed in PUT /api/products:", retryErr);
+          return NextResponse.json(
+            { success: false, error: formatErrorMessage(retryErr) },
+            { status: 500 }
+          );
+        }
+      }
+      return NextResponse.json(
+        { success: false, error: formatErrorMessage(dbErr) },
+        { status: 500 }
+      );
+    }
   } catch (err: any) {
     console.error("PUT /api/products error:", err);
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: formatErrorMessage(err) },
+      { status: 500 }
+    );
   }
 }
 
@@ -229,17 +318,21 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Missing styleCode" }, { status: 400 });
     }
 
-    try {
-      const db = await connectToDatabase();
-      if (db) {
-        await Product.findOneAndDelete({ styleCode });
-      }
-    } catch (dbErr) {
-      console.warn("MongoDB delete fallback:", dbErr);
+    const db = await connectToDatabase();
+    if (!db) {
+      return NextResponse.json(
+        { success: false, error: "Database connection unavailable. Please try again." },
+        { status: 503 }
+      );
     }
 
+    await Product.findOneAndDelete({ styleCode });
     return NextResponse.json({ success: true, message: `Product ${styleCode} deleted.` });
   } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    console.error("DELETE /api/products error:", err);
+    return NextResponse.json(
+      { success: false, error: formatErrorMessage(err) },
+      { status: 500 }
+    );
   }
 }

@@ -63,38 +63,47 @@ export default function AdminDashboardPage() {
     const fetchAdminSettings = async () => {
       try {
         const res = await fetch(`/api/admin/settings?_t=${Date.now()}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.settings) {
-            const s = data.settings;
-            const offer = s.offerPopup || {};
-            setStoreSettings((prev) => ({
-              ...prev,
-              ...s,
-              heroImages:
-                Array.isArray(s.heroImages) && s.heroImages.length > 0
-                  ? s.heroImages
-                  : (s.heroImage ? [s.heroImage] : prev.heroImages),
-              offerPopup: {
-                ...prev.offerPopup,
-                ...offer,
-              },
-              // Hydrate top-level popup fields, falling back to offerPopup values for older records
-              popupEnabled: typeof s.popupEnabled === "boolean" ? s.popupEnabled : Boolean(offer.enabled),
-              popupImage: s.popupImage || prev.popupImage || "",
-              popupHeadline: s.popupHeadline || offer.title || prev.popupHeadline,
-              popupSubtext: s.popupSubtext || offer.subtitle || prev.popupSubtext,
-              popupCouponCode: s.popupCouponCode ?? offer.couponCode ?? prev.popupCouponCode ?? "",
-              popupCtaText: s.popupCtaText || offer.ctaText || prev.popupCtaText,
-              popupCtaLink: s.popupCtaLink || offer.ctaLink || prev.popupCtaLink,
-              popupDelaySeconds: typeof s.popupDelaySeconds === "number" ? s.popupDelaySeconds : prev.popupDelaySeconds,
-              popupFrequency: s.popupFrequency || offer.frequency || prev.popupFrequency,
-              popupShowOnMobile: typeof s.popupShowOnMobile === "boolean" ? s.popupShowOnMobile : prev.popupShowOnMobile,
-            }));
-          }
+        const data = await res.json().catch(() => null);
+
+        // FIX 3: If success is false or request failed, do NOT overwrite current storeSettings state
+        if (!res.ok || !data || data.success === false) {
+          const errMsg = data?.error || `Failed to fetch settings (HTTP ${res.status})`;
+          console.warn("Failed to load live store settings from DB, preserving current state:", errMsg);
+          setSettingsLoadError(errMsg);
+          return;
         }
-      } catch (err) {
-        console.error("Failed to load store settings", err);
+
+        setSettingsLoadError(null);
+        if (data?.settings) {
+          const s = data.settings;
+          const offer = s.offerPopup || {};
+          setStoreSettings((prev) => ({
+            ...prev,
+            ...s,
+            heroImages:
+              Array.isArray(s.heroImages) && s.heroImages.length > 0
+                ? s.heroImages
+                : (s.heroImage ? [s.heroImage] : prev.heroImages),
+            offerPopup: {
+              ...prev.offerPopup,
+              ...offer,
+            },
+            // Hydrate top-level popup fields, falling back to offerPopup values for older records
+            popupEnabled: typeof s.popupEnabled === "boolean" ? s.popupEnabled : Boolean(offer.enabled),
+            popupImage: s.popupImage || prev.popupImage || "",
+            popupHeadline: s.popupHeadline || offer.title || prev.popupHeadline,
+            popupSubtext: s.popupSubtext || offer.subtitle || prev.popupSubtext,
+            popupCouponCode: s.popupCouponCode ?? offer.couponCode ?? prev.popupCouponCode ?? "",
+            popupCtaText: s.popupCtaText || offer.ctaText || prev.popupCtaText,
+            popupCtaLink: s.popupCtaLink || offer.ctaLink || prev.popupCtaLink,
+            popupDelaySeconds: typeof s.popupDelaySeconds === "number" ? s.popupDelaySeconds : prev.popupDelaySeconds,
+            popupFrequency: s.popupFrequency || offer.frequency || prev.popupFrequency,
+            popupShowOnMobile: typeof s.popupShowOnMobile === "boolean" ? s.popupShowOnMobile : prev.popupShowOnMobile,
+          }));
+        }
+      } catch (err: any) {
+        console.warn("Failed to load store settings, preserving state:", err);
+        setSettingsLoadError(err?.message || "Failed to load store settings");
       }
     };
     fetchAdminSettings();
@@ -406,6 +415,7 @@ export default function AdminDashboardPage() {
     returnPolicyNotice: "Hassle-free 7-day returns & exchanges on all eligible unworn apparel items.",
   });
   const [settingsSaveNotice, setSettingsSaveNotice] = useState(false);
+  const [settingsLoadError, setSettingsLoadError] = useState<string | null>(null);
 
   // 7. AUDIT LOGS STATE
   const [auditLogs, setAuditLogs] = useState([
@@ -1541,6 +1551,13 @@ export default function AdminDashboardPage() {
                   <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-4 py-2 rounded text-xs font-bold flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
                     <span>Store Configuration Saved Live!</span>
+                  </div>
+                )}
+
+                {settingsLoadError && (
+                  <div className="bg-amber-500/20 border border-amber-500/40 text-amber-400 px-4 py-2 rounded text-xs font-semibold flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    <span>{settingsLoadError}</span>
                   </div>
                 )}
               </div>
