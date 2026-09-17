@@ -40,8 +40,17 @@ import {
   ArrowUp,
   ArrowDown,
   Menu,
+  BookOpen,
+  Loader2,
 } from "lucide-react";
-import { SEED_PRODUCTS, ProductSeedInput } from "@/lib/data/productsData";
+import {
+  SEED_PRODUCTS,
+  ProductSeedInput,
+  hexToRgb,
+  rgbToHex,
+  formatRgbString,
+  parseRgbString,
+} from "@/lib/data/productsData";
 import { useProductStore } from "@/store/useProductStore";
 import { DragDropUpload } from "@/components/admin/DragDropUpload";
 import { ImageDropzone } from "@/components/admin/ImageDropzone";
@@ -153,19 +162,28 @@ export default function AdminDashboardPage() {
   // Modal State for Product Add / Edit
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductSeedInput | null>(null);
+  const [isSavingProduct, setIsSavingProduct] = useState(false);
+  const [productModalError, setProductModalError] = useState<string | null>(null);
+  const [isCustomCollection, setIsCustomCollection] = useState(false);
+  const [titleManuallyEdited, setTitleManuallyEdited] = useState(false);
 
   const defaultProductTemplate: ProductSeedInput = {
     ...SEED_PRODUCTS[0],
-    name: "",
-    slug: "",
+    name: "White Signature Formal Shirt",
+    slug: "white-signature-formal-shirt",
     styleCode: "KHV-NEW-01",
+    collectionName: "Formal Shirts",
+    colour: "White",
+    colourHex: "#FFFFFF",
+    colourRgb: "rgb(255, 255, 255)",
     price: 2999,
     compareAtPrice: 4999,
     customBadge: "",
     returnPolicyApplicable: true,
     isBestSeller: false,
     isNewArrival: true,
-    stock: { S: 10, M: 25, L: 20, XL: 15 },
+    sizes: ["S", "M", "L", "XL"],
+    stock: { XS: 0, S: 10, M: 25, L: 20, XL: 15, XXL: 0 },
     videoUrl: "",
   };
 
@@ -465,31 +483,122 @@ export default function AdminDashboardPage() {
   }, [customersList, customerSearch]);
 
   // HANDLERS
+  const STANDARD_COLLECTIONS = [
+    "Formal Shirts",
+    "Polo T-Shirts",
+    "Oversized T-Shirts",
+    "Round Neck T-Shirts",
+    "Baggy T-Shirts",
+    "Classic T-Shirts",
+    "Casual Shirts",
+  ];
+
   const handleOpenAddProduct = () => {
     setEditingProduct(null);
+    setTitleManuallyEdited(false);
+    setIsCustomCollection(false);
+    setProductModalError(null);
+    const randSku = `KHV-${Math.floor(1000 + Math.random() * 9000)}`;
     setProductForm({
       ...defaultProductTemplate,
-      styleCode: `KHV-SHIRT-${Math.floor(1000 + Math.random() * 9000)}`,
+      styleCode: randSku,
+      name: "White Signature Formal Shirts",
+      slug: "white-signature-formal-shirts",
+      colour: "White",
+      colourHex: "#FFFFFF",
+      colourRgb: "rgb(255, 255, 255)",
+      collectionName: "Formal Shirts",
     });
     setIsProductModalOpen(true);
   };
 
   const handleOpenEditProduct = (prod: ProductSeedInput) => {
     setEditingProduct(prod);
-    setProductForm({ ...prod });
+    setTitleManuallyEdited(true);
+    setIsCustomCollection(!STANDARD_COLLECTIONS.includes(prod.collectionName));
+    setProductModalError(null);
+
+    let rgbStr = prod.colourRgb || "";
+    if (!rgbStr && prod.colourHex) {
+      const rgb = hexToRgb(prod.colourHex);
+      if (rgb) rgbStr = formatRgbString(rgb.r, rgb.g, rgb.b);
+    }
+
+    setProductForm({
+      ...prod,
+      colourRgb: rgbStr,
+      stock: {
+        XS: (prod.stock as any)?.XS ?? 0,
+        S: prod.stock?.S ?? 0,
+        M: prod.stock?.M ?? 0,
+        L: prod.stock?.L ?? 0,
+        XL: prod.stock?.XL ?? 0,
+        XXL: (prod.stock as any)?.XXL ?? 0,
+      },
+    });
     setIsProductModalOpen(true);
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingProduct) {
-      await updateProduct(productForm);
-      addAuditLog("UPDATE_PRODUCT", "CATALOGUE", `Updated ${productForm.name} stock & pricing`);
-    } else {
-      await addProduct(productForm);
-      addAuditLog("CREATE_PRODUCT", "CATALOGUE", `Added new product ${productForm.name}`);
+    setIsSavingProduct(true);
+    setProductModalError(null);
+
+    let finalForm = { ...productForm };
+
+    // Auto-detect & generate title if blank
+    if (!finalForm.name.trim()) {
+      finalForm.name = `${finalForm.colour || "Signature"} ${finalForm.collectionName || "Apparel"}`.trim();
     }
-    setIsProductModalOpen(false);
+    if (!finalForm.slug.trim()) {
+      finalForm.slug = finalForm.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    // Ensure RGB is populated from Hex or vice versa
+    if (!finalForm.colourRgb && finalForm.colourHex) {
+      const rgb = hexToRgb(finalForm.colourHex);
+      if (rgb) finalForm.colourRgb = formatRgbString(rgb.r, rgb.g, rgb.b);
+    } else if (finalForm.colourRgb && (!finalForm.colourHex || finalForm.colourHex === "#C6A664")) {
+      const parsed = parseRgbString(finalForm.colourRgb);
+      if (parsed) finalForm.colourHex = rgbToHex(parsed.r, parsed.g, parsed.b);
+    }
+
+    // Sync sizes with stock
+    const activeSizes = Object.keys(finalForm.stock).filter(
+      (k) => (finalForm.stock as any)[k] > 0
+    );
+    finalForm.sizes = activeSizes.length > 0 ? activeSizes : ["S", "M", "L", "XL"];
+
+    try {
+      let result: { success: boolean; error?: string };
+      if (editingProduct) {
+        result = await updateProduct(finalForm);
+        if (result.success) {
+          addAuditLog("UPDATE_PRODUCT", "CATALOGUE", `Updated ${finalForm.name} stock & pricing`);
+        }
+      } else {
+        result = await addProduct(finalForm);
+        if (result.success) {
+          addAuditLog("CREATE_PRODUCT", "CATALOGUE", `Added new product ${finalForm.name}`);
+        }
+      }
+
+      if (!result.success) {
+        setProductModalError(result.error || "Failed to save product. Please check fields and try again.");
+        setIsSavingProduct(false);
+        return;
+      }
+
+      setIsProductModalOpen(false);
+    } catch (err: any) {
+      console.error("Save product exception:", err);
+      setProductModalError(err.message || "An unexpected error occurred while saving.");
+    } finally {
+      setIsSavingProduct(false);
+    }
   };
 
   const handleDeleteProduct = async (styleCode: string) => {
@@ -807,6 +916,18 @@ export default function AdminDashboardPage() {
               <div className="flex items-center gap-2">
                 <Megaphone className="w-3.5 h-3.5" />
                 <span>Promotional Popup</span>
+              </div>
+              <span className="text-[10px] font-mono font-bold bg-[#C6A664]/20 text-[#C6A664] px-1.5 py-0.5 rounded">NEW</span>
+            </Link>
+
+            <Link
+              href="/admin/blogs"
+              onClick={() => setMobileSidebarOpen(false)}
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded text-xs font-semibold uppercase tracking-wider text-[#C6A664] bg-[#C6A664]/10 border border-[#C6A664]/30 hover:bg-[#C6A664]/20 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Blog Admin</span>
               </div>
               <span className="text-[10px] font-mono font-bold bg-[#C6A664]/20 text-[#C6A664] px-1.5 py-0.5 rounded">NEW</span>
             </Link>
@@ -2085,21 +2206,41 @@ export default function AdminDashboardPage() {
               {editingProduct ? `Edit Product: ${editingProduct.name}` : "Add New Product to Catalogue"}
             </h3>
 
+            {productModalError && (
+              <div className="bg-red-950/60 border border-red-500/40 text-red-200 text-xs p-3 rounded-lg flex items-center justify-between gap-2">
+                <span>{productModalError}</span>
+                <button
+                  type="button"
+                  onClick={() => setProductModalError(null)}
+                  className="text-red-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-semibold uppercase text-white/70 block mb-1">Product Title *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[10px] font-semibold uppercase text-white/70">Product Title *</label>
+                    {!titleManuallyEdited && (
+                      <span className="text-[9px] text-[#C6A664] font-medium">Auto-detected from attributes</span>
+                    )}
+                  </div>
                   <input
                     type="text"
                     required
                     value={productForm.name}
-                    onChange={(e) =>
+                    placeholder="e.g. Sage Green Signature Polo T-Shirt"
+                    onChange={(e) => {
+                      setTitleManuallyEdited(true);
                       setProductForm({
                         ...productForm,
                         name: e.target.value,
-                        slug: e.target.value.toLowerCase().replace(/ /g, "-"),
-                      })
-                    }
+                        slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""),
+                      });
+                    }}
                     className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-[#C6A664]"
                   />
                 </div>
@@ -2116,22 +2257,59 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-semibold uppercase text-white/70 block mb-1">Collection *</label>
-                  <select
-                    value={productForm.collectionName}
-                    onChange={(e) =>
-                      setProductForm({
-                        ...productForm,
-                        collectionName: e.target.value as any,
-                      })
-                    }
-                    className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-[#C6A664]"
-                  >
-                    <option value="Formal Shirts">Formal Shirts</option>
-                    <option value="Polo T-Shirts">Polo T-Shirts</option>
-                    <option value="Oversized T-Shirts">Oversized T-Shirts</option>
-                    <option value="Round Neck T-Shirts">Round Neck T-Shirts</option>
-                  </select>
+                  <label className="text-[10px] font-semibold uppercase text-white/70 block mb-1">Product Type / Collection *</label>
+                  <div className="space-y-2">
+                    <select
+                      value={isCustomCollection ? "custom" : productForm.collectionName}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "custom") {
+                          setIsCustomCollection(true);
+                        } else {
+                          setIsCustomCollection(false);
+                          setProductForm((prev) => {
+                            const upd = { ...prev, collectionName: val };
+                            if (!titleManuallyEdited && !editingProduct) {
+                              upd.name = `${upd.colour || "Signature"} Signature ${val}`;
+                              upd.slug = upd.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+                            }
+                            return upd;
+                          });
+                        }
+                      }}
+                      className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-[#C6A664]"
+                    >
+                      <option value="Formal Shirts">Formal Shirts</option>
+                      <option value="Polo T-Shirts">Polo T-Shirts</option>
+                      <option value="Oversized T-Shirts">Oversized T-Shirts</option>
+                      <option value="Round Neck T-Shirts">Round Neck T-Shirts</option>
+                      <option value="Baggy T-Shirts">Baggy T-Shirts</option>
+                      <option value="Classic T-Shirts">Classic T-Shirts</option>
+                      <option value="Casual Shirts">Casual Shirts</option>
+                      <option value="custom">Custom / Other Product Type...</option>
+                    </select>
+
+                    {isCustomCollection && (
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter custom product type (e.g. Baggy, Henley, Hoodies)"
+                        value={productForm.collectionName}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setProductForm((prev) => {
+                            const upd = { ...prev, collectionName: val };
+                            if (!titleManuallyEdited && !editingProduct) {
+                              upd.name = `${upd.colour || "Signature"} Signature ${val}`;
+                              upd.slug = upd.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+                            }
+                            return upd;
+                          });
+                        }}
+                        className="w-full bg-[#141414] border border-[#C6A664]/60 rounded px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-[#C6A664]"
+                      />
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -2182,40 +2360,173 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* Colour Selection & Hex Picker */}
-              <div className="border-t border-white/10 pt-3 space-y-2">
-                <label className="text-[10px] font-semibold uppercase text-white/70 block">
-                  Colour Variant Settings *
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Colour Variant Settings with Full RGB & Hex Support */}
+              <div className="border-t border-white/10 pt-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-semibold uppercase text-white/70 block">
+                    Colour Variant Settings & RGB Engine *
+                  </label>
+                  <span className="text-[10px] text-[#C6A664]">
+                    Live Hex ↔ RGB Synchronized
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Colour Name */}
                   <div>
-                    <span className="text-[10px] text-white/50 block mb-1">Colour Name (e.g. Sage Green)</span>
+                    <span className="text-[10px] text-white/50 block mb-1">Colour Name (e.g. Sage Green, Midnight Navy)</span>
                     <input
                       type="text"
                       required
                       value={productForm.colour}
-                      onChange={(e) => setProductForm({ ...productForm, colour: e.target.value })}
+                      placeholder="e.g. Sage Green"
+                      onChange={(e) => {
+                        const newCol = e.target.value;
+                        setProductForm((prev) => {
+                          const upd = { ...prev, colour: newCol };
+                          if (!titleManuallyEdited && !editingProduct) {
+                            upd.name = `${newCol} Signature ${upd.collectionName}`;
+                            upd.slug = upd.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+                          }
+                          return upd;
+                        });
+                      }}
                       className="w-full bg-[#141414] border border-white/20 rounded px-3 py-2 text-white focus:outline-none focus:border-[#C6A664]"
                     />
                   </div>
+
+                  {/* Hex Color Picker */}
                   <div>
                     <span className="text-[10px] text-white/50 block mb-1">Colour Swatch Hex Code</span>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
                         value={productForm.colourHex || "#C6A664"}
-                        onChange={(e) => setProductForm({ ...productForm, colourHex: e.target.value })}
-                        className="w-9 h-9 rounded cursor-pointer border-0 bg-transparent"
+                        onChange={(e) => {
+                          const hex = e.target.value.toUpperCase();
+                          const rgb = hexToRgb(hex);
+                          setProductForm({
+                            ...productForm,
+                            colourHex: hex,
+                            colourRgb: rgb ? formatRgbString(rgb.r, rgb.g, rgb.b) : productForm.colourRgb,
+                          });
+                        }}
+                        className="w-9 h-9 rounded cursor-pointer border-0 bg-transparent shrink-0"
                       />
                       <input
                         type="text"
                         value={productForm.colourHex || "#C6A664"}
-                        onChange={(e) => setProductForm({ ...productForm, colourHex: e.target.value })}
+                        placeholder="#C6A664"
+                        onChange={(e) => {
+                          const hex = e.target.value.trim().toUpperCase();
+                          const rgb = hexToRgb(hex);
+                          setProductForm({
+                            ...productForm,
+                            colourHex: hex,
+                            colourRgb: rgb ? formatRgbString(rgb.r, rgb.g, rgb.b) : productForm.colourRgb,
+                          });
+                        }}
                         className="flex-1 bg-[#141414] border border-white/20 rounded px-3 py-2 font-mono text-white focus:outline-none focus:border-[#C6A664]"
                       />
                     </div>
                   </div>
                 </div>
+
+                {/* RGB Channels & Format Row */}
+                {(() => {
+                  const currentRgb = hexToRgb(productForm.colourHex || "#C6A664") || { r: 198, g: 166, b: 100 };
+                  const rgbStr = productForm.colourRgb || formatRgbString(currentRgb.r, currentRgb.g, currentRgb.b);
+
+                  const updateRgbChannel = (channel: "r" | "g" | "b", val: number) => {
+                    const clamped = Math.max(0, Math.min(255, val || 0));
+                    const nextRgb = { ...currentRgb, [channel]: clamped };
+                    const nextHex = rgbToHex(nextRgb.r, nextRgb.g, nextRgb.b);
+                    const nextStr = formatRgbString(nextRgb.r, nextRgb.g, nextRgb.b);
+                    setProductForm({
+                      ...productForm,
+                      colourHex: nextHex,
+                      colourRgb: nextStr,
+                    });
+                  };
+
+                  return (
+                    <div className="bg-[#141414] p-3 rounded-lg border border-white/10 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase font-bold text-white/70">
+                          RGB Precision Adjustment
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="inline-block w-4 h-4 rounded-full border border-white/30 shadow-sm"
+                            style={{ backgroundColor: productForm.colourHex || "#C6A664" }}
+                          />
+                          <span className="text-[10px] font-mono text-[#C6A664] font-semibold">
+                            {rgbStr}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2">
+                        <div>
+                          <span className="text-[9px] text-white/50 block mb-0.5">R (Red)</span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="255"
+                            value={currentRgb.r}
+                            onChange={(e) => updateRgbChannel("r", Number(e.target.value))}
+                            className="w-full bg-[#1F1F1F] border border-white/20 rounded px-2 py-1 text-center font-mono text-white text-xs"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-white/50 block mb-0.5">G (Green)</span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="255"
+                            value={currentRgb.g}
+                            onChange={(e) => updateRgbChannel("g", Number(e.target.value))}
+                            className="w-full bg-[#1F1F1F] border border-white/20 rounded px-2 py-1 text-center font-mono text-white text-xs"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-white/50 block mb-0.5">B (Blue)</span>
+                          <input
+                            type="number"
+                            min="0"
+                            max="255"
+                            value={currentRgb.b}
+                            onChange={(e) => updateRgbChannel("b", Number(e.target.value))}
+                            className="w-full bg-[#1F1F1F] border border-white/20 rounded px-2 py-1 text-center font-mono text-white text-xs"
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[9px] text-white/50 block mb-0.5">RGB String</span>
+                          <input
+                            type="text"
+                            placeholder="rgb(r,g,b)"
+                            value={rgbStr}
+                            onChange={(e) => {
+                              const text = e.target.value;
+                              const parsed = parseRgbString(text);
+                              if (parsed) {
+                                const newHex = rgbToHex(parsed.r, parsed.g, parsed.b);
+                                setProductForm({
+                                  ...productForm,
+                                  colourHex: newHex,
+                                  colourRgb: text,
+                                });
+                              } else {
+                                setProductForm({ ...productForm, colourRgb: text });
+                              }
+                            }}
+                            className="w-full bg-[#1F1F1F] border border-white/20 rounded px-2 py-1 font-mono text-white text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Product Images Drag & Drop Gallery */}
@@ -2275,47 +2586,44 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-
-              {/* Stock Inventory per size */}
+              {/* Stock Inventory per size (XS, S, M, L, XL, XXL) */}
               <div className="space-y-1.5 border-t border-white/10 pt-3">
-                <label className="text-[10px] font-semibold uppercase text-white/70">Size Variant Inventory *</label>
-                <div className="grid grid-cols-4 gap-3">
-                  <div>
-                    <span className="text-[10px] text-white/50 block">Size S</span>
-                    <input
-                      type="number"
-                      value={productForm.stock.S}
-                      onChange={(e) => setProductForm({ ...productForm, stock: { ...productForm.stock, S: Number(e.target.value) } })}
-                      className="w-full bg-[#141414] border border-white/20 rounded px-2 py-1.5 text-center text-white"
-                    />
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-white/50 block">Size M</span>
-                    <input
-                      type="number"
-                      value={productForm.stock.M}
-                      onChange={(e) => setProductForm({ ...productForm, stock: { ...productForm.stock, M: Number(e.target.value) } })}
-                      className="w-full bg-[#141414] border border-white/20 rounded px-2 py-1.5 text-center text-white"
-                    />
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-white/50 block">Size L</span>
-                    <input
-                      type="number"
-                      value={productForm.stock.L}
-                      onChange={(e) => setProductForm({ ...productForm, stock: { ...productForm.stock, L: Number(e.target.value) } })}
-                      className="w-full bg-[#141414] border border-white/20 rounded px-2 py-1.5 text-center text-white"
-                    />
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-white/50 block">Size XL</span>
-                    <input
-                      type="number"
-                      value={productForm.stock.XL}
-                      onChange={(e) => setProductForm({ ...productForm, stock: { ...productForm.stock, XL: Number(e.target.value) } })}
-                      className="w-full bg-[#141414] border border-white/20 rounded px-2 py-1.5 text-center text-white"
-                    />
-                  </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-semibold uppercase text-white/70">
+                    Size Variant Inventory & Live Matrix *
+                  </label>
+                  <span className="text-[10px] text-white/50 font-mono">
+                    Total Units: {Object.values(productForm.stock || {}).reduce((acc, v) => acc + (Number(v) || 0), 0)}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {(["XS", "S", "M", "L", "XL", "XXL"] as const).map((sz) => {
+                    const count = (productForm.stock as any)?.[sz] ?? 0;
+                    return (
+                      <div key={sz} className="bg-[#141414] border border-white/10 rounded p-2 text-center">
+                        <span className="text-[10px] font-bold text-[#C6A664] block mb-1">
+                          Size {sz}
+                        </span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={count}
+                          onChange={(e) => {
+                            const val = Math.max(0, Number(e.target.value) || 0);
+                            const newStock = { ...productForm.stock, [sz]: val };
+                            const activeSizes = Object.keys(newStock).filter((k) => (newStock as any)[k] > 0);
+                            setProductForm({
+                              ...productForm,
+                              stock: newStock,
+                              sizes: activeSizes.length > 0 ? activeSizes : ["S", "M", "L", "XL"],
+                            });
+                          }}
+                          className="w-full bg-[#1F1F1F] border border-white/20 rounded px-2 py-1 text-center font-mono text-white text-xs focus:border-[#C6A664] focus:outline-none"
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -2351,15 +2659,18 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setIsProductModalOpen(false)}
-                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded font-semibold"
+                  disabled={isSavingProduct}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded font-semibold disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-[#C6A664] hover:bg-white text-black font-bold rounded uppercase tracking-wider"
+                  disabled={isSavingProduct}
+                  className="px-6 py-2 bg-[#C6A664] hover:bg-white text-black font-bold rounded uppercase tracking-wider flex items-center gap-2 disabled:opacity-75 cursor-pointer shadow-lg"
                 >
-                  Save Product
+                  {isSavingProduct && <Loader2 className="w-4 h-4 animate-spin text-black" />}
+                  <span>{isSavingProduct ? "Saving Product..." : "Save Product"}</span>
                 </button>
               </div>
             </form>

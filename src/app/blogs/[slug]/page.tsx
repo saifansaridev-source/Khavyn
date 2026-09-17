@@ -23,6 +23,11 @@ import {
   ExternalLink,
   CheckCircle2,
 } from "lucide-react";
+import { connectToDatabase } from "@/lib/db/connect";
+import { StoreSettings } from "@/models/StoreSettings";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -51,6 +56,21 @@ export async function generateMetadata({
     ...(post.secondaryKeywords || []),
   ];
 
+  let customImage: string | undefined;
+  try {
+    const db = await connectToDatabase();
+    if (db) {
+      const settings = await StoreSettings.findOne().lean();
+      if (settings?.blogImages && typeof settings.blogImages === "object") {
+        customImage = (settings.blogImages as Record<string, string>)[slug];
+      }
+    }
+  } catch (e) {
+    // fallback gracefully
+  }
+
+  const activeImage = customImage || post.image;
+
   return {
     title: post.seoTitle,
     description: post.metaDescription,
@@ -69,7 +89,7 @@ export async function generateMetadata({
       authors: ["KHAVYN Editorial Board"],
       images: [
         {
-          url: post.image,
+          url: activeImage,
           width: 1200,
           height: 630,
           alt: post.imageAlt,
@@ -80,7 +100,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: post.seoTitle,
       description: post.metaDescription,
-      images: [post.image],
+      images: [activeImage],
     },
   };
 }
@@ -96,13 +116,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const relatedPosts = getRelatedBlogs(post.slug, 3);
   const articleUrl = `https://www.khavyn.com/blogs/${post.slug}`;
 
+  let blogImages: Record<string, string> = {};
+  try {
+    const db = await connectToDatabase();
+    if (db) {
+      const settings = await StoreSettings.findOne().lean();
+      if (settings?.blogImages && typeof settings.blogImages === "object") {
+        blogImages = settings.blogImages as Record<string, string>;
+      }
+    }
+  } catch (e) {
+    // fallback gracefully
+  }
+
+  const activeHeroImage = blogImages[post.slug] || post.image;
+
   // Structured Data (Schema.org BlogPosting)
   const blogPostingSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: post.title,
     description: post.metaDescription,
-    image: [post.image],
+    image: [activeHeroImage],
     datePublished: "2026-09-01T00:00:00+05:30",
     dateModified: "2026-09-17T00:00:00+05:30",
     author: {
@@ -262,7 +297,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Featured Hero Media */}
           <div className="relative w-full h-80 sm:h-[460px] md:h-[520px] rounded-2xl overflow-hidden shadow-2xl border border-[#D8C9B0]/40 mb-12 bg-[#1A1A1A]">
             <Image
-              src={post.image}
+              src={activeHeroImage}
               alt={post.imageAlt}
               fill
               priority
@@ -477,7 +512,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                     className="relative h-48 w-full block overflow-hidden bg-[#1A1A1A]"
                   >
                     <Image
-                      src={relPost.image}
+                      src={blogImages[relPost.slug] || relPost.image}
                       alt={relPost.imageAlt}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"

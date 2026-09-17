@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use } from "react";
+import React, { use, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/layout/Header";
@@ -9,6 +9,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { SEED_PRODUCTS } from "@/lib/data/productsData";
 import { notFound } from "next/navigation";
 import { WishlistButton } from "@/components/product/WishlistButton";
+import { useProductStore } from "@/store/useProductStore";
 
 interface CollectionPageProps {
   params: Promise<{ slug: string }>;
@@ -35,22 +36,52 @@ const COLLECTION_MAP: Record<string, { title: string; desc: string; banner: stri
     desc: "210 GSM Combed Cotton Everyday Essentials. Fade-resistant color fastness with soft ribbed necks.",
     banner: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1600&auto=format&fit=crop&q=80",
   },
+  "baggy-t-shirts": {
+    title: "Baggy T-Shirts Collection",
+    desc: "Relaxed, streetwear-inspired silhouettes tailored for effortless everyday luxury.",
+    banner: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1600&auto=format&fit=crop&q=80",
+  },
+  "classic-t-shirts": {
+    title: "Classic T-Shirts Collection",
+    desc: "Timeless fits in breathable long-staple cotton.",
+    banner: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1600&auto=format&fit=crop&q=80",
+  },
+  "casual-shirts": {
+    title: "Casual Shirts Collection",
+    desc: "Effortlessly refined shirts for relaxed weekends and smart evenings.",
+    banner: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1600&auto=format&fit=crop&q=80",
+  },
 };
 
 export default function CollectionPage({ params }: CollectionPageProps) {
   const { slug } = use(params);
-  const colInfo = COLLECTION_MAP[slug];
+  const { products: storeProducts, fetchProducts } = useProductStore();
 
-  if (!colInfo) {
-    notFound();
-  }
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
-  const products = SEED_PRODUCTS.filter((p) => {
-    if (slug === "formal-shirts") return p.collectionName === "Formal Shirts";
-    if (slug === "polo-t-shirts") return p.collectionName === "Polo T-Shirts";
-    if (slug === "oversized-t-shirts") return p.collectionName === "Oversized T-Shirts";
-    if (slug === "round-neck-t-shirts") return p.collectionName === "Round Neck T-Shirts";
-    return false;
+  const allProducts = storeProducts && storeProducts.length > 0 ? storeProducts : SEED_PRODUCTS;
+
+  const colInfo = COLLECTION_MAP[slug] || {
+    title: `${slug
+      .split("-")
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join(" ")} Collection`,
+    desc: "Crafted with architectural precision and long-staple combed cotton for everyday luxury.",
+    banner:
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1600&auto=format&fit=crop&q=80",
+  };
+
+  const normalizedSlug = slug.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  const products = allProducts.filter((p) => {
+    const pNorm = (p.collectionName || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    return (
+      pNorm === normalizedSlug ||
+      pNorm.includes(normalizedSlug) ||
+      normalizedSlug.includes(pNorm)
+    );
   });
 
   return (

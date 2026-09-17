@@ -6,7 +6,12 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BlogListClient } from "@/components/blog/BlogListClient";
 import { getAllBlogs, getBlogCategories } from "@/lib/data/blogsData";
+import { connectToDatabase } from "@/lib/db/connect";
+import { StoreSettings } from "@/models/StoreSettings";
 import { Sparkles, ArrowRight } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "The KHAVYN Journal | Fabric Guides, Styling & Modern Menswear",
@@ -50,8 +55,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogsPage() {
-  const posts = getAllBlogs();
+export default async function BlogsPage() {
+  let blogImages: Record<string, string> = {};
+  try {
+    const db = await connectToDatabase();
+    if (db) {
+      const settings = await StoreSettings.findOne().lean();
+      if (settings?.blogImages && typeof settings.blogImages === "object") {
+        blogImages = settings.blogImages as Record<string, string>;
+      }
+    }
+  } catch (e) {
+    console.error("Failed to load blog images in BlogsPage:", e);
+  }
+
+  const rawPosts = getAllBlogs();
+  const posts = rawPosts.map((post) => ({
+    ...post,
+    image: blogImages[post.slug] || post.image,
+  }));
   const categories = getBlogCategories();
 
   // Schema.org structured data for SEO

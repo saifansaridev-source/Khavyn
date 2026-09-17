@@ -15,21 +15,25 @@ export interface IProductImages {
 }
 
 export interface IProductStock {
-  S: number;
-  M: number;
-  L: number;
-  XL: number;
+  S?: number;
+  M?: number;
+  L?: number;
+  XL?: number;
+  XS?: number;
+  XXL?: number;
+  [key: string]: number | undefined;
 }
 
 export interface IProduct extends Document {
   name: string;
   slug: string;
-  collectionName: "Formal Shirts" | "Polo T-Shirts" | "Oversized T-Shirts" | "Round Neck T-Shirts";
+  collectionName: string;
   styleCode: string;
   /** GST HSN code for garment classification (e.g., 6205 for shirts, 6109 for t-shirts) */
   hsnCode?: string;
   colour: string;
   colourHex: string;
+  colourRgb?: string;
   sizes: string[];
   stock: IProductStock;
   price: number;
@@ -62,24 +66,29 @@ export interface IProduct extends Document {
 
 const ProductImagesSchema = new Schema<IProductImages>({
   front: { type: String, required: true },
-  side: { type: String, required: true },
-  back: { type: String, required: true },
-  angle45: { type: String, required: true },
-  fabricTexture: { type: String, required: true },
-  embroidery: { type: String, required: true },
-  collarLabel: { type: String, required: true },
-  modelFront: { type: String, required: true },
-  modelSide: { type: String, required: true },
-  modelBack: { type: String, required: true },
-  model45: { type: String, required: true },
+  side: { type: String, default: "" },
+  back: { type: String, default: "" },
+  angle45: { type: String, default: "" },
+  fabricTexture: { type: String, default: "" },
+  embroidery: { type: String, default: "" },
+  collarLabel: { type: String, default: "" },
+  modelFront: { type: String, default: "" },
+  modelSide: { type: String, default: "" },
+  modelBack: { type: String, default: "" },
+  model45: { type: String, default: "" },
 });
 
-const ProductStockSchema = new Schema<IProductStock>({
-  S: { type: Number, default: 15 },
-  M: { type: Number, default: 25 },
-  L: { type: Number, default: 20 },
-  XL: { type: Number, default: 10 },
-});
+const ProductStockSchema = new Schema<IProductStock>(
+  {
+    S: { type: Number, default: 15 },
+    M: { type: Number, default: 25 },
+    L: { type: Number, default: 20 },
+    XL: { type: Number, default: 10 },
+    XS: { type: Number, default: 0 },
+    XXL: { type: Number, default: 0 },
+  },
+  { strict: false }
+);
 
 const ProductSchema = new Schema<IProduct>(
   {
@@ -88,13 +97,13 @@ const ProductSchema = new Schema<IProduct>(
     collectionName: {
       type: String,
       required: true,
-      enum: ["Formal Shirts", "Polo T-Shirts", "Oversized T-Shirts", "Round Neck T-Shirts"],
       index: true,
     },
     styleCode: { type: String, required: true, unique: true },
     hsnCode: { type: String, default: "6205" },
     colour: { type: String, required: true },
     colourHex: { type: String, required: true },
+    colourRgb: { type: String, default: "" },
     sizes: { type: [String], default: ["S", "M", "L", "XL"] },
     stock: { type: ProductStockSchema, required: true },
     price: { type: Number, required: true },

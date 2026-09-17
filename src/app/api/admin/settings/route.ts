@@ -41,6 +41,7 @@ const DEFAULT_SETTINGS = {
   popupShowOnMobile: true,
   aboutHeroImage: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1920&auto=format&fit=crop&q=85",
   craftedInIndiaImage: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=900&auto=format&fit=crop&q=80",
+  blogImages: {},
 };
 
 const NO_CACHE_HEADERS = {

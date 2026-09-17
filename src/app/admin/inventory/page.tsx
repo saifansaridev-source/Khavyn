@@ -152,8 +152,8 @@ export default function AdminInventoryPage() {
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <span
-                            className="w-3.5 h-3.5 rounded-full border border-white/20 inline-block"
-                            style={{ backgroundColor: prod.colourHex }}
+                            className="w-3.5 h-3.5 rounded-full border border-white/20 inline-block shadow-sm"
+                            style={{ backgroundColor: prod.colourHex || prod.colourRgb || "#C6A664" }}
                           />
                           <span className="text-white/80">{prod.colour}</span>
                         </div>

@@ -28,28 +28,51 @@ export default function ShopPage() {
 
   const { toggleWishlist, isInWishlist } = useWishlistStore();
 
-  const collections = [
-    "All",
-    "Formal Shirts",
-    "Polo T-Shirts",
-    "Oversized T-Shirts",
-    "Round Neck T-Shirts",
-  ];
+  const collections = useMemo(() => {
+    const base = [
+      "All",
+      "Formal Shirts",
+      "Polo T-Shirts",
+      "Oversized T-Shirts",
+      "Round Neck T-Shirts",
+      "Baggy T-Shirts",
+      "Classic T-Shirts",
+      "Casual Shirts",
+    ];
+    const storeCols = Array.from(
+      new Set(storeProducts.map((p) => p.collectionName).filter(Boolean))
+    );
+    return Array.from(new Set(["All", ...base.slice(1), ...storeCols]));
+  }, [storeProducts]);
 
-  const colours = [
-    { name: "White", hex: "#FFFFFF" },
-    { name: "Blue", hex: "#2B547E" },
-    { name: "Light Pink", hex: "#F4C2C2" },
-    { name: "Sand Beige", hex: "#D8C9B0" },
-    { name: "Midnight Navy", hex: "#0F1B2D" },
-    { name: "Dark Wine", hex: "#4A0E17" },
-    { name: "Sage Green", hex: "#8A9A86" },
-    { name: "Coffee Brown", hex: "#4A2E1B" },
-    { name: "Cream White", hex: "#FDFBF7" },
-    { name: "Black", hex: "#1A1A1A" },
-  ];
+  const colours = useMemo(() => {
+    const baseColours = [
+      { name: "White", hex: "#FFFFFF" },
+      { name: "Blue", hex: "#2B547E" },
+      { name: "Light Pink", hex: "#F4C2C2" },
+      { name: "Sand Beige", hex: "#D8C9B0" },
+      { name: "Midnight Navy", hex: "#0F1B2D" },
+      { name: "Dark Wine", hex: "#4A0E17" },
+      { name: "Sage Green", hex: "#8A9A86" },
+      { name: "Coffee Brown", hex: "#4A2E1B" },
+      { name: "Cream White", hex: "#FDFBF7" },
+      { name: "Black", hex: "#1A1A1A" },
+    ];
+    const existingNames = new Set(baseColours.map((c) => c.name.toLowerCase()));
+    const customColours: { name: string; hex: string }[] = [];
+    storeProducts.forEach((p) => {
+      if (p.colour && !existingNames.has(p.colour.toLowerCase())) {
+        existingNames.add(p.colour.toLowerCase());
+        customColours.push({
+          name: p.colour,
+          hex: p.colourHex || p.colourRgb || "#C6A664",
+        });
+      }
+    });
+    return [...baseColours, ...customColours];
+  }, [storeProducts]);
 
-  const sizes = ["S", "M", "L", "XL"];
+  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
   // Filter & Sort Logic from dynamic product store
   const filteredProducts = useMemo(() => {

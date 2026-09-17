@@ -42,6 +42,7 @@ export interface IStoreSettings extends Document {
   popupFrequency: "every_visit" | "once_per_session" | "once_per_day";
   popupShowOnMobile: boolean;
   returnPolicyNotice: string;
+  blogImages?: Record<string, string>;
   updatedAt: Date;
 }
 
@@ -150,6 +151,10 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     returnPolicyNotice: {
       type: String,
       default: "Hassle-free 7-day returns & exchanges on all eligible unworn apparel items.",
+    },
+    blogImages: {
+      type: Schema.Types.Mixed,
+      default: () => ({}),
     },
   },
   { timestamps: true }

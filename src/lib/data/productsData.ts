@@ -1,13 +1,14 @@
 export interface ProductSeedInput {
   name: string;
   slug: string;
-  collectionName: "Formal Shirts" | "Polo T-Shirts" | "Oversized T-Shirts" | "Round Neck T-Shirts";
+  collectionName: string;
   styleCode: string;
   colour: string;
   colourHex: string;
+  colourRgb?: string;
   colorSwatches?: { name: string; hex: string }[];
   sizes: string[];
-  stock: { S: number; M: number; L: number; XL: number };
+  stock: { S: number; M: number; L: number; XL: number; [key: string]: number };
   price: number;
   compareAtPrice: number;
   images: {
@@ -22,6 +23,7 @@ export interface ProductSeedInput {
     modelSide: string;
     modelBack: string;
     model45: string;
+    [key: string]: string;
   };
   videoUrl?: string;
   material: string;
@@ -42,6 +44,51 @@ export interface ProductSeedInput {
   isNewArrival: boolean;
   customBadge?: string;
   returnPolicyApplicable?: boolean;
+}
+
+/** Convert Hex color code (#RGB or #RRGGBB) to RGB object */
+export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  if (!hex) return null;
+  let clean = hex.trim().replace(/^#/, "");
+  if (clean.length === 3) {
+    clean = clean
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  if (clean.length !== 6) return null;
+  const num = parseInt(clean, 16);
+  if (isNaN(num)) return null;
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
+
+/** Convert RGB values (0-255) to 6-character uppercase Hex code (#RRGGBB) */
+export function rgbToHex(r: number, g: number, b: number): string {
+  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(Number(v) || 0)));
+  const hexPart = (v: number) => clamp(v).toString(16).padStart(2, "0").toUpperCase();
+  return `#${hexPart(r)}${hexPart(g)}${hexPart(b)}`;
+}
+
+/** Format RGB object to CSS string e.g. "rgb(198, 166, 100)" */
+export function formatRgbString(r: number, g: number, b: number): string {
+  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(Number(v) || 0)));
+  return `rgb(${clamp(r)}, ${clamp(g)}, ${clamp(b)})`;
+}
+
+/** Parse any RGB text format: "rgb(255, 255, 255)", "255, 255, 255", "255 255 255" */
+export function parseRgbString(str: string): { r: number; g: number; b: number } | null {
+  if (!str) return null;
+  const match = str.match(/(?:rgb\s*\(\s*)?(\d{1,3})[\s,]+(\d{1,3})[\s,]+(\d{1,3})\s*\)?/i);
+  if (!match) return null;
+  const r = parseInt(match[1], 10);
+  const g = parseInt(match[2], 10);
+  const b = parseInt(match[3], 10);
+  if (r > 255 || g > 255 || b > 255) return null;
+  return { r, g, b };
 }
 
 // Slot-based distinct luxury photography angles map

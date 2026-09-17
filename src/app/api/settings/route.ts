@@ -66,6 +66,7 @@ const DEFAULT_SETTINGS = {
   popupDelaySeconds: 3,
   popupFrequency: "once_per_session" as "every_visit" | "once_per_session" | "once_per_day",
   popupShowOnMobile: true,
+  blogImages: {},
 };
 
 const NO_CACHE_HEADERS = {
