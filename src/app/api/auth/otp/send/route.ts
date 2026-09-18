@@ -3,7 +3,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/db/connect";
 import { OtpVerification } from "@/models/OtpVerification";
-import { sendEmail } from "@/lib/email";
+import { sendEmail } from "@/lib/email/mailer";
 import { sendPhoneOtp } from "@/lib/otp";
 import { wrapInLuxuryEmailTemplate } from "@/lib/email/emailTemplates";
 
@@ -124,8 +124,15 @@ export async function POST(req: Request) {
         });
       }
 
+      console.error("[OTP Send Error] Resend rejection reason:", emailResult.error);
+
       return NextResponse.json(
-        { success: false, error: emailResult.error || "Failed to send verification email. Please try again." },
+        {
+          success: false,
+          error:
+            emailResult.error ||
+            "Failed to send verification email. Please try again or contact support.",
+        },
         { status: 500 }
       );
     }
