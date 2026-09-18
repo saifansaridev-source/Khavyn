@@ -168,6 +168,27 @@ export default function AdminDashboardPage() {
 
   const productsList = storeProducts;
 
+  // Priority-ordered list of all possible image slot keys
+  const IMAGE_SLOT_ORDER = [
+    "front", "side", "back", "angle45", "fabricTexture",
+    "embroidery", "collarLabel", "modelFront", "modelSide", "modelBack", "model45",
+  ] as const;
+  type ImageSlotKey = typeof IMAGE_SLOT_ORDER[number];
+
+  const IMAGE_SLOT_LABELS: Record<ImageSlotKey, string> = {
+    front: "Front View Shot",
+    side: "Side View Shot",
+    back: "Back View Shot",
+    angle45: "45° Angle Shot",
+    fabricTexture: "Fabric Texture Close-up",
+    embroidery: "Embroidery Detail",
+    collarLabel: "Collar & Label Shot",
+    modelFront: "Model Showcase — Front",
+    modelSide: "Model Showcase — Side",
+    modelBack: "Model Showcase — Back",
+    model45: "Model Showcase — 45°",
+  };
+
   // Modal State for Product Add / Edit
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductSeedInput | null>(null);
@@ -175,6 +196,8 @@ export default function AdminDashboardPage() {
   const [productModalError, setProductModalError] = useState<string | null>(null);
   const [isCustomCollection, setIsCustomCollection] = useState(false);
   const [titleManuallyEdited, setTitleManuallyEdited] = useState(false);
+  // Active image slots shown in the gallery editor (always includes "front")
+  const [activeImageSlots, setActiveImageSlots] = useState<ImageSlotKey[]>(["front"]);
 
   const defaultProductTemplate: ProductSeedInput = {
     ...SEED_PRODUCTS[0],
@@ -194,6 +217,21 @@ export default function AdminDashboardPage() {
     sizes: ["S", "M", "L", "XL"],
     stock: { XS: 0, S: 10, M: 25, L: 20, XL: 15, XXL: 0 },
     videoUrl: "",
+    // Explicitly blank out all image slots so new products never inherit
+    // SEED_PRODUCTS[0]'s sample stock photos from the spread above.
+    images: {
+      front: "",
+      side: "",
+      back: "",
+      angle45: "",
+      fabricTexture: "",
+      embroidery: "",
+      collarLabel: "",
+      modelFront: "",
+      modelSide: "",
+      modelBack: "",
+      model45: "",
+    },
   };
 
   const [productForm, setProductForm] = useState<ProductSeedInput>(defaultProductTemplate);
@@ -519,6 +557,8 @@ export default function AdminDashboardPage() {
       colourRgb: "rgb(255, 255, 255)",
       collectionName: "Formal Shirts",
     });
+    // New product — only mandatory "front" slot visible to start
+    setActiveImageSlots(["front"]);
     setIsProductModalOpen(true);
   };
 
@@ -546,6 +586,14 @@ export default function AdminDashboardPage() {
         XXL: (prod.stock as any)?.XXL ?? 0,
       },
     });
+    // Build active slots from existing images — only keys that have a non-empty value
+    const filledSlots = IMAGE_SLOT_ORDER.filter(
+      (k) => !!(prod.images as any)[k]
+    );
+    // Always include "front" as the first slot (mandatory)
+    setActiveImageSlots(
+      filledSlots.length > 0 ? filledSlots : ["front"]
+    );
     setIsProductModalOpen(true);
   };
 
@@ -2546,50 +2594,88 @@ export default function AdminDashboardPage() {
                 })()}
               </div>
 
-              {/* Product Images Drag & Drop Gallery */}
-              <div className="border-t border-white/10 pt-3 space-y-2">
+              {/* Product Images Drag & Drop Gallery — Dynamic Slot List */}
+              <div className="border-t border-white/10 pt-3 space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-[10px] font-semibold uppercase text-white/70 block">
                     Product Image Gallery (Drag & Drop or Pick File) *
                   </label>
                   <span className="text-[10px] text-[#C6A664]">
-                    Drag files directly or paste image URLs
+                    {activeImageSlots.length} / {IMAGE_SLOT_ORDER.length} slots active
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {[
-                    { label: "Front View Shot", key: "front" },
-                    { label: "Side View Shot", key: "side" },
-                    { label: "Back View Shot", key: "back" },
-                    { label: "45° Angle Shot", key: "angle45" },
-                    { label: "Fabric Texture Close-up", key: "fabricTexture" },
-                    { label: "Model Showcase Shot", key: "modelFront" },
-                  ].map((imgField) => {
-                    const currentUrl = (productForm.images as any)[imgField.key] || "";
+                  {activeImageSlots.map((slotKey) => {
+                    const currentUrl = (productForm.images as any)[slotKey] || "";
+                    const isFront = slotKey === "front";
                     return (
-                      <DragDropUpload
-                        key={imgField.key}
-                        label={imgField.label}
-                        value={currentUrl}
-                        folder="khavyn/products"
-                        resourceType="image"
-                        onChange={(newUrl) =>
-                          setProductForm({
-                            ...productForm,
-                            images: {
-                              ...productForm.images,
-                              [imgField.key]: newUrl,
-                            },
-                          })
-                        }
-                      />
+                      <div key={slotKey} className="relative">
+                        {/* Remove-slot button — not available for mandatory "front" */}
+                        {!isFront && (
+                          <button
+                            type="button"
+                            title={`Remove ${IMAGE_SLOT_LABELS[slotKey]} slot`}
+                            onClick={() => {
+                              // Clear value in form
+                              setProductForm({
+                                ...productForm,
+                                images: {
+                                  ...productForm.images,
+                                  [slotKey]: "",
+                                },
+                              });
+                              // Remove from active list
+                              setActiveImageSlots((prev) =>
+                                prev.filter((k) => k !== slotKey)
+                              );
+                            }}
+                            className="absolute top-2 right-2 z-10 w-5 h-5 flex items-center justify-center rounded-full bg-red-600/80 hover:bg-red-500 text-white transition-colors shadow"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        )}
+                        <DragDropUpload
+                          label={IMAGE_SLOT_LABELS[slotKey]}
+                          value={currentUrl}
+                          folder="khavyn/products"
+                          resourceType="image"
+                          onChange={(newUrl) =>
+                            setProductForm({
+                              ...productForm,
+                              images: {
+                                ...productForm.images,
+                                [slotKey]: newUrl,
+                              },
+                            })
+                          }
+                        />
+                      </div>
                     );
                   })}
                 </div>
 
+                {/* "+ Add Image" button — visible while fewer than 11 slots are active */}
+                {activeImageSlots.length < IMAGE_SLOT_ORDER.length && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextSlot = IMAGE_SLOT_ORDER.find(
+                        (k) => !activeImageSlots.includes(k)
+                      );
+                      if (nextSlot) {
+                        setActiveImageSlots((prev) => [...prev, nextSlot]);
+                      }
+                    }}
+                    className="w-full py-2.5 px-4 rounded border border-dashed border-[#C6A664]/40 hover:border-[#C6A664] bg-[#C6A664]/5 hover:bg-[#C6A664]/10 text-[#C6A664] text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Add Image Slot</span>
+                  </button>
+                )}
+
                 {/* Product Video Showcase Upload */}
-                <div className="pt-3">
+                <div className="pt-1">
                   <DragDropUpload
                     label="Product Video Showcase (MP4 / WebM)"
                     value={productForm.videoUrl || ""}

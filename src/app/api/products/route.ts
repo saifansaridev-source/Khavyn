@@ -70,21 +70,20 @@ function normalizeProductPayload(body: any) {
     }
   }
 
-  // Normalize Images
-  const frontImg = cleanBody.images?.front || DEFAULT_IMAGE;
+  // Normalize Images — only "front" gets a fallback (it is the mandatory primary image).
+  // Every other slot is stored exactly as submitted; empty string stays empty.
   const images = {
-    front: frontImg,
-    side: cleanBody.images?.side || frontImg,
-    back: cleanBody.images?.back || frontImg,
-    angle45: cleanBody.images?.angle45 || frontImg,
-    fabricTexture: cleanBody.images?.fabricTexture || frontImg,
-    embroidery: cleanBody.images?.embroidery || frontImg,
-    collarLabel: cleanBody.images?.collarLabel || frontImg,
-    modelFront: cleanBody.images?.modelFront || frontImg,
-    modelSide: cleanBody.images?.modelSide || frontImg,
-    modelBack: cleanBody.images?.modelBack || frontImg,
-    model45: cleanBody.images?.model45 || frontImg,
-    ...(cleanBody.images || {}),
+    front: cleanBody.images?.front || DEFAULT_IMAGE,
+    side: cleanBody.images?.side ?? "",
+    back: cleanBody.images?.back ?? "",
+    angle45: cleanBody.images?.angle45 ?? "",
+    fabricTexture: cleanBody.images?.fabricTexture ?? "",
+    embroidery: cleanBody.images?.embroidery ?? "",
+    collarLabel: cleanBody.images?.collarLabel ?? "",
+    modelFront: cleanBody.images?.modelFront ?? "",
+    modelSide: cleanBody.images?.modelSide ?? "",
+    modelBack: cleanBody.images?.modelBack ?? "",
+    model45: cleanBody.images?.model45 ?? "",
   };
 
   // Normalize Stock & Sizes

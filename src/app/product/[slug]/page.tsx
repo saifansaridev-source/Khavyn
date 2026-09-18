@@ -62,20 +62,15 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
   }
 
 
-  // Gallery view state
-  const imageList = [
-    product.images.front,
-    product.images.side,
-    product.images.back,
-    product.images.angle45,
-    product.images.fabricTexture,
-    product.images.embroidery,
-    product.images.collarLabel,
-    product.images.modelFront,
-    product.images.modelSide,
-    product.images.modelBack,
-    product.images.model45,
-  ];
+  // Gallery view state — only include image slots that have a non-empty, truthy URL.
+  // Priority order mirrors the admin slot order.
+  const IMAGE_SLOT_PRIORITY = [
+    "front", "side", "back", "angle45", "fabricTexture",
+    "embroidery", "collarLabel", "modelFront", "modelSide", "modelBack", "model45",
+  ] as const;
+  const imageList = IMAGE_SLOT_PRIORITY
+    .map((k) => (product.images as any)[k] as string)
+    .filter(Boolean);
 
   const [selectedImage, setSelectedImage] = useState<string>(imageList[0]);
   const [selectedSize, setSelectedSize] = useState<string>("M");
@@ -142,9 +137,10 @@ export default function ProductDetailPage({ params }: ProductPageProps) {
 
   // Keep selected image updated when product slug changes
   useEffect(() => {
-    setSelectedImage(product.images.front);
+    setSelectedImage(imageList[0] || product.images.front);
     setIsVideoSelected(false);
-  }, [product.slug, product.images.front]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.slug]);
 
   const toggleAccordion = (name: string) => {
     setOpenAccordion(openAccordion === name ? null : name);
